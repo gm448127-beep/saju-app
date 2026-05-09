@@ -1,0 +1,119 @@
+@import "tailwindcss";
+
+/* ===== 기본 배경 & 폰트 ===== */
+body {
+  background-color: #F5F0EB;
+  font-family: 'Noto Sans KR', sans-serif !important;
+  color: #3D3338;
+  font-size: 16px;
+  line-height: 1.7;
+  letter-spacing: -0.02em;
+}
+
+/* ===== 폰트 전역 적용 ===== */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Noto Sans KR', sans-serif !important;
+  color: #2D2D2D;
+  font-weight: 600;
+}
+
+p, span, div, li, td, th, label, input, select, textarea, button, a {
+  font-family: 'Noto Sans KR', sans-serif !important;
+}
+
+/* ===== 카드 스타일 ===== */
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 20px 24px;
+  border: 1.5px solid #E8E2DC;
+  transition: all 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  border-color: #D4CEC8;
+}
+
+/* ===== 태그 ===== */
+.tag {
+  display: inline-block;
+  background: white;
+  border: 1.5px solid #E8E2DC;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #5A4A42;
+}
+
+/* ===== 텍스트 가독성 개선 ===== */
+.text-\[\#9B9B9B\] {
+  color: #7A6B63 !important;
+}
+
+.text-\[\#6B6B6B\] {
+  color: #5A4A42 !important;
+}
+
+.card p {
+  color: #7A6B63 !important;
+  font-size: 14px;
+}
+
+.card h3 {
+  font-size: 17px;
+  font-weight: 600;
+  color: #2D2D2D;
+}
+
+/* ===== 버튼 ===== */
+button, .btn, [role="button"] {
+  font-weight: 500;
+}
+
+/* ===== 입력 폼 ===== */
+input, select, textarea {
+  font-size: 16px !important;
+  color: #2D2D2D;
+}
+
+/* ===== 푸터 ===== */
+footer p {
+  color: #9B8E86 !important;
+  font-size: 13px;
+}
+
+/* ===== 애니메이션 ===== */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease forwards;
+}
+
+@keyframes bounce-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-bounce-soft {
+  animation: bounce-soft 2s ease-in-out infinite;
+}
+
+/* ===== 스크롤바 ===== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D4CEC8;
+  border-radius: 3px;
+}

@@ -1,0 +1,348 @@
+import { NextRequest, NextResponse } from "next/server";
+import { calculateSaju } from "ssaju";
+import { getInterpretation } from "@/data/interpretations";
+
+const ganInfo: Record<string, { hanja: string; element: string; emoji: string; color: string; eum: string }> = {
+  "갑": { hanja: "甲", element: "목(木)", emoji: "🌳", color: "#22c55e", eum: "양" },
+  "을": { hanja: "乙", element: "목(木)", emoji: "🌿", color: "#22c55e", eum: "음" },
+  "병": { hanja: "丙", element: "화(火)", emoji: "🔥", color: "#ef4444", eum: "양" },
+  "정": { hanja: "丁", element: "화(火)", emoji: "🕯️", color: "#ef4444", eum: "음" },
+  "무": { hanja: "戊", element: "토(土)", emoji: "⛰️", color: "#eab308", eum: "양" },
+  "기": { hanja: "己", element: "토(土)", emoji: "🏔️", color: "#eab308", eum: "음" },
+  "경": { hanja: "庚", element: "금(金)", emoji: "⚔️", color: "#a3a3a3", eum: "양" },
+  "신": { hanja: "辛", element: "금(金)", emoji: "💎", color: "#a3a3a3", eum: "음" },
+  "임": { hanja: "壬", element: "수(水)", emoji: "🌊", color: "#3b82f6", eum: "양" },
+  "계": { hanja: "癸", element: "수(水)", emoji: "💧", color: "#3b82f6", eum: "음" },
+};
+
+const jiInfo: Record<string, { hanja: string; element: string; emoji: string; color: string; eum: string; ddi: string; ddiEmoji: string }> = {
+  "자": { hanja: "子", element: "수(水)", emoji: "🐀", color: "#3b82f6", eum: "양", ddi: "쥐", ddiEmoji: "🐀" },
+  "축": { hanja: "丑", element: "토(土)", emoji: "🐂", color: "#eab308", eum: "음", ddi: "소", ddiEmoji: "🐂" },
+  "인": { hanja: "寅", element: "목(木)", emoji: "🐅", color: "#22c55e", eum: "양", ddi: "호랑이", ddiEmoji: "🐅" },
+  "묘": { hanja: "卯", element: "목(木)", emoji: "🐇", color: "#22c55e", eum: "음", ddi: "토끼", ddiEmoji: "🐇" },
+  "진": { hanja: "辰", element: "토(土)", emoji: "🐉", color: "#eab308", eum: "양", ddi: "용", ddiEmoji: "🐉" },
+  "사": { hanja: "巳", element: "화(火)", emoji: "🐍", color: "#ef4444", eum: "음", ddi: "뱀", ddiEmoji: "🐍" },
+  "오": { hanja: "午", element: "화(火)", emoji: "🐴", color: "#ef4444", eum: "양", ddi: "말", ddiEmoji: "🐴" },
+  "미": { hanja: "未", element: "토(土)", emoji: "🐑", color: "#eab308", eum: "음", ddi: "양", ddiEmoji: "🐑" },
+  "신": { hanja: "申", element: "금(金)", emoji: "🐒", color: "#a3a3a3", eum: "양", ddi: "원숭이", ddiEmoji: "🐒" },
+  "유": { hanja: "酉", element: "금(金)", emoji: "🐓", color: "#a3a3a3", eum: "음", ddi: "닭", ddiEmoji: "🐓" },
+  "술": { hanja: "戌", element: "토(土)", emoji: "🐕", color: "#eab308", eum: "양", ddi: "개", ddiEmoji: "🐕" },
+  "해": { hanja: "亥", element: "수(水)", emoji: "🐖", color: "#3b82f6", eum: "음", ddi: "돼지", ddiEmoji: "🐖" },
+};
+
+const personalityMap: Record<string, string> = {
+  "갑": "큰 나무처럼 곧고 정직하며 리더십이 강합니다. 자존심이 높고 진취적이며 새로운 것을 개척하는 힘이 있습니다. 독립심이 강하고 남에게 지기 싫어하며, 대의를 위해 솔선수범하는 기질이 있습니다.",
+  "을": "덩굴처럼 유연하고 적응력이 뛰어납니다. 부드럽지만 끈기 있으며 예술적 감각이 풍부합니다. 타인과의 조화를 중시하고 섬세한 감수성으로 주변을 따뜻하게 만듭니다.",
+  "병": "태양처럼 밝고 화려하며 열정적입니다. 활동적이고 표현력이 강하며 주변을 환하게 만듭니다. 정의감이 강하고 솔직하며, 때로는 급한 성격으로 앞뒤를 가리지 않을 수 있습니다.",
+  "정": "촛불처럼 섬세하고 따뜻합니다. 내면의 열정이 강하고 사려 깊으며 학문과 예술에 뛰어납니다. 겉으로는 온화하지만 내면에는 강한 의지와 집중력을 가지고 있습니다.",
+  "무": "큰 산처럼 듬직하고 신뢰감을 줍니다. 포용력이 크고 안정적이며 중재 능력이 뛰어납니다. 고집이 있지만 책임감이 강하고, 한번 마음먹으면 끝까지 해내는 성품입니다.",
+  "기": "기름진 밭처럼 만물을 기르는 힘이 있습니다. 꼼꼼하고 실용적이며 배려심이 깊습니다. 겸손하고 성실하며 내면이 풍요롭습니다. 남을 돕는 것을 좋아하고 실속을 중시합니다. 다만 우유부단한 면이 있을 수 있습니다.",
+  "경": "강철처럼 강하고 결단력이 있습니다. 의리가 있고 정의감이 강하며 실행력이 뛰어납니다. 원칙을 중시하고 불의를 참지 못하며, 직설적인 화법으로 때로는 냉정하게 비칠 수 있습니다.",
+  "신": "보석처럼 섬세하고 날카로운 감각을 가졌습니다. 완벽주의적이고 품위가 있으며 예리한 판단력을 가졌습니다. 자존심이 강하고 독창적이며, 내면의 고독을 즐기는 경향이 있습니다.",
+  "임": "큰 바다처럼 지혜롭고 포용력이 큽니다. 자유로운 영혼으로 창의적이며 변화를 두려워하지 않습니다. 도전정신이 강하고 진취적이며, 넓은 시야로 큰 그림을 그리는 능력이 있습니다.",
+  "계": "맑은 샘물처럼 깨끗하고 지적입니다. 섬세하고 직관력이 뛰어나며 학문적 능력이 출중합니다. 총명하고 영리하며 감수성이 풍부합니다. 내성적이지만 관찰력이 뛰어나고 깊은 통찰력을 가졌습니다.",
+};
+
+const sipsinDesc: Record<string, string> = {
+  "비견": "자기주장이 강하고 독립적입니다. 경쟁심과 자존심이 강하며 형제·친구와의 인연이 깊습니다.",
+  "겁재": "추진력과 승부욕이 강합니다. 과감한 행동력이 있으나 재물 손실에 주의가 필요합니다.",
+  "식신": "먹복이 좋고 표현력이 뛰어납니다. 예술적 감각과 창의력이 풍부하며 낙천적입니다.",
+  "상관": "재능이 뛰어나고 언변이 좋습니다. 자유로운 영혼으로 기존 규범에 얽매이지 않습니다.",
+  "편재": "활동적이고 사교적이며 돈을 잘 다룹니다. 사업 수완이 좋고 넓은 인맥을 가집니다.",
+  "정재": "성실하고 안정적인 재물운을 가집니다. 계획적이고 저축을 잘하며 가정적입니다.",
+  "편관": "권위와 리더십이 있으며 추진력이 강합니다. 조직에서 인정받지만 스트레스에 주의해야 합니다.",
+  "정관": "책임감이 강하고 도덕적입니다. 사회적 명예를 중시하며 안정적인 직장운이 좋습니다.",
+  "편인": "학문과 연구에 뛰어나며 독창적 사고를 합니다. 종교·철학에 관심이 많고 직관력이 뛰어납니다.",
+  "정인": "학문과 교육에 인연이 깊습니다. 어머니의 덕이 있고 지식욕이 강하며 자격증운이 좋습니다.",
+  "(일간)": "자기 자신을 나타냅니다.",
+};
+
+const ohaengDesc: Record<string, string> = {
+  "목(木)": "성장·발전·인자함을 상징합니다. 목이 강하면 리더십과 추진력이 있고, 부족하면 결단력이 약할 수 있습니다.",
+  "화(火)": "열정·예의·표현력을 상징합니다. 화가 강하면 활동적이고 밝지만, 부족하면 소극적일 수 있습니다.",
+  "토(土)": "신뢰·중재·포용력을 상징합니다. 토가 강하면 안정적이고 듬직하지만, 과하면 고집이 셀 수 있습니다.",
+  "금(金)": "결단·의리·정의를 상징합니다. 금이 강하면 실행력이 뛰어나지만, 과하면 냉정할 수 있습니다.",
+  "수(水)": "지혜·유연함·창의력을 상징합니다. 수가 강하면 총명하지만, 과하면 우유부단할 수 있습니다.",
+};
+
+export async function POST(req: NextRequest) {
+  try {
+    const body = await req.json();
+    const { year, month, day, hour, minute, gender, isLunar } = body;
+
+    const input: any = {
+      year: Number(year),
+      month: Number(month),
+      day: Number(day),
+      gender: gender || "남",
+      calendar: isLunar ? "lunar" : "solar",
+      timezone: "Asia/Seoul",
+      applyLocalMeanTime: true,
+      longitude: 126.9784,
+    };
+
+    if (hour !== undefined && hour !== null) {
+      input.hour = Number(hour);
+      input.minute = (minute !== undefined && minute !== null) ? Number(minute) : 0;
+    }
+
+    const result = calculateSaju(input);
+    const pd = result.pillarDetails;
+    const tg = result.tenGods;
+    const st12 = result.stages12;
+
+    function buildPillar(key: "year" | "month" | "day" | "hour", label: string) {
+      const p = pd[key];
+      const g = ganInfo[p.stemKo] || { hanja: "", element: "", emoji: "", color: "#888", eum: "" };
+      const j = jiInfo[p.branchKo] || { hanja: "", element: "", emoji: "", color: "#888", eum: "" };
+      const tenGod = tg[key] || { stem: "", branch: "" };
+      const stageBong = st12?.bong?.[key] || "";
+      const stageGeo = st12?.geo?.[key] || "";
+
+      const hidden = p.hiddenStems || {};
+      const hiddenStems = {
+        yeogi: hidden["여기"] || null,
+        junggi: hidden["중기"] || null,
+        jeonggi: hidden["정기"] || null,
+      };
+
+      return {
+        label,
+        sky: g.hanja,
+        earth: j.hanja,
+        skyKo: p.stemKo,
+        earthKo: p.branchKo,
+        skyElement: g.element,
+        earthElement: j.element,
+        skyEmoji: g.emoji,
+        earthEmoji: j.emoji,
+        skyColor: g.color,
+        earthColor: j.color,
+        skyEum: g.eum,
+        earthEum: j.eum,
+        tenGodSky: tenGod.stem || "",
+        tenGodEarth: tenGod.branch || "",
+        stage12Bong: stageBong,
+        stage12Geo: stageGeo,
+        stage12: stageBong,
+        hiddenStems,
+      };
+    }
+
+    const pillars = {
+      hour: buildPillar("hour", "시주(時柱)"),
+      day: buildPillar("day", "일주(日柱)"),
+      month: buildPillar("month", "월주(月柱)"),
+      year: buildPillar("year", "년주(年柱)"),
+    };
+
+    const dayGanKo = pd.day.stemKo;
+    const yearJiKo = pd.year.branchKo;
+    const dayGanData = ganInfo[dayGanKo] || {};
+    const yearJiData = jiInfo[yearJiKo] || {};
+
+    const rawFive = result.fiveElements || {};
+    const ohaengCount: Record<string, number> = {
+      "목(木)": rawFive["목"] || rawFive["木"] || 0,
+      "화(火)": rawFive["화"] || rawFive["火"] || 0,
+      "토(土)": rawFive["토"] || rawFive["土"] || 0,
+      "금(金)": rawFive["금"] || rawFive["金"] || 0,
+      "수(水)": rawFive["수"] || rawFive["水"] || 0,
+    };
+
+    const sipsinCount: Record<string, number> = {};
+    for (const key of ["year", "month", "day", "hour"] as const) {
+      const t = tg[key];
+      if (t) {
+        if (t.stem) sipsinCount[t.stem] = (sipsinCount[t.stem] || 0) + 1;
+        if (t.branch) sipsinCount[t.branch] = (sipsinCount[t.branch] || 0) + 1;
+      }
+    }
+
+    const age = result.currentAge || (new Date().getFullYear() - Number(year) + 1);
+
+    const birthDate = `${year}년 ${month}월 ${day}일 (${isLunar ? "음력" : "양력"})`;
+    const birthTime = (hour !== undefined) ? `${String(hour).padStart(2, "0")}:${String(minute || 0).padStart(2, "0")}` : "";
+
+    const adv = result.advanced;
+    const strengthRaw = adv?.dayStrength?.strength;
+    const strengthScore = adv?.dayStrength?.score;
+    const strength = strengthRaw === "strong" ? "신강" : strengthRaw === "weak" ? "신약" : strengthRaw === "neutral" ? "중화" : "";
+    const gyeok = adv?.geukguk || "";
+    const yongsinArr = adv?.yongsin || [];
+    const yongshin = yongsinArr.join(", ");
+    const gilsin = adv?.sinsal?.gilsin || [];
+    const hyungsin = adv?.sinsal?.hyungsin || [];
+
+    // ── 해석 데이터 연동 ──
+    const advInterpretation = adv?.interpretation || "";
+    const currentYear = new Date().getFullYear();
+    const yearInterp = getInterpretation(dayGanKo, currentYear);
+
+    const interpretation = yearInterp
+      ? `${yearInterp.title}\n\n${yearInterp.content}`
+      : advInterpretation;
+
+    const interpretationTitle = yearInterp?.title || "";
+    const interpretationSummary = yearInterp?.summary || "";
+    // ── 해석 데이터 연동 끝 ──
+
+    const stemRelations = (result.stemRelations || []).map((r: any) => ({
+      type: r.type,
+      desc: r.desc,
+      pillars: r.pillars,
+      stems: r.stems,
+    }));
+
+    const branchRelations = result.branchRelations || {};
+    const brRelSummary: Array<{ type: string; details: Record<string, string> }> = [];
+    const brTypes = ["육합", "삼합", "반합", "방합", "충", "형", "파", "해", "원진", "귀문"];
+    for (const t of brTypes) {
+      const data = branchRelations[t];
+      if (data && Object.keys(data).length > 0) {
+        brRelSummary.push({ type: t, details: data });
+      }
+    }
+
+    const sals = result.sals || {};
+    const salsSummary: Array<{ pillar: string; twelveSal: string; specialSals: string[] }> = [];
+    for (const key of ["year", "month", "day", "hour"] as const) {
+      const s = sals[key];
+      if (s) {
+        const pillarLabels: Record<string, string> = { year: "년주", month: "월주", day: "일주", hour: "시주" };
+        salsSummary.push({
+          pillar: pillarLabels[key],
+          twelveSal: s.twelveSal || "",
+          specialSals: s.specialSals || [],
+        });
+      }
+    }
+
+    const gongmang = result.gongmang || {};
+    const gongmangText = gongmang.branchesKo ? gongmang.branchesKo.join(", ") : "";
+
+    const daeunList = result.daeun?.list || [];
+    const daeunStartAge = result.daeun?.startAge;
+    const daeunCurrent = result.daeun?.current;
+    const daeunBasis = result.daeun?.basis;
+    const daeun = daeunList.map((d: any) => ({
+      age: d.startAge,
+      endAge: d.endAge,
+      ganzhi: d.ganzhi,
+      gan: ganInfo[d.stem]?.hanja || d.stem || "",
+      ji: jiInfo[d.branch]?.hanja || d.branch || "",
+      ganKo: d.stem || "",
+      jiKo: d.branch || "",
+      tenGodStem: d.stemTenGod || "",
+      tenGodBranch: d.branchTenGod || "",
+      stage12: d.stage12 || d["12unsung"] || "",
+      sal: d.sal || [],
+    }));
+
+    const seyun = (result.seyun || []).map((s: any) => ({
+      year: s.year,
+      ganzhi: s.ganzhi,
+      gan: ganInfo[s.stem]?.hanja || s.stem || "",
+      ji: jiInfo[s.branch]?.hanja || s.branch || "",
+      ganKo: s.stem || "",
+      jiKo: s.branch || "",
+      tenGodStem: s.tenGodStem || "",
+      tenGodBranch: s.tenGodBranch || "",
+      stage12: s.stage12 || "",
+    }));
+
+    const wolun = (result.wolun || []).map((w: any) => ({
+      month: w.month,
+      monthName: w.monthName || w.month_name || "",
+      ganzhi: w.ganzhi,
+      gan: ganInfo[w.stem]?.hanja || w.stem || "",
+      ji: jiInfo[w.branch]?.hanja || w.branch || "",
+      ganKo: w.stem || "",
+      jiKo: w.branch || "",
+      tenGodStem: w.stemTenGod || w.stem_tengod || "",
+      tenGodBranch: w.branchTenGod || w.branch_tengod || "",
+      stage12: w.stage12 || w["12unsung"] || "",
+    }));
+
+    const personality = personalityMap[dayGanKo] || "";
+
+    const sipsinAnalysis: Array<{ name: string; count: number; desc: string }> = [];
+    for (const [name, count] of Object.entries(sipsinCount)) {
+      sipsinAnalysis.push({ name, count: count as number, desc: sipsinDesc[name] || "" });
+    }
+
+    const ohaengAnalysis: Array<{ name: string; count: number; desc: string }> = [];
+    for (const [name, count] of Object.entries(ohaengCount)) {
+      ohaengAnalysis.push({ name, count, desc: ohaengDesc[name] || "" });
+    }
+
+    const maxOhaeng = Object.entries(ohaengCount).sort((a, b) => b[1] - a[1])[0];
+    const minOhaeng = Object.entries(ohaengCount).sort((a, b) => a[1] - b[1])[0];
+    const maxSipsin = Object.entries(sipsinCount).filter(([k]) => k !== "(일간)").sort((a, b) => b[1] - a[1])[0];
+
+    let summary = `일간 ${dayGanKo}(${dayGanData.hanja || ""})은(는) ${dayGanData.element || ""} 오행으로, ${personality}\n\n`;
+    if (strength) summary += `사주의 강약은 "${strength}"이며${strengthScore ? ` (점수: ${strengthScore})` : ""}, `;
+    if (gyeok) summary += `격국은 "${gyeok}"입니다. `;
+    if (yongshin) summary += `용신은 ${yongshin}입니다.\n\n`;
+    if (maxOhaeng) summary += `오행 중 ${maxOhaeng[0]}이(가) ${maxOhaeng[1]}개로 가장 강하고, `;
+    if (minOhaeng) summary += `${minOhaeng[0]}이(가) ${minOhaeng[1]}개로 가장 약합니다.\n`;
+    if (maxSipsin) summary += `십성 중 ${maxSipsin[0]}이(가) ${maxSipsin[1]}개로 두드러집니다. ${sipsinDesc[maxSipsin[0]] || ""}\n\n`;
+    if (gilsin.length > 0) summary += `길신: ${gilsin.join(", ")}\n`;
+    if (hyungsin.length > 0) summary += `흉신: ${hyungsin.join(", ")}\n`;
+    if (gongmangText) summary += `공망: ${gongmangText}\n`;
+
+    // 종합 해석에 올해 운세 요약 추가
+    if (interpretationSummary) {
+      summary += `\n📌 ${currentYear}년 운세 한줄평: ${interpretationSummary}\n`;
+    }
+
+    const compactText = result.toCompact?.() || "";
+    const markdownText = result.toMarkdown?.() || "";
+
+    return NextResponse.json({
+      birthDate,
+      birthTime,
+      gender: gender || "남",
+      age,
+      ddi: { emoji: yearJiData.ddiEmoji || "", name: yearJiData.ddi || "", hanja: yearJiData.hanja || "" },
+      eumyang: dayGanData.eum || "",
+      dayGan: `${dayGanKo}(${dayGanData.hanja || ""})`,
+      mainElement: dayGanData.element || "",
+      strength,
+      strengthScore,
+      gyeok,
+      yongshin,
+      gilsin,
+      hyungsin,
+      interpretation,
+      interpretationTitle,
+      interpretationSummary,
+      pillars,
+      ohaengCount,
+      ohaengAnalysis,
+      sipsinCount,
+      sipsinAnalysis,
+      personality,
+      stemRelations,
+      branchRelations: brRelSummary,
+      salsSummary,
+      gongmang: gongmangText,
+      summary,
+      compactText,
+      markdownText,
+      daeun,
+      daeunStartAge,
+      daeunCurrent: daeunCurrent ? {
+        age: daeunCurrent.startAge,
+        ganzhi: daeunCurrent.ganzhi,
+        ganKo: daeunCurrent.stem,
+        jiKo: daeunCurrent.branch,
+      } : null,
+      seyun,
+      wolun,
+    });
+  } catch (err: any) {
+    console.error("Saju API error:", err);
+    return NextResponse.json({ error: err.message || "분석 중 오류가 발생했습니다." }, { status: 500 });
+  }
+}
