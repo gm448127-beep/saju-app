@@ -1,0 +1,102 @@
+﻿  // ─── 입력 폼 렌더링 ───
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#FFF8F0] to-[#F0E6D6] py-8 px-4">
+      <div className="max-w-lg mx-auto">
+        <h1 className="text-2xl font-bold text-center text-[#3D3338] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>🔮 사주팔자 분석</h1>
+        <p className="text-center text-sm text-[#9B9B9B] mb-6">생년월일시를 입력하면 정확한 사주를 분석합니다</p>
+
+        {/* 입력 폼 */}
+        {!result && (
+          <div className="card">
+            <div className="flex gap-2 mb-4">
+              <label className="flex items-center gap-1 text-sm cursor-pointer">
+                <input type="radio" checked={!isLunar} onChange={() => setIsLunar(false)} className="accent-[#A855F7]" /> 양력
+              </label>
+              <label className="flex items-center gap-1 text-sm cursor-pointer">
+                <input type="radio" checked={isLunar} onChange={() => setIsLunar(true)} className="accent-[#A855F7]" /> 음력
+              </label>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              <select value={year} onChange={e => setYear(+e.target.value)} className="p-2 border rounded-lg text-sm">
+                {Array.from({ length: 100 }, (_, i) => currentYear - i).map(y => <option key={y} value={y}>{y}년</option>)}
+              </select>
+              <select value={month} onChange={e => setMonth(+e.target.value)} className="p-2 border rounded-lg text-sm">
+                {Array.from({ length: 12 }, (_, i) => i + 1).map(m => <option key={m} value={m}>{m}월</option>)}
+              </select>
+              <select value={day} onChange={e => setDay(+e.target.value)} className="p-2 border rounded-lg text-sm">
+                {Array.from({ length: 31 }, (_, i) => i + 1).map(d => <option key={d} value={d}>{d}일</option>)}
+              </select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              <select value={hour} onChange={e => setHour(+e.target.value)} className="p-2 border rounded-lg text-sm">
+                {timeSlots.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+              </select>
+              <select value={gender} onChange={e => setGender(e.target.value)} className="p-2 border rounded-lg text-sm">
+                <option value="남">남성 👨</option>
+                <option value="여">여성 👩</option>
+              </select>
+            </div>
+
+            <button onClick={handleSubmit} disabled={loading}
+              className="w-full py-3 bg-gradient-to-r from-[#A855F7] to-[#6366F1] text-white font-bold rounded-xl shadow-lg hover:opacity-90 transition disabled:opacity-50">
+              {loading ? "분석 중..." : "사주 분석하기 🔮"}
+            </button>
+          </div>
+        )}
+
+        {/* ─── 결과 영역 ─── */}
+        {result && (
+          <div className="space-y-4">
+            {/* 다시하기 버튼 */}
+            <button onClick={() => setResult(null)} className="text-sm text-[#A855F7] font-bold hover:underline">← 다시 분석하기</button>
+
+            {/* ★ 기본 정보 카드 */}
+            <div className="card text-center">
+              <div className="text-4xl mb-1">{result.ddi?.emoji || "🔮"}</div>
+              <h2 className="text-lg font-bold text-[#3D3338]" style={{ fontFamily: "Jua, sans-serif" }}>
+                {result.ddi?.name || ""} {result.ddi?.hanja ? `(${result.ddi.hanja})` : ""}
+              </h2>
+              <p className="text-xs text-[#9B9B9B] mt-1">{result.birthDate} {result.birthTime} · {result.gender} · 만 {result.age}세</p>
+              <div className="flex justify-center gap-3 mt-3">
+                <span className="px-3 py-1 rounded-full text-xs font-bold" style={{ background: "#FFF3E0", color: "#FF9800" }}>
+                  {eumyangIcon(result.eumyang)} {result.eumyang}
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-bold" style={{ background: `${ohaengColor(result.mainElement)}20`, color: ohaengColor(result.mainElement) }}>
+                  {result.mainElement} 오행
+                </span>
+                {result.strength && (
+                  <span className="px-3 py-1 rounded-full text-xs font-bold" style={{ background: `${strengthLabel(result.strength).color}20`, color: strengthLabel(result.strength).color }}>
+                    {strengthLabel(result.strength).text} {result.strengthScore ? `${result.strengthScore}점` : ""}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* ★ 사주 원국표 (무료) */}
+            <div className="card">
+              <h2 className="text-lg font-bold text-[#3D3338] mb-3" style={{ fontFamily: "Jua, sans-serif" }}>📋 사주 원국표</h2>
+              <div className="grid grid-cols-4 gap-2 text-center text-sm">
+                {(["hour", "day", "month", "year"] as const).map((key) => {
+                  const p = result.pillars?.[key];
+                  if (!p) return null;
+                  const h = p.hiddenStems;
+                  return (
+                    <div key={key} className="bg-[#F5F0EB] rounded-xl p-3">
+                      <div className="text-[10px] text-[#9B9B9B] mb-2">{p.label}</div>
+                      <div className="text-xl font-bold text-[#3D3338] mb-1">{p.stem}</div>
+                      <div className="text-xs text-[#5C5358] mb-2">{p.stemKo}</div>
+                      <div className="text-xl font-bold text-[#3D3338] mb-1">{p.branch}</div>
+                      <div className="text-xs text-[#5C5358] mb-2">{p.branchKo}</div>
+                      <div className="border-t border-[#E0D5CC] pt-1 space-y-0.5">
+                        {h?.yeogi && <div className="text-xs text-[#9B9B9B]">여기: {h.yeogi}</div>}
+                        {h?.junggi && <div className="text-xs text-[#9B9B9B]">중기: {h.junggi}</div>}
+                        {h?.jeonggi && <div className="text-xs text-[#9B9B9B]">정기: {h.jeonggi}</div>}
+                        {!h?.yeogi && !h?.junggi && !h?.jeonggi && <div className="text-xs text-[#ccc]">-</div>}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>

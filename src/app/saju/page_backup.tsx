@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 
@@ -108,19 +108,19 @@ export default function SajuPage() {
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="block text-xs text-[#9B9B9B] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>출생년도</label>
-              <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="w-full bg-white border-2 border-[#E8E2DC] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#A89080] outline-none">
+              <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="w-full bg-white border-2 border-[#E8E2DC] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#8B7EC8] outline-none">
                 {Array.from({ length: currentYear - 1927 + 1 }, (_, i) => currentYear - i).map((y) => (<option key={y} value={y}>{y}년</option>))}
               </select>
             </div>
             <div>
               <label className="block text-xs text-[#9B9B9B] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>월</label>
-              <select value={month} onChange={(e) => setMonth(Number(e.target.value))} className="w-full bg-white border-2 border-[#E8E2DC] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#A89080] outline-none">
+              <select value={month} onChange={(e) => setMonth(Number(e.target.value))} className="w-full bg-white border-2 border-[#E8E2DC] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#8B7EC8] outline-none">
                 {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (<option key={m} value={m}>{m}월</option>))}
               </select>
             </div>
             <div>
               <label className="block text-xs text-[#9B9B9B] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>일</label>
-              <select value={day} onChange={(e) => setDay(Number(e.target.value))} className="w-full bg-white border-2 border-[#E8E2DC] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#A89080] outline-none">
+              <select value={day} onChange={(e) => setDay(Number(e.target.value))} className="w-full bg-white border-2 border-[#E8E2DC] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#8B7EC8] outline-none">
                 {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (<option key={d} value={d}>{d}일</option>))}
               </select>
             </div>
@@ -130,29 +130,29 @@ export default function SajuPage() {
           <div>
             <label className="block text-xs text-[#9B9B9B] mb-2" style={{ fontFamily: "Jua, sans-serif" }}>출생시간</label>
             <div className="flex gap-2 mb-3">
-              <button type="button" onClick={() => setTimeMode("none")} className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "none" ? "bg-[#A89080] text-white shadow-md" : "bg-white border-2 border-[#E8E2DC] text-[#9B9B9B]"}`}>모름</button>
-              <button type="button" onClick={() => setTimeMode("slot")} className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "slot" ? "bg-[#A89080] text-white shadow-md" : "bg-white border-2 border-[#E8E2DC] text-[#9B9B9B]"}`}>시간대 선택</button>
-              <button type="button" onClick={() => setTimeMode("exact")} className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "exact" ? "bg-[#A89080] text-white shadow-md" : "bg-white border-2 border-[#E8E2DC] text-[#9B9B9B]"}`}>⏰ 시/분 직접입력</button>
+              <button type="button" onClick={() => setTimeMode("none")} className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "none" ? "bg-[#8B7EC8] text-white shadow-md" : "bg-white border-2 border-[#E8E2DC] text-[#9B9B9B]"}`}>모름</button>
+              <button type="button" onClick={() => setTimeMode("slot")} className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "slot" ? "bg-[#8B7EC8] text-white shadow-md" : "bg-white border-2 border-[#E8E2DC] text-[#9B9B9B]"}`}>시간대 선택</button>
+              <button type="button" onClick={() => setTimeMode("exact")} className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "exact" ? "bg-[#8B7EC8] text-white shadow-md" : "bg-white border-2 border-[#E8E2DC] text-[#9B9B9B]"}`}>⏰ 시/분 직접입력</button>
             </div>
             {timeMode === "slot" && (
-              <select value={slotValue} onChange={(e) => setSlotValue(Number(e.target.value))} className="w-full bg-white border-2 border-[#E8E2DC] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#A89080] outline-none">
+              <select value={slotValue} onChange={(e) => setSlotValue(Number(e.target.value))} className="w-full bg-white border-2 border-[#E8E2DC] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#8B7EC8] outline-none">
                 {timeSlots.map((slot) => (<option key={slot.value} value={slot.value}>{slot.label}</option>))}
               </select>
             )}
             {timeMode === "exact" && (
               <div className="bg-[#F0EDFA] rounded-xl p-4 space-y-3">
-                <p className="text-xs text-[#8B7968]">정확한 출생 시각을 입력하면 진태양시(서울 기준 약 -32분) 보정이 자동 적용됩니다.</p>
+                <p className="text-xs text-[#6B5FA0]">정확한 출생 시각을 입력하면 진태양시(서울 기준 약 -32분) 보정이 자동 적용됩니다.</p>
                 <div className="flex items-center gap-3">
                   <div className="flex-1">
-                    <label className="block text-xs text-[#8B7968] mb-1 font-medium">시</label>
-                    <select value={exactHour} onChange={(e) => setExactHour(Number(e.target.value))} className="w-full bg-white border-2 border-[#D5CFF0] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#A89080] outline-none">
+                    <label className="block text-xs text-[#6B5FA0] mb-1 font-medium">시</label>
+                    <select value={exactHour} onChange={(e) => setExactHour(Number(e.target.value))} className="w-full bg-white border-2 border-[#D5CFF0] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#8B7EC8] outline-none">
                       {Array.from({ length: 24 }, (_, i) => i).map((h) => (<option key={h} value={h}>{String(h).padStart(2, "0")}시</option>))}
                     </select>
                   </div>
                   <span className="text-[#9B9B9B] font-bold text-xl mt-5">:</span>
                   <div className="flex-1">
-                    <label className="block text-xs text-[#8B7968] mb-1 font-medium">분</label>
-                    <select value={exactMinute} onChange={(e) => setExactMinute(Number(e.target.value))} className="w-full bg-white border-2 border-[#D5CFF0] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#A89080] outline-none">
+                    <label className="block text-xs text-[#6B5FA0] mb-1 font-medium">분</label>
+                    <select value={exactMinute} onChange={(e) => setExactMinute(Number(e.target.value))} className="w-full bg-white border-2 border-[#D5CFF0] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#8B7EC8] outline-none">
                       {Array.from({ length: 12 }, (_, i) => i * 5).map((m) => (<option key={m} value={m}>{String(m).padStart(2, "0")}분</option>))}
                     </select>
                   </div>
@@ -165,8 +165,8 @@ export default function SajuPage() {
           <div>
             <label className="block text-xs text-[#9B9B9B] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>달력</label>
             <div className="flex gap-2">
-              <button type="button" onClick={() => setIsLunar(false)} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${!isLunar ? "bg-[#A89080] text-white shadow-md" : "bg-white border-2 border-[#E8E2DC] text-[#9B9B9B]"}`}>☀️ 양력</button>
-              <button type="button" onClick={() => setIsLunar(true)} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${isLunar ? "bg-[#A89080] text-white shadow-md" : "bg-white border-2 border-[#E8E2DC] text-[#9B9B9B]"}`}>🌙 음력</button>
+              <button type="button" onClick={() => setIsLunar(false)} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${!isLunar ? "bg-[#8B7EC8] text-white shadow-md" : "bg-white border-2 border-[#E8E2DC] text-[#9B9B9B]"}`}>☀️ 양력</button>
+              <button type="button" onClick={() => setIsLunar(true)} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${isLunar ? "bg-[#8B7EC8] text-white shadow-md" : "bg-white border-2 border-[#E8E2DC] text-[#9B9B9B]"}`}>🌙 음력</button>
             </div>
           </div>
 
@@ -174,12 +174,12 @@ export default function SajuPage() {
           <div>
             <label className="block text-xs text-[#9B9B9B] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>성별</label>
             <div className="flex gap-2">
-            <button type="button" onClick={() => setGender("남")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${gender === "남" ? "bg-[#A89080] text-white shadow-md" : "bg-white border-2 border-[#E8E2DC] text-[#9B9B9B]"}`}>👨 남</button>
-            <button type="button" onClick={() => setGender("여")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${gender === "여" ? "bg-[#C4A8D8] text-white shadow-md" : "bg-white border-2 border-[#E8E2DC] text-[#9B9B9B]"}`}>👩 여</button>
+              <button type="button" onClick={() => setGender("남")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${gender === "남" ? "bg-[#5B8AF0] text-white shadow-md" : "bg-white border-2 border-[#E8E2DC] text-[#9B9B9B]"}`}>👨 남</button>
+              <button type="button" onClick={() => setGender("여")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${gender === "여" ? "bg-[#F06292] text-white shadow-md" : "bg-white border-2 border-[#E8E2DC] text-[#9B9B9B]"}`}>👩 여</button>
             </div>
           </div>
 
-            <button type="submit" disabled={loading} className="w-full py-3 rounded-xl text-white font-bold text-base transition-all bg-gradient-to-r from-[#A89080] to-[#8B7968] hover:shadow-lg disabled:opacity-50" style={{ fontFamily: "Jua, sans-serif" }}>{loading ? "분석 중 ..." : "🔮 사주 분석하기"}</button>
+          <button type="submit" disabled={loading} className="w-full py-3 rounded-xl text-white font-bold text-base transition-all bg-gradient-to-r from-[#8B7EC8] to-[#6B5FA0] hover:shadow-lg disabled:opacity-50" style={{ fontFamily: "Jua, sans-serif" }}>{loading ? "분석 중..." : "🔮 사주 분석하기"}</button>
         </form>
       </div>
 
@@ -198,9 +198,9 @@ export default function SajuPage() {
               <div className="bg-[#F5F0EB] rounded-lg p-2"><span className="text-[#9B9B9B]">띠:</span> <span className="font-medium">{result.ddi?.emoji} {result.ddi?.name} ({result.ddi?.hanja})</span></div>
               <div className="bg-[#F5F0EB] rounded-lg p-2"><span className="text-[#9B9B9B]">일간:</span> <span className="font-medium">{result.dayGan} ({result.mainElement})</span></div>
               {result.strength && <div className="bg-[#F5F0EB] rounded-lg p-2"><span className="text-[#9B9B9B]">신강/신약:</span> <span className="font-medium">{result.strength}{result.strengthScore ? ` (${result.strengthScore}점)` : ""}</span></div>}
-            {result.gyeok && <div className="bg-gradient-to-r from-[#F3E8FF] to-[#EDE9FE] rounded-xl p-3 border border-[#DDD6FE]"><span className="text-xs text-[#7C3AED] font-bold block mb-1">격국 (格局)</span><span className="text-sm font-bold text-[#3D3338]">{result.gyeok}</span></div>}
-            {result.yongshin && <div className="bg-gradient-to-r from-[#FEF3C7] to-[#FDE68A] rounded-xl p-3 border border-[#FCD34D] col-span-2"><span className="text-xs text-[#B45309] font-bold block mb-1">용신 (用神)</span><span className="text-sm font-bold text-[#3D3338]">{result.yongshin}</span></div>}
-            {result.gongmang && <div className="bg-[#F5F0EB] rounded-xl p-3 border border-[#E8E0D8] col-span-2"><span className="text-xs text-[#9B9B9B] font-bold block mb-1">공망 (空亡)</span><span className="text-sm font-bold text-[#3D3338]">{result.gongmang}</span></div>}
+              {result.gyeok && <div className="bg-[#F5F0EB] rounded-lg p-2"><span className="text-[#9B9B9B]">격국:</span> <span className="font-medium">{result.gyeok}</span></div>}
+              {result.yongshin && <div className="bg-[#F5F0EB] rounded-lg p-2 col-span-2"><span className="text-[#9B9B9B]">용신:</span> <span className="font-medium">{result.yongshin}</span></div>}
+              {result.gongmang && <div className="bg-[#F5F0EB] rounded-lg p-2 col-span-2"><span className="text-[#9B9B9B]">공망:</span> <span className="font-medium">{result.gongmang}</span></div>}
             </div>
           </div>
 
@@ -223,7 +223,7 @@ export default function SajuPage() {
                     <div className="text-2xl my-1">{p.earthEmoji}</div>
                     <div className="font-bold text-lg" style={{ color: p.earthColor }}>{p.earth}</div>
                     <div className="text-xs text-[#9B9B9B]">{p.earthKo} ({p.earthElement})</div>
-                    {p.stage12 && <div className="text-[10px] mt-1 text-[#A89080]">{p.stage12}</div>}
+                    {p.stage12 && <div className="text-[10px] mt-1 text-[#8B7EC8]">{p.stage12}</div>}
                   </div>
                 );
               })}
@@ -336,7 +336,7 @@ export default function SajuPage() {
                   <div key={i} className="bg-[#F5F0EB] rounded-xl p-3">
                     <div className="text-xs font-bold text-[#3D3338] mb-1">{s.pillar}</div>
                     {s.twelveSal && <div className="text-xs text-[#5A5A5A]">12신살: {s.twelveSal}</div>}
-                    {s.specialSals.length > 0 && <div className="text-xs text-[#A89080]">특수살: {s.specialSals.join(", ")}</div>}
+                    {s.specialSals.length > 0 && <div className="text-xs text-[#8B7EC8]">특수살: {s.specialSals.join(", ")}</div>}
                   </div>
                 ))}
               </div>
@@ -361,7 +361,7 @@ export default function SajuPage() {
           {result.daeun && result.daeun.length > 0 && (
             <div className="card">
               <h2 className="text-lg font-bold text-[#3D3338] mb-3" style={{ fontFamily: "Jua, sans-serif" }}>🔄 대운 (10년 단위)</h2>
-              {result.daeunCurrent && <p className="text-xs text-[#A89080] mb-2">현재 대운: {result.daeunCurrent.ganKo}{result.daeunCurrent.jiKo} ({result.daeunCurrent.ganzhi})</p>}
+              {result.daeunCurrent && <p className="text-xs text-[#8B7EC8] mb-2">현재 대운: {result.daeunCurrent.ganKo}{result.daeunCurrent.jiKo} ({result.daeunCurrent.ganzhi})</p>}
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-center min-w-[600px]">
                   <thead>
@@ -381,7 +381,7 @@ export default function SajuPage() {
                     </tr>
                     <tr>
                       <td className="p-1 text-[#9B9B9B]">십성</td>
-                      {result.daeun.map((d, i) => (<td key={i} className="p-1 text-[#A89080]">{d.tenGodStem}/{d.tenGodBranch}</td>))}
+                      {result.daeun.map((d, i) => (<td key={i} className="p-1 text-[#8B7EC8]">{d.tenGodStem}/{d.tenGodBranch}</td>))}
                     </tr>
                     <tr>
                       <td className="p-1 text-[#9B9B9B]">12운성</td>
@@ -416,7 +416,7 @@ export default function SajuPage() {
                     </tr>
                     <tr>
                       <td className="p-1 text-[#9B9B9B]">십성</td>
-                      {result.seyun.map((s, i) => (<td key={i} className="p-1 text-[#A89080]">{s.tenGodStem}/{s.tenGodBranch}</td>))}
+                      {result.seyun.map((s, i) => (<td key={i} className="p-1 text-[#8B7EC8]">{s.tenGodStem}/{s.tenGodBranch}</td>))}
                     </tr>
                     <tr>
                       <td className="p-1 text-[#9B9B9B]">12운성</td>
@@ -447,7 +447,7 @@ export default function SajuPage() {
                     </tr>
                     <tr>
                       <td className="p-1 text-[#9B9B9B]">십성</td>
-                      {result.wolun.map((w, i) => (<td key={i} className="p-1 text-[#A89080]">{w.tenGodStem}/{w.tenGodBranch}</td>))}
+                      {result.wolun.map((w, i) => (<td key={i} className="p-1 text-[#8B7EC8]">{w.tenGodStem}/{w.tenGodBranch}</td>))}
                     </tr>
                   </tbody>
                 </table>
@@ -470,25 +470,6 @@ export default function SajuPage() {
               <p className="text-sm text-[#5A5A5A] leading-relaxed whitespace-pre-line">{result.interpretation}</p>
             </div>
           )}
-
-            {/* 프리미엄 해설 유도 배너 */}
-            <div className="rounded-2xl p-6 text-center shadow-lg" style={{ background: "linear-gradient(135deg, #E8DEF8 0%, #D4C6F0 50%, #C9B8E8 100%)", border: "1px solid #D1C4E9" }}>
-              <div className="text-3xl mb-2">🔮</div>
-              <h2 className="text-lg font-bold mb-2 text-[#4A3660]" style={{ fontFamily: "Jua, sans-serif" }}>더 깊은 사주 해설이 궁금하신가요?</h2>
-              <p className="text-sm mb-1 text-[#6B5B7B]">AI가 분석하는 프리미엄 사주 리포트</p>
-              <div className="text-xs mb-4 space-y-1 text-left inline-block text-[#5C4D6E]">
-                <div>✨ 십성 심화 해설 & 성격 분석</div>
-                <div>✨ 대운별 인생 흐름 상세 풀이</div>
-                <div>✨ 올해 & 내년 운세 심층 분석</div>
-                <div>✨ 재물운 · 직업운 · 건강운 · 연애운</div>
-                <div>✨ 100페이지+ 맞춤형 리포트</div>
-              </div>
-              <br />
-              <button className="bg-[#7C5DAF] text-white font-bold py-3 px-8 rounded-xl shadow-md hover:bg-[#6B4D9E] transition text-sm" onClick={() => alert("프리미엄 해설 서비스 준비 중입니다!")}>
-                프리미엄 해설 보기 →
-              </button>
-              <p className="text-[10px] text-[#8B7BA0] mt-2">서비스 준비 중 · 곧 오픈 예정</p>
-            </div>
         </div>
       )}
     </div>

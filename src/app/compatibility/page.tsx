@@ -213,22 +213,19 @@ function PersonCard({
         {/* 년/월/일 */}
         <div className="grid grid-cols-3 gap-2">
           <div>
-            <label className="text-sm text-[#5C5358] font-bold block mb-1">년</label>
-            <select value={person.year} onChange={(e) => onChange("year", e.target.value)} className="w-full p-2 rounded-xl">
+                        <select value={person.year} onChange={(e) => onChange("year", e.target.value)} className="w-full p-2 rounded-xl">
               <option value="">년도</option>
               {YEARS.map((y) => <option key={y} value={y}>{y}년</option>)}
             </select>
           </div>
           <div>
-            <label className="text-sm text-[#5C5358] font-bold block mb-1">월</label>
-            <select value={person.month} onChange={(e) => onChange("month", e.target.value)} className="w-full p-2 rounded-xl">
+                        <select value={person.month} onChange={(e) => onChange("month", e.target.value)} className="w-full p-2 rounded-xl">
               <option value="">월</option>
               {MONTHS.map((m) => <option key={m} value={m}>{m}월</option>)}
             </select>
           </div>
           <div>
-            <label className="text-sm text-[#5C5358] font-bold block mb-1">일</label>
-            <select value={person.day} onChange={(e) => onChange("day", e.target.value)} className="w-full p-2 rounded-xl">
+                        <select value={person.day} onChange={(e) => onChange("day", e.target.value)} className="w-full p-2 rounded-xl">
               <option value="">일</option>
               {DAYS.map((d) => <option key={d} value={d}>{d}일</option>)}
             </select>
@@ -407,8 +404,8 @@ export default function CompatibilityPage() {
           {/* 사주 기둥 표시 */}
           <div className="card">
             <h2 className="label mb-4">📋 사주 기둥 (四柱)</h2>
-            <PillarTable label={`💜 ${result.person1.name}`} pillars={result.person1.pillars} hasHour={result.person1.hasHour} />
-            <PillarTable label={`💖 ${result.person2.name}`} pillars={result.person2.pillars} hasHour={result.person2.hasHour} />
+            <PillarTable label={`💜 ${result.person1.name}`} pillars={result.person1.pillarDetails} hasHour={result.person1.hasHour} />
+            <PillarTable label={`💖 ${result.person2.name}`} pillars={result.person2.pillarDetails} hasHour={result.person2.hasHour} />
           </div>
 
           {/* 톱니바퀴 분석 */}

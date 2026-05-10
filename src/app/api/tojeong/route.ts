@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { calculateSaju } from "ssaju";
 
 /* ═══════════════════════════════════════════
@@ -206,6 +206,7 @@ export async function POST(request: NextRequest) {
       gender: gender === "여" ? "여" : "남",
       calendar: isLunar ? "lunar" : "solar",
       timezone: "Asia/Seoul",
+      applyLocalMeanTime: true,
     });
 
     const myStems = [
