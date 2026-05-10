@@ -1,11 +1,10 @@
 ﻿"use client";
 
-import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState, Suspense } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import React from "react";
 
-function PremiumReportContent() {
-  const searchParams = useSearchParams();
+export default function PremiumPage() {
   const router = useRouter();
   const [report, setReport] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -13,8 +12,8 @@ function PremiumReportContent() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const dataParam = searchParams.get("data");
-    if (!dataParam) {
+    const stored = localStorage.getItem("premiumSajuData");
+    if (!stored) {
       setError("사주 데이터가 없습니다. 먼저 사주 분석을 진행해주세요.");
       setLoading(false);
       return;
@@ -22,14 +21,13 @@ function PremiumReportContent() {
 
     let sajuData: any;
     try {
-      sajuData = JSON.parse(decodeURIComponent(dataParam));
+      sajuData = JSON.parse(stored);
     } catch {
       setError("데이터 파싱 오류가 발생했습니다.");
       setLoading(false);
       return;
     }
 
-    // 프로그레스 애니메이션
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 90) return prev;
@@ -37,7 +35,6 @@ function PremiumReportContent() {
       });
     }, 800);
 
-    // 프리미엄 API 호출
     fetch("/api/saju/premium", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -61,93 +58,64 @@ function PremiumReportContent() {
       });
 
     return () => clearInterval(progressInterval);
-  }, [searchParams]);
+  }, []);
 
-  // 마크다운 간단 렌더링
   function renderMarkdown(text: string) {
     const lines = text.split("\n");
     const elements: React.ReactNode[] = [];
-
     lines.forEach((line, i) => {
       if (line.startsWith("## ")) {
         elements.push(
-          <h2
-            key={i}
-            className="text-xl font-bold mt-8 mb-3 pb-2 border-b-2 border-purple-200"
-            style={{ fontFamily: "Jua, sans-serif", color: "#3D3338" }}
-          >
+          <h2 key={i} className="text-xl font-bold mt-8 mb-3 pb-2 border-b-2 border-purple-200" style={{ fontFamily: "Jua, sans-serif", color: "#3D3338" }}>
             {line.replace("## ", "")}
           </h2>
         );
       } else if (line.startsWith("### ")) {
         elements.push(
-          <h3 key={i} className="text-lg font-bold mt-4 mb-2 text-purple-700">
-            {line.replace("### ", "")}
-          </h3>
+          <h3 key={i} className="text-lg font-bold mt-4 mb-2 text-purple-700">{line.replace("### ", "")}</h3>
         );
       } else if (line.startsWith("- ")) {
         elements.push(
           <div key={i} className="flex items-start gap-2 ml-2 my-1">
             <span className="text-purple-400 mt-1">•</span>
-            <span className="text-sm text-gray-700 leading-relaxed">
-              {renderInlineMarkdown(line.replace("- ", ""))}
-            </span>
+            <span className="text-sm text-gray-700 leading-relaxed">{renderInline(line.replace("- ", ""))}</span>
           </div>
         );
       } else if (line.trim() === "") {
         elements.push(<div key={i} className="h-2" />);
       } else {
         elements.push(
-          <p key={i} className="text-sm text-gray-700 leading-relaxed my-1">
-            {renderInlineMarkdown(line)}
-          </p>
+          <p key={i} className="text-sm text-gray-700 leading-relaxed my-1">{renderInline(line)}</p>
         );
       }
     });
-
     return elements;
   }
 
-  function renderInlineMarkdown(text: string): React.ReactNode[] {
+  function renderInline(text: string): React.ReactNode[] {
     const parts = text.split(/(\*\*[^*]+\*\*)/g);
     return parts.map((part, i) => {
       if (part.startsWith("**") && part.endsWith("**")) {
-        return (
-          <strong key={i} className="font-bold text-gray-900">
-            {part.slice(2, -2)}
-          </strong>
-        );
+        return <strong key={i} className="font-bold text-gray-900">{part.slice(2, -2)}</strong>;
       }
       return <span key={i}>{part}</span>;
     });
   }
 
-  // 로딩 화면
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#F8F0FF] to-[#E8E0F0] flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4 animate-pulse">🔮</div>
-          <h2
-            className="text-xl font-bold mb-2"
-            style={{ fontFamily: "Jua, sans-serif", color: "#3D3338" }}
-          >
+          <h2 className="text-xl font-bold mb-2" style={{ fontFamily: "Jua, sans-serif", color: "#3D3338" }}>
             프리미엄 사주 리포트 생성 중...
           </h2>
-          <p className="text-sm text-gray-500 mb-6">
-            AI가 당신의 사주를 깊이 분석하고 있습니다
-          </p>
-
-          {/* 프로그레스 바 */}
+          <p className="text-sm text-gray-500 mb-6">AI가 당신의 사주를 깊이 분석하고 있습니다</p>
           <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
-            <div
-              className="h-3 rounded-full transition-all duration-500 bg-gradient-to-r from-purple-400 to-pink-400"
-              style={{ width: `${Math.min(progress, 100)}%` }}
-            />
+            <div className="h-3 rounded-full transition-all duration-500 bg-gradient-to-r from-purple-400 to-pink-400" style={{ width: `${Math.min(progress, 100)}%` }} />
           </div>
           <p className="text-xs text-gray-400">{Math.round(Math.min(progress, 99))}% 완료</p>
-
-          <div className="mt-6 space-y-2 text-xs text-gray-400">
+          <div className="mt-6 text-xs text-gray-400">
             <p>{progress < 20 ? "📊 사주 원국 분석 중..." : progress < 40 ? "🔍 오행·십성 심화 분석 중..." : progress < 60 ? "📅 2026년 운세 계산 중..." : progress < 80 ? "🔮 대운 흐름 해석 중..." : "✍️ 맞춤형 리포트 작성 중..."}</p>
           </div>
         </div>
@@ -155,7 +123,6 @@ function PremiumReportContent() {
     );
   }
 
-  // 에러 화면
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#F8F0FF] to-[#E8E0F0] flex items-center justify-center p-4">
@@ -163,10 +130,7 @@ function PremiumReportContent() {
           <div className="text-5xl mb-4">😔</div>
           <h2 className="text-lg font-bold mb-2 text-red-500">오류 발생</h2>
           <p className="text-sm text-gray-600 mb-6">{error}</p>
-          <button
-            onClick={() => router.push("/saju")}
-            className="bg-purple-500 text-white px-6 py-2 rounded-xl font-bold hover:bg-purple-600 transition"
-          >
+          <button onClick={() => router.push("/saju")} className="bg-purple-500 text-white px-6 py-2 rounded-xl font-bold hover:bg-purple-600 transition">
             사주 분석으로 돌아가기
           </button>
         </div>
@@ -174,63 +138,24 @@ function PremiumReportContent() {
     );
   }
 
-  // 리포트 화면
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F8F0FF] to-[#E8E0F0]">
-      {/* 헤더 */}
-      <div
-        className="text-center py-6 px-4"
-        style={{
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-        }}
-      >
+      <div className="text-center py-6 px-4" style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}>
         <div className="text-3xl mb-1">👑</div>
-        <h1
-          className="text-2xl font-bold text-white"
-          style={{ fontFamily: "Jua, sans-serif" }}
-        >
-          프리미엄 사주 리포트
-        </h1>
-        <p className="text-purple-100 text-xs mt-1">
-          AI 명리학 전문가의 심층 분석
-        </p>
+        <h1 className="text-2xl font-bold text-white" style={{ fontFamily: "Jua, sans-serif" }}>프리미엄 사주 리포트</h1>
+        <p className="text-purple-100 text-xs mt-1">AI 명리학 전문가의 심층 분석</p>
       </div>
-
-      {/* 리포트 본문 */}
       <div className="max-w-2xl mx-auto p-4">
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
           {renderMarkdown(report)}
         </div>
-
-        {/* 하단 안내 */}
         <div className="text-center mb-8">
-          <p className="text-xs text-gray-400 mb-4">
-            본 리포트는 AI 명리학 분석을 기반으로 작성되었으며, 참고용으로 활용해주세요.
-          </p>
-          <button
-            onClick={() => router.push("/saju")}
-            className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition"
-            style={{ fontFamily: "Jua, sans-serif" }}
-          >
+          <p className="text-xs text-gray-400 mb-4">본 리포트는 AI 명리학 분석을 기반으로 작성되었으며, 참고용으로 활용해주세요.</p>
+          <button onClick={() => router.push("/saju")} className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition" style={{ fontFamily: "Jua, sans-serif" }}>
             새로운 사주 분석하기
           </button>
         </div>
       </div>
     </div>
-  );
-}
-
-export default function PremiumPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-gradient-to-b from-[#F8F0FF] to-[#E8E0F0] flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-5xl animate-pulse">🔮</div>
-          <p className="mt-4 text-gray-500">로딩 중...</p>
-        </div>
-      </div>
-    }>
-      <PremiumReportContent />
-    </Suspense>
   );
 }
