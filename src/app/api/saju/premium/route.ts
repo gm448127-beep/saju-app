@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     const data = await response.json();
     const report = data.candidates?.[0]?.content?.parts?.[0]?.text || "분석 결과를 생성하지 못했습니다.";
 
-    return NextResponse.json({ report });
+    return NextResponse.json({ success: true, report });
   } catch (error) {
     console.error("Premium API Error:", error instanceof Error ? error.message : error);
     return NextResponse.json({ error: "서버 오류: " + (error instanceof Error ? error.message : String(error)) }, { status: 500 });
