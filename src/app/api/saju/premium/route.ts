@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const prompt = "당신은 사주팔자 전문가입니다. 아래 사주 데이터를 바탕으로 상세한 프리미엄 사주 해설을 작성해주세요. 운세, 성격, 재물운, 건강운, 연애운, 직업운을 각각 자세히 분석해주세요.\n\n사주 데이터:\n" + JSON.stringify(sajuData, null, 2);
 
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite-lite:generateContent?key=" + apiKey,
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=" + apiKey,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
