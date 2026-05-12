@@ -19,7 +19,7 @@ export default function PremiumPage() {
       return;
     }
 
-    let sajuData: any;
+    let sajuData: any; alert("stored raw: " + stored?.substring(0, 200));
     try {
       sajuData = JSON.parse(stored);
     } catch {
