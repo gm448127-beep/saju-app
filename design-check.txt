@@ -1,0 +1,243 @@
+﻿===== layout.tsx =====
+import type { Metadata } from "next";
+import "./globals.css";
+import Header from "@/components/Header";
+
+export const metadata: Metadata = {
+  title: "사주도우미 - AI 사주 분석",
+  description: "데이터 기반 사주팔자, 오늘의 운세, 토정비결, 궁합 분석, AI 사주상담",
+  openGraph: {
+    title: "🏮 사주도우미 - AI 맞춤 사주 분석",
+    description: "나만을 위한 사주팔자, 오늘의 운세, 토정비결, 궁합, AI 사주상담까지! 무료로 바로 확인하세요 ✨",
+    url: "https://saju-app-vert.vercel.app",
+    siteName: "사주도우미",
+    locale: "ko_KR",
+    type: "website",
+    images: [
+      {
+        url: "https://saju-app-vert.vercel.app/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "사주도우미 - AI 맞춤 사주 분석",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "🏮 사주도우미 - AI 맞춤 사주 분석",
+    description: "나만을 위한 사주팔자, 오늘의 운세, 토정비결, 궁합, AI 사주상담까지!",
+    images: ["https://saju-app-vert.vercel.app/og-image.png"],
+  },
+  icons: {
+    icon: "/favicon.ico",
+  },
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="ko">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&family=Jua&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="min-h-screen">
+        <Header />
+        <main className="max-w-4xl mx-auto px-4 py-6">
+          {children}
+        </main>
+      </body>
+    </html>
+  );
+}
+
+
+===== page.tsx (홈) =====
+import Link from 'next/link';
+
+const MENU_ITEMS = [
+  { href: '/saju', emoji: '🔮', title: '사주팔자', description: '나의 타고난 운명을 알아보세요', color: '#8B7EC8', bg: '#F0EDF8' },
+  { href: '/today', emoji: '🌤️', title: '오늘의 운세', description: '오늘 하루 어떤 기운이 함께할까요?', color: '#7EB3C8', bg: '#EDF5F8' },
+  { href: '/tojeong', emoji: '📜', title: '토정비결', description: '올해 나의 운세를 확인하세요', color: '#7EC8A4', bg: '#EDF8F2' },
+  { href: '/compatibility', emoji: '💕', title: '궁합 보기', description: '우리 둘의 궁합은 몇 점?', color: '#E88B9C', bg: '#F8EDF0' },
+  { href: '/chat', emoji: '💬', title: 'AI 사주상담', description: 'AI에게 사주 이야기를 들어보세요', color: '#E8A87C', bg: '#F8F2ED' },
+];
+
+export default function HomePage() {
+  return (
+    <div className="space-y-8">
+      <section className="text-center py-16">
+        <div className="text-6xl mb-6 animate-bounce-soft">🏮</div>
+        <h1 style={{fontFamily:'Jua, sans-serif'}} className="text-4xl text-[#2D2D2D] mb-3">사주도우미</h1>
+        <p className="text-[#6B6B6B] text-lg mb-2">오로지 당신만을 위한</p>
+        <p className="text-[#6B6B6B] text-lg">맞춤형 사주 분석을 진행합니다.</p>
+        <div className="mt-6 flex justify-center gap-3">
+          <span className="tag">🔮 사주</span>
+          <span className="tag">🌤️ 운세</span>
+          <span className="tag">💬 AI상담</span>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        {MENU_ITEMS.map((item, index) => (
+          <Link
+            key={item.href}
+            href={item.href}
+            className="card card-hover block animate-fade-in"
+            style={{ animationDelay: `${index * 0.1}s`, opacity: 0 }}
+          >
+            <div className="flex items-center gap-5">
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl shrink-0" style={{ backgroundColor: item.bg }}>
+                {item.emoji}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 style={{fontFamily:'Jua, sans-serif'}} className="text-lg mb-0.5" >{item.title}</h3>
+                <p className="text-[#9B9B9B] text-sm">{item.description}</p>
+              </div>
+              <div className="text-[#E8E2DC] text-xl shrink-0">→</div>
+            </div>
+          </Link>
+        ))}
+      </section>
+
+      <footer className="text-center py-10 text-sm text-[#9B9B9B]">
+        <p>사주도우미는 재미와 참고용입니다 ☺️</p>
+        <p className="mt-1">중요한 결정은 전문가와 상담하세요.</p>
+      </footer>
+    </div>
+  );
+}
+
+
+===== C:\Users\user\saju-app\src\app\globals.css =====
+@import "tailwindcss";
+
+/* ===== 기본 배경 & 폰트 ===== */
+body {
+  background-color: #F5F0EB;
+  font-family: 'Noto Sans KR', sans-serif !important;
+  color: #3D3338;
+  font-size: 16px;
+  line-height: 1.7;
+  letter-spacing: -0.02em;
+}
+
+/* ===== 폰트 전역 적용 ===== */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Noto Sans KR', sans-serif !important;
+  color: #2D2D2D;
+  font-weight: 600;
+}
+
+p, span, div, li, td, th, label, input, select, textarea, button, a {
+  font-family: 'Noto Sans KR', sans-serif !important;
+}
+
+/* ===== 카드 스타일 ===== */
+.card {
+  background: white;
+  border-radius: 20px;
+  padding: 20px 24px;
+  border: 1.5px solid #E8E2DC;
+  transition: all 0.2s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  border-color: #D4CEC8;
+}
+
+/* ===== 태그 ===== */
+.tag {
+  display: inline-block;
+  background: white;
+  border: 1.5px solid #E8E2DC;
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #5A4A42;
+}
+
+/* ===== 텍스트 가독성 개선 ===== */
+.text-\[\#9B9B9B\] {
+  color: #7A6B63 !important;
+}
+
+.text-\[\#6B6B6B\] {
+  color: #5A4A42 !important;
+}
+
+.card p {
+  color: #7A6B63 !important;
+  font-size: 14px;
+}
+
+.card h3 {
+  font-size: 17px;
+  font-weight: 600;
+  color: #2D2D2D;
+}
+
+/* ===== 버튼 ===== */
+button, .btn, [role="button"] {
+  font-weight: 500;
+}
+
+/* ===== 입력 폼 ===== */
+input, select, textarea {
+  font-size: 16px !important;
+  color: #2D2D2D;
+}
+
+/* ===== 푸터 ===== */
+footer p {
+  color: #9B8E86 !important;
+  font-size: 13px;
+}
+
+/* ===== 애니메이션 ===== */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.5s ease forwards;
+}
+
+@keyframes bounce-soft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.animate-bounce-soft {
+  animation: bounce-soft 2s ease-in-out infinite;
+}
+
+/* ===== 스크롤바 ===== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D4CEC8;
+  border-radius: 3px;
+}
+
+
+===== saju/page.tsx 총 줄수 =====
+총 501 줄
+
