@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "사주 데이터가 없습니다." }, { status: 400 });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY_PREMIUM || process.env.GEMINI_API_KEY;
     if (!apiKey) {
       return NextResponse.json({ error: "API 키가 설정되지 않았습니다." }, { status: 500 });
     }
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
 
           if (response.status === 429) {
             console.log(`429 Rate limit (${model}, attempt ${attempt + 1}). Waiting...`);
-            await new Promise(r => setTimeout(r, (attempt + 1) * 2000));
+            await new Promise(r => setTimeout(r, (attempt + 1) * 10000));
             continue;
           }
           break;
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
         }
       }
       if (response?.ok) break;
-      console.log(`Model ${model} failed, trying next...`);
+      console.log(`Model ${model} failed, trying next...`); await new Promise(r => setTimeout(r, 5000));
     }
 
     if (!response || !response.ok) {
