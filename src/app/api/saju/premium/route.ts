@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const { sajuData } = await request.json();
+    const { sajuData, name } = await request.json();
 
     if (!sajuData) {
       return NextResponse.json({ error: "사주 데이터가 없습니다." }, { status: 400 });
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "API 키가 설정되지 않았습니다." }, { status: 500 });
     }
 
-    const userName = sajuData.name || "회원";
+    const userName = name || sajuData.userName || sajuData.name || "회원";
     const birthDate = sajuData.birthDate || "";
     const gender = sajuData.gender === "male" ? "남성" : "여성";
     const birthTime = sajuData.birthTime || "미상";
