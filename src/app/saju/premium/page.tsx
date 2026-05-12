@@ -35,7 +35,7 @@ export default function PremiumPage() {
       });
     }, 800);
 
-    fetch("/api/saju/premium", {
+    console.log("DEBUG sajuData:", sajuData); console.log("DEBUG userName:", sajuData.userName); fetch("/api/saju/premium", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sajuData, name: sajuData.userName || "회원" }),
