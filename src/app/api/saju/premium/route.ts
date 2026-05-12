@@ -127,33 +127,44 @@ export async function POST(request: NextRequest) {
     if (!report) {
       const openRouterKey = process.env.OPENROUTER_API_KEY;
       if (openRouterKey) {
+        const openRouterModels = [
+          "google/gemma-4-31b-it:free",
+          "openai/gpt-oss-120b:free",
+          "nvidia/nemotron-3-super:free",
+          "openrouter/free"
+        ];
         console.log("OpenRouter로 전환...");
-        try {
-          const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-            method: "POST",
-            headers: {
-              "Authorization": `Bearer ${openRouterKey}`,
-              "Content-Type": "application/json",
-              "HTTP-Referer": "https://saju-app-vert.vercel.app",
-              "X-Title": "Saju App"
-            },
-            body: JSON.stringify({
-              model: "google/gemini-2.0-flash-exp:free",
-              messages: [{ role: "user", content: prompt }],
-              max_tokens: 8192,
-              temperature: 0.85
-            })
-          });
-          if (response.ok) {
-            const data = await response.json();
-            report = data.choices?.[0]?.message?.content;
-            if (report) console.log("OpenRouter 성공!");
-          } else {
-            const errText = await response.text();
-            console.error("OpenRouter 오류:", response.status, errText);
+        for (const openRouterModel of openRouterModels) {
+          try {
+            console.log("OpenRouter 모델 시도:", openRouterModel);
+            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${openRouterKey}`,
+                "Content-Type": "application/json",
+                "HTTP-Referer": "https://saju-app-vert.vercel.app",
+                "X-Title": "Saju App"
+              },
+              body: JSON.stringify({
+                model: openRouterModel,
+                messages: [{ role: "user", content: prompt }],
+                max_tokens: 8192,
+                temperature: 0.85
+              })
+            });
+            if (response.ok) {
+              const data = await response.json();
+              report = data.choices?.[0]?.message?.content;
+              if (report) {
+                console.log("OpenRouter 성공:", openRouterModel);
+                break;
+              }
+            } else {
+              console.log("OpenRouter", openRouterModel, "실패:", response.status);
+            }
+          } catch (e) {
+            console.log("OpenRouter", openRouterModel, "오류:", e);
           }
-        } catch (e) {
-          console.error("OpenRouter 오류:", e);
         }
       }
     }
