@@ -489,7 +489,7 @@ export default function SajuPage() {
                 <div>✨ 100페이지+ 맞춤형 리포트</div>
               </div>
               <br />
-            <button className="bg-[#7C5DAF] text-white font-bold py-3 px-8 rounded-xl shadow-md hover:bg-[#6B4D9E] transition text-sm" onClick={() => { localStorage.setItem("premiumSajuData", JSON.stringify({...result, userName: name})); window.location.href = "/saju/premium"; }}>
+            <button className="bg-[#7C5DAF] text-white font-bold py-3 px-8 rounded-xl shadow-md hover:bg-[#6B4D9E] transition text-sm" onClick={() => { localStorage.setItem("sajuUserName", name); localStorage.setItem("premiumSajuData", JSON.stringify({...result, userName: name})); window.location.href = "/saju/premium"; }}>
                 프리미엄 해설 보기 →
               </button>
             <p className="text-[10px] text-[#8B7BA0] mt-2">10개 챕터 심층 분석 · AI 맞춤형 리포트</p>
