@@ -72,21 +72,51 @@ export async function POST(request: NextRequest) {
 
 위 데이터를 바탕으로 만세력을 계산하여 사주팔자(연주, 월주, 일주, 시주의 천간과 지지)를 도출한 후, 위 구조에 맞게 상세하고 따뜻한 사주 해설을 작성해주세요. 최소 2000자 이상으로 충분히 길고 상세하게 작성하세요.`;
 
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=" + apiKey,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.85,
-            maxOutputTokens: 8192
-          }
-        })
-      }
-    );
+    const models = [
+      "gemini-2.5-flash-lite",
+      "gemini-2.0-flash-lite", 
+      "gemini-1.5-flash"
+    ];
+    const maxRetries = 3;
+    let response = null;
+    let lastError = null;
 
+    for (const model of models) {
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+          response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                  temperature: 0.85,
+                  maxOutputTokens: 8192
+                }
+              })
+            }
+          );
+
+          if (response.ok) break;
+
+          if (response.status === 429) {
+            console.log(`429 Rate limit (${model}, attempt ${attempt + 1}). Waiting...`);
+            await new Promise(r => setTimeout(r, (attempt + 1) * 2000));
+            continue;
+          }
+          break;
+        } catch (e) {
+          lastError = e;
+          await new Promise(r => setTimeout(r, 1000));
+        }
+      }
+      if (response?.ok) break;
+      console.log(`Model ${model} failed, trying next...`);
+    }
+
+    if (!response || !response.ok) {
     if (!response.ok) {
       const errText = await response.text();
       console.error("Gemini API Error:", errText);
