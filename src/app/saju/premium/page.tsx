@@ -19,7 +19,7 @@ export default function PremiumPage() {
       return;
     }
 
-    let sajuData: any; alert("stored raw: " + stored?.substring(0, 200));
+    let sajuData: any;
     try {
       sajuData = JSON.parse(stored);
     } catch {
@@ -35,7 +35,7 @@ export default function PremiumPage() {
       });
     }, 800);
 
-    console.log("DEBUG sajuData:", sajuData); console.log("DEBUG userName:", sajuData.userName); fetch("/api/saju/premium", {
+    fetch("/api/saju/premium", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sajuData, name: sajuData.userName || "회원" }),

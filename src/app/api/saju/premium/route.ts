@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "API 키가 설정되지 않았습니다." }, { status: 500 });
     }
 
-    const userName = name || sajuData.userName || sajuData.name || "회원";
+    console.log("=== DEBUG name:", name, "sajuData.userName:", sajuData?.userName, "sajuData.name:", sajuData?.name); const userName = name || sajuData.userName || sajuData.name || "회원"; console.log("=== DEBUG final userName:", userName);
     const birthDate = sajuData.birthDate || "";
     const gender = sajuData.gender === "male" ? "남성" : "여성";
     const birthTime = sajuData.birthTime || "미상";
