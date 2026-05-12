@@ -38,7 +38,7 @@ export default function PremiumPage() {
     fetch("/api/saju/premium", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sajuData }),
+      body: JSON.stringify({ sajuData, name: sajuData.userName || "회원" }),
     })
       .then((res) => res.json())
       .then((data) => {

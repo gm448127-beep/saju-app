@@ -56,6 +56,7 @@ const timeSlots = [
 
 export default function SajuPage() {
   const currentYear = new Date().getFullYear();
+  const [name, setName] = useState("");
   const [year, setYear] = useState(1995);
   const [month, setMonth] = useState(1);
   const [day, setDay] = useState(1);
@@ -80,7 +81,7 @@ export default function SajuPage() {
 
       const res = await fetch("/api/saju", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ year, month, day, hour: sendHour, minute: sendMinute, gender, isLunar }),
+        body: JSON.stringify({ name, year, month, day, hour: sendHour, minute: sendMinute, gender, isLunar }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "분석 실패");
@@ -105,6 +106,10 @@ export default function SajuPage() {
 
       <div className="card">
         <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="mb-3">
+              <label className="block text-xs text-[#9B9B9B] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>이름</label>
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="홍길동" className="w-full p-2 rounded-lg border border-[#E8E2DC] text-[#3D3338] text-sm focus:outline-none focus:border-[#C4A882]" style={{ fontFamily: "Jua, sans-serif" }} />
+            </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="block text-xs text-[#9B9B9B] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>출생년도</label>
@@ -484,7 +489,7 @@ export default function SajuPage() {
                 <div>✨ 100페이지+ 맞춤형 리포트</div>
               </div>
               <br />
-            <button className="bg-[#7C5DAF] text-white font-bold py-3 px-8 rounded-xl shadow-md hover:bg-[#6B4D9E] transition text-sm" onClick={() => { localStorage.setItem("premiumSajuData", JSON.stringify(result)); window.location.href = "/saju/premium"; }}>
+            <button className="bg-[#7C5DAF] text-white font-bold py-3 px-8 rounded-xl shadow-md hover:bg-[#6B4D9E] transition text-sm" onClick={() => { localStorage.setItem("premiumSajuData", JSON.stringify({...result, userName: name})); window.location.href = "/saju/premium"; }}>
                 프리미엄 해설 보기 →
               </button>
             <p className="text-[10px] text-[#8B7BA0] mt-2">10개 챕터 심층 분석 · AI 맞춤형 리포트</p>
