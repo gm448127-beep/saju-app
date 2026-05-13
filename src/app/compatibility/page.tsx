@@ -55,7 +55,7 @@ const defaultPerson = (gender: string): PersonInput => ({
 /* ── 점수 색상 ── */
 function scoreColor(s: number) {
   if (s >= 80) return "#f59e0b";
-  if (s >= 60) return "#8B7EC8";
+  if (s >= 60) return "#9B8EC8";
   if (s >= 40) return "#5EA3B8";
   return "#D87A8C";
 }
@@ -64,7 +64,7 @@ function scoreColor(s: number) {
 function TimeInput({ person, onChange }: { person: PersonInput; onChange: (k: string, v: any) => void }) {
   return (
     <div className="space-y-2">
-      <label className="text-sm text-[#5C5358] font-bold block mb-1">태어난 시간</label>
+      <label className="text-sm text-[#5A5468] font-bold block mb-1">태어난 시간</label>
       <div className="flex gap-2">
         {([
           { mode: "none" as TimeMode, label: "🚫 모름" },
@@ -76,8 +76,8 @@ function TimeInput({ person, onChange }: { person: PersonInput; onChange: (k: st
             onClick={() => onChange("timeMode", m.mode)}
             className={`flex-1 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
               person.timeMode === m.mode
-                ? "border-[#8B7EC8] bg-[#8B7EC8] text-white"
-                : "border-[#E8E2DC] bg-white text-[#5C5358] hover:border-[#8B7EC8]"
+                ? "border-[#9B8EC8] bg-[#9B8EC8] text-white"
+                : "border-[#D7D3E7] bg-white text-[#5A5468] hover:border-[#9B8EC8]"
             }`}
             style={{ fontFamily: "Jua, sans-serif" }}
           >
@@ -94,8 +94,8 @@ function TimeInput({ person, onChange }: { person: PersonInput; onChange: (k: st
               onClick={() => onChange("slotHour", ts.value)}
               className={`py-2 px-1 rounded-xl border-2 text-xs font-bold transition-all ${
                 person.slotHour === ts.value
-                  ? "border-[#8B7EC8] bg-[#8B7EC8] text-white"
-                  : "border-[#E8E2DC] bg-white text-[#5C5358] hover:border-[#8B7EC8]"
+                  ? "border-[#9B8EC8] bg-[#9B8EC8] text-white"
+                  : "border-[#D7D3E7] bg-white text-[#5A5468] hover:border-[#9B8EC8]"
               }`}
             >
               {ts.label}
@@ -109,7 +109,7 @@ function TimeInput({ person, onChange }: { person: PersonInput; onChange: (k: st
           <select
             value={person.exactHour}
             onChange={(e) => onChange("exactHour", e.target.value === "" ? "" : Number(e.target.value))}
-            className="flex-1 p-2 rounded-xl border-2 border-[#E8E2DC]"
+            className="flex-1 p-2 rounded-xl border-2 border-[#D7D3E7]"
           >
             <option value="">시</option>
             {HOURS.map((h) => (
@@ -119,7 +119,7 @@ function TimeInput({ person, onChange }: { person: PersonInput; onChange: (k: st
           <select
             value={person.exactMinute}
             onChange={(e) => onChange("exactMinute", e.target.value === "" ? "" : Number(e.target.value))}
-            className="flex-1 p-2 rounded-xl border-2 border-[#E8E2DC]"
+            className="flex-1 p-2 rounded-xl border-2 border-[#D7D3E7]"
           >
             <option value="">분</option>
             {MINUTES.map((m) => (
@@ -130,7 +130,7 @@ function TimeInput({ person, onChange }: { person: PersonInput; onChange: (k: st
       )}
 
       {person.timeMode === "none" && (
-        <p className="text-xs text-[#847A80] bg-[#FAF7F4] p-2 rounded-lg border border-[#E8E2DC]">
+        <p className="text-xs text-[#8A8498] bg-[#F8F7FC] p-2 rounded-lg border border-[#D7D3E7]">
           ⚠️ 시간 미입력 시 시주(時柱)가 제외되어 정확도가 다소 떨어질 수 있습니다.
         </p>
       )}
@@ -149,25 +149,25 @@ function PersonCard({
     <div className="card" style={{ borderColor: color }}>
       <div className="flex items-center gap-2 mb-4">
         <span className="text-2xl">{emoji}</span>
-        <h3 style={{ fontFamily: "Jua, sans-serif" }} className="text-lg text-[#3D3338]">{label}</h3>
+        <h3 style={{ fontFamily: "Jua, sans-serif" }} className="text-lg text-[#2D2B3D]">{label}</h3>
       </div>
       <div className="space-y-3">
         {/* 이름 */}
         <div>
-          <label className="text-sm text-[#5C5358] font-bold block mb-1">이름 (선택)</label>
+          <label className="text-sm text-[#5A5468] font-bold block mb-1">이름 (선택)</label>
           <input
             type="text"
             placeholder="이름 입력"
             value={person.name}
             onChange={(e) => onChange("name", e.target.value)}
-            className="w-full p-3 rounded-xl border-2 border-[#E8E2DC] bg-white text-[#3D3338] focus:border-[#8B7EC8] outline-none"
+            className="w-full p-3 rounded-xl border-2 border-[#D7D3E7] bg-white text-[#2D2B3D] focus:border-[#9B8EC8] outline-none"
             style={{ fontFamily: "Gaegu, cursive", fontSize: "16px", fontWeight: 700 }}
           />
         </div>
 
         {/* 성별 */}
         <div>
-          <label className="text-sm text-[#5C5358] font-bold block mb-1">성별</label>
+          <label className="text-sm text-[#5A5468] font-bold block mb-1">성별</label>
           <div className="flex gap-2">
             {["남", "여"].map((g) => (
               <button
@@ -175,8 +175,8 @@ function PersonCard({
                 onClick={() => onChange("gender", g)}
                 className={`flex-1 py-2 rounded-xl border-2 text-base font-bold transition-all ${
                   person.gender === g
-                    ? "border-[#8B7EC8] bg-[#8B7EC8] text-white"
-                    : "border-[#E8E2DC] bg-white text-[#5C5358] hover:border-[#8B7EC8]"
+                    ? "border-[#9B8EC8] bg-[#9B8EC8] text-white"
+                    : "border-[#D7D3E7] bg-white text-[#5A5468] hover:border-[#9B8EC8]"
                 }`}
                 style={{ fontFamily: "Jua, sans-serif" }}
               >
@@ -188,7 +188,7 @@ function PersonCard({
 
         {/* 달력 */}
         <div>
-          <label className="text-sm text-[#5C5358] font-bold block mb-1">달력 구분</label>
+          <label className="text-sm text-[#5A5468] font-bold block mb-1">달력 구분</label>
           <div className="flex gap-2">
             {[
               { value: false, label: "☀️ 양력" },
@@ -199,8 +199,8 @@ function PersonCard({
                 onClick={() => onChange("isLunar", c.value)}
                 className={`flex-1 py-2 rounded-xl border-2 text-base font-bold transition-all ${
                   person.isLunar === c.value
-                    ? "border-[#D8986C] bg-[#D8986C] text-white"
-                    : "border-[#E8E2DC] bg-white text-[#5C5358] hover:border-[#D8986C]"
+                    ? "border-[#B8A0D0] bg-[#B8A0D0] text-white"
+                    : "border-[#D7D3E7] bg-white text-[#5A5468] hover:border-[#B8A0D0]"
                 }`}
                 style={{ fontFamily: "Jua, sans-serif" }}
               >
@@ -236,7 +236,7 @@ function PersonCard({
         <TimeInput person={person} onChange={onChange} />
 
         {person.isLunar && (
-          <p className="text-xs text-[#D8986C] bg-[#FFF9F0] p-2 rounded-lg border border-[#E8DCC8]">
+          <p className="text-xs text-[#B8A0D0] bg-[#F8F7FC] p-2 rounded-lg border border-[#E8DCC8]">
             🌙 음력 생년월일을 입력해주세요. 서버에서 양력으로 변환하여 계산합니다.
           </p>
         )}
@@ -256,21 +256,21 @@ function PillarTable({ label, pillars, hasHour }: { label: string; pillars: any;
   ];
   return (
     <div className="mb-3">
-      <p className="text-sm font-bold text-[#5C5358] mb-1">{label}</p>
+      <p className="text-sm font-bold text-[#5A5468] mb-1">{label}</p>
       <div className="grid grid-cols-4 gap-2 text-center">
         {cols.map((c) => {
           const p = pillars[c.key];
           const noHour = c.key === "hour" && !hasHour;
           return (
-            <div key={c.key} className="bg-white rounded-xl p-2 border border-[#E8E2DC]">
-              <p className="text-xs text-[#847A80]">{c.emoji} {c.name}</p>
-              <p className="text-lg font-bold" style={{ fontFamily: "Jua, sans-serif", color: noHour ? "#ccc" : "#3D3338" }}>
+            <div key={c.key} className="bg-white rounded-xl p-2 border border-[#D7D3E7]">
+              <p className="text-xs text-[#8A8498]">{c.emoji} {c.name}</p>
+              <p className="text-lg font-bold" style={{ fontFamily: "Jua, sans-serif", color: noHour ? "#ccc" : "#2D2B3D" }}>
                 {noHour ? "—" : (p?.stem || "?")}
               </p>
-              <p className="text-lg font-bold" style={{ fontFamily: "Jua, sans-serif", color: noHour ? "#ccc" : "#3D3338" }}>
+              <p className="text-lg font-bold" style={{ fontFamily: "Jua, sans-serif", color: noHour ? "#ccc" : "#2D2B3D" }}>
                 {noHour ? "—" : (p?.branch || "?")}
               </p>
-              <p className="text-xs text-[#847A80]">
+              <p className="text-xs text-[#8A8498]">
                 {noHour ? "미입력" : `${p?.stemKo || ""}${p?.branchKo || ""}`}
               </p>
             </div>
@@ -347,21 +347,21 @@ export default function CompatibilityPage() {
       {/* 헤더 */}
       <div className="text-center py-4">
         <span className="text-5xl">💕</span>
-        <h1 style={{ fontFamily: "Jua, sans-serif" }} className="text-2xl text-[#3D3338] mt-3">궁합 분석</h1>
-        <p className="text-[#847A80] text-sm mt-1">두 사람의 사주팔자로 정밀 궁합을 분석합니다</p>
+        <h1 style={{ fontFamily: "Jua, sans-serif" }} className="text-2xl text-[#2D2B3D] mt-3">궁합 분석</h1>
+        <p className="text-[#8A8498] text-sm mt-1">두 사람의 사주팔자로 정밀 궁합을 분석합니다</p>
       </div>
 
       {/* 인물 입력 */}
-      <PersonCard label="첫 번째 사람" emoji="💜" color="#8B7EC8" person={person1} onChange={(k, v) => setPerson1((p) => ({ ...p, [k]: v }))} />
+      <PersonCard label="첫 번째 사람" emoji="💜" color="#9B8EC8" person={person1} onChange={(k, v) => setPerson1((p) => ({ ...p, [k]: v }))} />
       <div className="text-center"><span className="text-3xl animate-bounce-soft inline-block">💘</span></div>
-      <PersonCard label="두 번째 사람" emoji="💖" color="#E88B9C" person={person2} onChange={(k, v) => setPerson2((p) => ({ ...p, [k]: v }))} />
+      <PersonCard label="두 번째 사람" emoji="💖" color="#C8A0D0" person={person2} onChange={(k, v) => setPerson2((p) => ({ ...p, [k]: v }))} />
 
       {/* 제출 버튼 */}
       <button
         onClick={handleSubmit}
         disabled={loading}
         className="w-full py-4 rounded-2xl text-white text-lg transition-all active:scale-[0.98] disabled:opacity-50"
-        style={{ fontFamily: "Jua, sans-serif", background: "linear-gradient(135deg, #E88B9C, #8B7EC8)" }}
+        style={{ fontFamily: "Jua, sans-serif", background: "linear-gradient(135deg, #C8A0D0, #9B8EC8)" }}
       >
         {loading ? "분석 중... 💫" : "💕 궁합 분석하기"}
       </button>
@@ -380,8 +380,8 @@ export default function CompatibilityPage() {
                 <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto" style={{ backgroundColor: `${result.person1.mainElementColor}20` }}>
                   {result.person1.mainElementEmoji}
                 </div>
-                <p style={{ fontFamily: "Jua, sans-serif" }} className="text-base text-[#3D3338] mt-1">{result.person1.name}</p>
-                <p className="text-xs text-[#847A80]">{result.person1.ddiEmoji} {result.person1.ddi}띠</p>
+                <p style={{ fontFamily: "Jua, sans-serif" }} className="text-base text-[#2D2B3D] mt-1">{result.person1.name}</p>
+                <p className="text-xs text-[#8A8498]">{result.person1.ddiEmoji} {result.person1.ddi}띠</p>
               </div>
               {/* 점수 */}
               <div className="text-center">
@@ -394,11 +394,11 @@ export default function CompatibilityPage() {
                 <div className="w-16 h-16 rounded-full flex items-center justify-center text-2xl mx-auto" style={{ backgroundColor: `${result.person2.mainElementColor}20` }}>
                   {result.person2.mainElementEmoji}
                 </div>
-                <p style={{ fontFamily: "Jua, sans-serif" }} className="text-base text-[#3D3338] mt-1">{result.person2.name}</p>
-                <p className="text-xs text-[#847A80]">{result.person2.ddiEmoji} {result.person2.ddi}띠</p>
+                <p style={{ fontFamily: "Jua, sans-serif" }} className="text-base text-[#2D2B3D] mt-1">{result.person2.name}</p>
+                <p className="text-xs text-[#8A8498]">{result.person2.ddiEmoji} {result.person2.ddi}띠</p>
               </div>
             </div>
-            <p className="text-base text-[#5C5358] leading-relaxed">{result.mainAdvice}</p>
+            <p className="text-base text-[#5A5468] leading-relaxed">{result.mainAdvice}</p>
           </div>
 
           {/* 사주 기둥 표시 */}
@@ -410,7 +410,7 @@ export default function CompatibilityPage() {
 
           {/* 톱니바퀴 분석 */}
           {result.gearAnalysis && result.gearAnalysis.length > 0 && (
-            <div className="card" style={{ backgroundColor: "#F8F5FF", borderColor: "#D4CCE8" }}>
+            <div className="card" style={{ backgroundColor: "#F5F3FA", borderColor: "#D4CCE8" }}>
               <h2 className="label mb-3">⚙️ 사주 톱니바퀴 분석</h2>
               <div className="space-y-2">
                 {result.gearAnalysis.map((g: any, i: number) => (
@@ -418,8 +418,8 @@ export default function CompatibilityPage() {
                     <span className="text-lg">{g.emoji}</span>
                     <div>
                       <p className="text-sm font-bold text-[#5C4B8A]">{g.label}</p>
-                      <p className="text-sm text-[#5C5358]">{g.desc}</p>
-                      <p className="text-xs mt-1" style={{ color: g.score > 0 ? "#5FB88A" : g.score < 0 ? "#D87A8C" : "#847A80" }}>
+                      <p className="text-sm text-[#5A5468]">{g.desc}</p>
+                      <p className="text-xs mt-1" style={{ color: g.score > 0 ? "#5FB88A" : g.score < 0 ? "#D87A8C" : "#8A8498" }}>
                         {g.score > 0 ? `+${g.score}` : g.score} 점
                       </p>
                     </div>
@@ -434,45 +434,45 @@ export default function CompatibilityPage() {
             <h2 className="label mb-4">🪞 두 사람의 성격</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {[result.person1, result.person2].map((p: any, i: number) => (
-                <div key={i} className="bg-[#FAF7F4] border-2 border-[#E8E2DC] rounded-xl p-4">
+                <div key={i} className="bg-[#F8F7FC] border-2 border-[#D7D3E7] rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xl">{p.mainElementEmoji}</span>
-                    <p style={{ fontFamily: "Jua, sans-serif" }} className="text-base text-[#3D3338]">{p.name}</p>
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#E8E2DC] text-[#5C5358]">{p.eumyang} {p.mainElement}</span>
+                    <p style={{ fontFamily: "Jua, sans-serif" }} className="text-base text-[#2D2B3D]">{p.name}</p>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-[#D7D3E7] text-[#5A5468]">{p.eumyang} {p.mainElement}</span>
                   </div>
                   <p className="text-sm text-[#7B6CB8] font-bold mb-1">{p.personality.title}</p>
-                  <p className="text-sm text-[#5C5358]">{p.personality.traits}</p>
+                  <p className="text-sm text-[#5A5468]">{p.personality.traits}</p>
                 </div>
               ))}
             </div>
           </div>
 
           {/* 오행 궁합 */}
-          <div className="card" style={{ backgroundColor: "#F8F5FF", borderColor: "#D4CCE8" }}>
+          <div className="card" style={{ backgroundColor: "#F5F3FA", borderColor: "#D4CCE8" }}>
             <h2 className="label mb-2">🔮 오행 궁합</h2>
             <p style={{ fontFamily: "Jua, sans-serif" }} className="text-lg text-[#5C4B8A] mb-3">{result.ohaengCombo.title}</p>
-            <p className="text-base text-[#5C5358] leading-relaxed mb-4">{result.ohaengCombo.chemistry}</p>
+            <p className="text-base text-[#5A5468] leading-relaxed mb-4">{result.ohaengCombo.chemistry}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="bg-white/60 rounded-xl p-3 border border-[#D4CCE8]">
                 <p className="text-sm text-[#5FB88A] font-bold mb-1">✨ 장점</p>
-                <p className="text-sm text-[#5C5358]">{result.ohaengCombo.strength}</p>
+                <p className="text-sm text-[#5A5468]">{result.ohaengCombo.strength}</p>
               </div>
               <div className="bg-white/60 rounded-xl p-3 border border-[#D4CCE8]">
                 <p className="text-sm text-[#D87A8C] font-bold mb-1">💭 주의점</p>
-                <p className="text-sm text-[#5C5358]">{result.ohaengCombo.weakness}</p>
+                <p className="text-sm text-[#5A5468]">{result.ohaengCombo.weakness}</p>
               </div>
             </div>
             <div className="mt-3 bg-white/60 rounded-xl p-3 border border-[#D4CCE8]">
               <p className="text-sm text-[#5EA3B8] font-bold mb-1">💡 관계 TIP</p>
-              <p className="text-sm text-[#5C5358]">{result.ohaengCombo.tip}</p>
+              <p className="text-sm text-[#5A5468]">{result.ohaengCombo.tip}</p>
             </div>
           </div>
 
           {/* 음양 궁합 */}
-          <div className="card" style={{ backgroundColor: result.eumyangMatch ? "#F0F8F2" : "#FFF9F0", borderColor: result.eumyangMatch ? "#C8E8D4" : "#E8DCC8" }}>
+          <div className="card" style={{ backgroundColor: result.eumyangMatch ? "#F0F2F8" : "#F8F7FC", borderColor: result.eumyangMatch ? "#C8E8D4" : "#E8DCC8" }}>
             <h2 className="label mb-2">☯️ 음양 궁합</h2>
             <div className="flex items-center gap-4 mb-3">
-              <span className="px-3 py-1 rounded-full text-sm font-bold" style={{ backgroundColor: "#F8F5FF", color: "#7B6CB8" }}>
+              <span className="px-3 py-1 rounded-full text-sm font-bold" style={{ backgroundColor: "#F5F3FA", color: "#7B6CB8" }}>
                 {result.person1.name}: {result.person1.eumyang}
               </span>
               <span className="text-xl">{result.eumyangMatch ? "⚡" : "🤝"}</span>
@@ -480,11 +480,11 @@ export default function CompatibilityPage() {
                 {result.person2.name}: {result.person2.eumyang}
               </span>
             </div>
-            <p className="text-base text-[#5C5358] leading-relaxed">{result.eumyangDesc}</p>
+            <p className="text-base text-[#5A5468] leading-relaxed">{result.eumyangDesc}</p>
           </div>
 
           {/* 띠 궁합 */}
-          <div className="card" style={{ backgroundColor: "#FFF9F0", borderColor: "#E8DCC8" }}>
+          <div className="card" style={{ backgroundColor: "#F8F7FC", borderColor: "#E8DCC8" }}>
             <h2 className="label mb-2">🐾 띠 궁합</h2>
             <div className="flex items-center gap-4 mb-3">
               <span className="text-3xl">{result.person1.ddiEmoji}</span>
@@ -492,7 +492,7 @@ export default function CompatibilityPage() {
               <span className="text-3xl">{result.person2.ddiEmoji}</span>
             </div>
             <p style={{ fontFamily: "Jua, sans-serif" }} className="text-base text-[#5C4B3A] mb-2">{result.ddiCombo.title}</p>
-            <p className="text-base text-[#5C5358] leading-relaxed">{result.ddiCombo.desc}</p>
+            <p className="text-base text-[#5A5468] leading-relaxed">{result.ddiCombo.desc}</p>
           </div>
 
           {/* 일주 궁합 (추가) */}
@@ -500,7 +500,7 @@ export default function CompatibilityPage() {
             <div className="card" style={{ backgroundColor: "#F5FFF8", borderColor: "#C8E8D4" }}>
               <h2 className="label mb-2">📅 일주(日柱) 궁합</h2>
               <p style={{ fontFamily: "Jua, sans-serif" }} className="text-base text-[#3D5838] mb-2">{result.ilju.title}</p>
-              <p className="text-sm text-[#5C5358] leading-relaxed">{result.ilju.desc}</p>
+              <p className="text-sm text-[#5A5468] leading-relaxed">{result.ilju.desc}</p>
             </div>
           )}
 
@@ -509,15 +509,15 @@ export default function CompatibilityPage() {
             <h2 className="label mb-4">📊 세부 궁합 분석</h2>
             <div className="space-y-4">
               {result.categories.map((cat: any) => (
-                <div key={cat.label} className="bg-[#FAF7F4] border-2 border-[#E8E2DC] rounded-xl p-4">
+                <div key={cat.label} className="bg-[#F8F7FC] border-2 border-[#D7D3E7] rounded-xl p-4">
                   <div className="flex justify-between items-center mb-2">
-                    <span style={{ fontFamily: "Jua, sans-serif" }} className="text-base text-[#3D3338]">{cat.emoji} {cat.label}</span>
+                    <span style={{ fontFamily: "Jua, sans-serif" }} className="text-base text-[#2D2B3D]">{cat.emoji} {cat.label}</span>
                     <span className="text-lg font-bold" style={{ color: scoreColor(cat.score) }}>{cat.score}점</span>
                   </div>
-                  <div className="h-3 bg-[#E8E2DC] rounded-full overflow-hidden mb-3">
+                  <div className="h-3 bg-[#D7D3E7] rounded-full overflow-hidden mb-3">
                     <div className="h-full rounded-full transition-all duration-700" style={{ width: `${cat.score}%`, backgroundColor: scoreColor(cat.score) }} />
                   </div>
-                  <p className="text-sm text-[#5C5358] leading-relaxed">{cat.description}</p>
+                  <p className="text-sm text-[#5A5468] leading-relaxed">{cat.description}</p>
                 </div>
               ))}
             </div>
@@ -527,17 +527,17 @@ export default function CompatibilityPage() {
           <div className="card">
             <h2 className="label mb-4">💝 관계 분석 요약</h2>
             <div className="space-y-4">
-              <div className="bg-[#F0F8F2] border-2 border-[#C8E8D4] rounded-xl p-4">
+              <div className="bg-[#F0F2F8] border-2 border-[#C8E8D4] rounded-xl p-4">
                 <p style={{ fontFamily: "Jua, sans-serif" }} className="text-base text-[#5FB88A] mb-2">✨ 이 관계의 장점</p>
                 {result.strengths.map((s: string, i: number) => <p key={i} className="text-sm text-[#3D5838] mb-1">• {s}</p>)}
               </div>
-              <div className="bg-[#FFF5F5] border-2 border-[#E8C8C8] rounded-xl p-4">
+              <div className="bg-[#F5F0FA] border-2 border-[#E8C8C8] rounded-xl p-4">
                 <p style={{ fontFamily: "Jua, sans-serif" }} className="text-base text-[#D87A8C] mb-2">💭 주의할 점</p>
                 {result.weaknesses.map((s: string, i: number) => <p key={i} className="text-sm text-[#5C3838] mb-1">• {s}</p>)}
               </div>
-              <div className="bg-[#F8F5FF] border-2 border-[#D4CCE8] rounded-xl p-4">
+              <div className="bg-[#F5F3FA] border-2 border-[#D4CCE8] rounded-xl p-4">
                 <p style={{ fontFamily: "Jua, sans-serif" }} className="text-base text-[#7B6CB8] mb-2">💡 관계 개선 TIP</p>
-                {result.tips.map((s: string, i: number) => <p key={i} className="text-sm text-[#5C5358] mb-1">• {s}</p>)}
+                {result.tips.map((s: string, i: number) => <p key={i} className="text-sm text-[#5A5468] mb-1">• {s}</p>)}
               </div>
             </div>
           </div>

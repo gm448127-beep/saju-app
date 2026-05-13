@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useRef, useEffect } from 'react';
 
@@ -106,7 +106,7 @@ export default function ChatPage() {
       const parts = line.split(/(\*\*.*?\*\*)/g);
       const rendered = parts.map((part, j) => {
         if (part.startsWith('**') && part.endsWith('**')) {
-          return <strong key={j} className="text-[#3D3338]">{part.slice(2, -2)}</strong>;
+          return <strong key={j} className="text-[#2D2B3D]">{part.slice(2, -2)}</strong>;
         }
         return <span key={j}>{part}</span>;
       });
@@ -125,16 +125,16 @@ export default function ChatPage() {
       <div className="text-center py-3 shrink-0">
         <div className="flex items-center justify-center gap-2">
           <span className="text-3xl">🔮</span>
-          <h1 style={{ fontFamily: 'Jua, sans-serif' }} className="text-xl text-[#3D3338]">AI 사주 상담</h1>
+          <h1 style={{ fontFamily: 'Jua, sans-serif' }} className="text-xl text-[#2D2B3D]">AI 사주 상담</h1>
         </div>
         {birthSaved && (
-          <p className="text-xs text-[#847A80] mt-1">
+          <p className="text-xs text-[#8A8498] mt-1">
             {birthData.year}년 {birthData.month}월 {birthData.day}일 ({birthData.gender === '남' ? '남' : '여'}, {birthData.isLunar ? '음력' : '양력'})
-            <button onClick={() => setShowBirthForm(true)} className="ml-2 text-[#8B7EC8] underline">수정</button>
+            <button onClick={() => setShowBirthForm(true)} className="ml-2 text-[#9B8EC8] underline">수정</button>
           </p>
         )}
         {!birthSaved && !showBirthForm && (
-          <button onClick={() => setShowBirthForm(true)} className="text-xs text-[#8B7EC8] underline mt-1">
+          <button onClick={() => setShowBirthForm(true)} className="text-xs text-[#9B8EC8] underline mt-1">
             생년월일 입력하기
           </button>
         )}
@@ -142,7 +142,7 @@ export default function ChatPage() {
 
       {/* 생년월일 입력 폼 */}
       {showBirthForm && (
-        <div className="mx-4 mb-3 card shrink-0" style={{ backgroundColor: '#F8F5FF', borderColor: '#D4CCE8' }}>
+        <div className="mx-4 mb-3 card shrink-0" style={{ backgroundColor: '#F5F3FA', borderColor: '#D4CCE8' }}>
           <p style={{ fontFamily: 'Jua, sans-serif' }} className="text-base text-[#5C4B8A] mb-3">🎂 생년월일을 입력하면 맞춤 상담이 가능해요!</p>
           <div className="space-y-3">
             <div className="flex gap-2">
@@ -151,7 +151,7 @@ export default function ChatPage() {
                   key={g}
                   onClick={() => setBirthData(prev => ({ ...prev, gender: g }))}
                   className={`flex-1 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                    birthData.gender === g ? 'border-[#8B7EC8] bg-[#8B7EC8] text-white' : 'border-[#E8E2DC] bg-white text-[#5C5358]'
+                    birthData.gender === g ? 'border-[#9B8EC8] bg-[#9B8EC8] text-white' : 'border-[#D7D3E7] bg-white text-[#5A5468]'
                   }`}
                   style={{ fontFamily: 'Jua, sans-serif' }}
                 >
@@ -163,7 +163,7 @@ export default function ChatPage() {
                   key={String(lunar)}
                   onClick={() => setBirthData(prev => ({ ...prev, isLunar: lunar }))}
                   className={`flex-1 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                    birthData.isLunar === lunar ? 'border-[#D8986C] bg-[#D8986C] text-white' : 'border-[#E8E2DC] bg-white text-[#5C5358]'
+                    birthData.isLunar === lunar ? 'border-[#B8A0D0] bg-[#B8A0D0] text-white' : 'border-[#D7D3E7] bg-white text-[#5A5468]'
                   }`}
                   style={{ fontFamily: 'Jua, sans-serif' }}
                 >
@@ -189,13 +189,13 @@ export default function ChatPage() {
               <button
                 onClick={saveBirthData}
                 className="flex-1 py-2 rounded-xl text-white text-sm font-bold"
-                style={{ fontFamily: 'Jua, sans-serif', backgroundColor: '#8B7EC8' }}
+                style={{ fontFamily: 'Jua, sans-serif', backgroundColor: '#9B8EC8' }}
               >
                 ✅ 저장하고 상담 시작
               </button>
               <button
                 onClick={skipBirthData}
-                className="py-2 px-4 rounded-xl text-sm font-bold border-2 border-[#E8E2DC] text-[#847A80]"
+                className="py-2 px-4 rounded-xl text-sm font-bold border-2 border-[#D7D3E7] text-[#8A8498]"
                 style={{ fontFamily: 'Jua, sans-serif' }}
               >
                 건너뛰기
@@ -210,23 +210,23 @@ export default function ChatPage() {
         {messages.length === 0 && !showBirthForm && (
           <div className="text-center py-10">
             <span className="text-5xl block mb-3">🔮</span>
-            <p style={{ fontFamily: 'Jua, sans-serif' }} className="text-lg text-[#3D3338]">사주도우미와 대화해보세요!</p>
-            <p className="text-sm text-[#847A80]">아래 버튼이나 직접 입력으로 질문하세요</p>
+            <p style={{ fontFamily: 'Jua, sans-serif' }} className="text-lg text-[#2D2B3D]">사주도우미와 대화해보세요!</p>
+            <p className="text-sm text-[#8A8498]">아래 버튼이나 직접 입력으로 질문하세요</p>
           </div>
         )}
 
         {messages.map((msg, idx) => (
           <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'assistant' && (
-              <div className="w-8 h-8 rounded-full bg-[#F8F5FF] flex items-center justify-center text-sm shrink-0 mr-2 mt-1">
+              <div className="w-8 h-8 rounded-full bg-[#F5F3FA] flex items-center justify-center text-sm shrink-0 mr-2 mt-1">
                 🔮
               </div>
             )}
             <div
               className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                 msg.role === 'user'
-                  ? 'bg-[#8B7EC8] text-white rounded-br-md'
-                  : 'bg-white border-2 border-[#E8E2DC] text-[#3D3338] rounded-bl-md'
+                  ? 'bg-[#9B8EC8] text-white rounded-br-md'
+                  : 'bg-white border-2 border-[#D7D3E7] text-[#2D2B3D] rounded-bl-md'
               }`}
             >
               {msg.role === 'assistant' ? renderContent(msg.content) : msg.content}
@@ -236,14 +236,14 @@ export default function ChatPage() {
 
         {loading && (
           <div className="flex justify-start">
-            <div className="w-8 h-8 rounded-full bg-[#F8F5FF] flex items-center justify-center text-sm shrink-0 mr-2">
+            <div className="w-8 h-8 rounded-full bg-[#F5F3FA] flex items-center justify-center text-sm shrink-0 mr-2">
               🔮
             </div>
-            <div className="bg-white border-2 border-[#E8E2DC] rounded-2xl rounded-bl-md px-4 py-3">
+            <div className="bg-white border-2 border-[#D7D3E7] rounded-2xl rounded-bl-md px-4 py-3">
               <div className="flex gap-1">
-                <span className="w-2 h-2 bg-[#8B7EC8] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-2 h-2 bg-[#8B7EC8] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-2 h-2 bg-[#8B7EC8] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                <span className="w-2 h-2 bg-[#9B8EC8] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-2 h-2 bg-[#9B8EC8] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-2 h-2 bg-[#9B8EC8] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
               </div>
             </div>
           </div>
@@ -261,7 +261,7 @@ export default function ChatPage() {
                 key={i}
                 onClick={() => sendMessage(q.text)}
                 disabled={loading}
-                className="px-3 py-1.5 rounded-full border-2 border-[#E8E2DC] bg-white text-sm text-[#5C5358] hover:border-[#8B7EC8] hover:bg-[#F8F5FF] transition-all disabled:opacity-50"
+                className="px-3 py-1.5 rounded-full border-2 border-[#D7D3E7] bg-white text-sm text-[#5A5468] hover:border-[#9B8EC8] hover:bg-[#F5F3FA] transition-all disabled:opacity-50"
                 style={{ fontFamily: 'Gaegu, cursive', fontWeight: 700 }}
               >
                 {q.emoji} {q.text}
@@ -273,7 +273,7 @@ export default function ChatPage() {
 
       {/* 입력 영역 */}
       {!showBirthForm && (
-        <div className="px-4 py-3 shrink-0 border-t-2 border-[#E8E2DC] bg-[#FAF7F4]">
+        <div className="px-4 py-3 shrink-0 border-t-2 border-[#D7D3E7] bg-[#F8F7FC]">
           <div className="flex gap-2">
             <input
               type="text"
@@ -282,14 +282,14 @@ export default function ChatPage() {
               onKeyDown={handleKeyDown}
               placeholder="궁금한 것을 물어보세요..."
               disabled={loading}
-              className="flex-1 p-3 rounded-2xl border-2 border-[#E8E2DC] bg-white text-[#3D3338] focus:border-[#8B7EC8] outline-none disabled:opacity-50"
+              className="flex-1 p-3 rounded-2xl border-2 border-[#D7D3E7] bg-white text-[#2D2B3D] focus:border-[#9B8EC8] outline-none disabled:opacity-50"
               style={{ fontFamily: 'Gaegu, cursive', fontSize: '16px', fontWeight: 700 }}
             />
             <button
               onClick={() => sendMessage()}
               disabled={loading || !input.trim()}
               className="px-5 py-3 rounded-2xl text-white text-base disabled:opacity-50 transition-all active:scale-95"
-              style={{ fontFamily: 'Jua, sans-serif', backgroundColor: '#8B7EC8' }}
+              style={{ fontFamily: 'Jua, sans-serif', backgroundColor: '#9B8EC8' }}
             >
               {loading ? '...' : '전송'}
             </button>
