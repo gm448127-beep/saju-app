@@ -185,7 +185,11 @@ export default function TojeongPage() {
                 className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   calendarType === "lunar" ? 'bg-[#CCB6B0] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
                 }`}>🌙 음력</button>
-                }`}>🌙 윤달</button>
+            <button type="button" onClick={() => setCalendarType("lunarLeap")}
+              className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all
+${
+                calendarType === "lunarLeap" ? 'bg-[#CCB6B0] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
+              }`}>🌙 윤달</button>
             </div>
           </div>
 

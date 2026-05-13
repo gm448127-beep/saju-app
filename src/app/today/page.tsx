@@ -204,6 +204,10 @@ export default function TodayPage() {
                   className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${calendarType === "lunar" ? "bg-[#F2E4DC] text-[#CCB6B0] border-[#CCB6B0]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#D4CCE8]"}`}>
                   🌙 음력
                 </button>
+              <button type="button" onClick={() => setCalendarType("lunarLeap")}
+                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${calendarType === "lunarLeap" ? "bg-[#F2E4DC] text-[#CCB6B0] border-[#CCB6B0]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#D4CCE8]"}`}>
+                🌙 윤달
+              </button>
               </div>
             </div>
             <div className="flex-1">
