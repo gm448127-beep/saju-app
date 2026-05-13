@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 
@@ -352,9 +352,9 @@ export default function CompatibilityPage() {
       </div>
 
       {/* 인물 입력 */}
-      <PersonCard label="첫 번째 사람" emoji="💜" color="#CCB6B0" person={person1} onChange={(k, v) => setPerson1((p) => ({ ...p, [k]: v }))} />
+      <PersonCard label="내 정보" emoji="💜" color="#CCB6B0" person={person1} onChange={(k, v) => setPerson1((p) => ({ ...p, [k]: v }))} />
       <div className="text-center"><span className="text-3xl animate-bounce-soft inline-block">💘</span></div>
-      <PersonCard label="두 번째 사람" emoji="💖" color="#C8A0D0" person={person2} onChange={(k, v) => setPerson2((p) => ({ ...p, [k]: v }))} />
+      <PersonCard label="상대방 정보" emoji="💖" color="#C8A0D0" person={person2} onChange={(k, v) => setPerson2((p) => ({ ...p, [k]: v }))} />
 
       {/* 제출 버튼 */}
       <button
