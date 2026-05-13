@@ -28,7 +28,7 @@ export default function TodayPage() {
   const [slotHour, setSlotHour] = useState(9);
   const [exactHour, setExactHour] = useState(9);
   const [exactMinute, setExactMinute] = useState(0);
-  const [isLunar, setIsLunar] = useState(false);
+  const [calendarType, setCalendarType] = useState("solar");
   const [gender, setGender] = useState("남");
 
   // 결과 상태
@@ -59,7 +59,7 @@ export default function TodayPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           year, month, day, hour, minute,
-          isLunar, gender,
+          isLunar: calendarType !== "solar", gender,
         }),
       });
       const json = await res.json();
@@ -196,12 +196,12 @@ export default function TodayPage() {
             <div className="flex-1">
               <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>달력</label>
               <div className="flex gap-2">
-                <button type="button" onClick={() => setIsLunar(false)}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${!isLunar ? "bg-[#EFDED5] text-[#E5C100] border-[#FFD700]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#D4CCE8]"}`}>
+                <button type="button" onClick={() => setCalendarType("solar")}
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${calendarType !== "lunar" ? "bg-[#EFDED5] text-[#E5C100] border-[#FFD700]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#D4CCE8]"}`}>
                   ☀️ 양력
                 </button>
-                <button type="button" onClick={() => setIsLunar(true)}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${isLunar ? "bg-[#F2E4DC] text-[#CCB6B0] border-[#CCB6B0]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#D4CCE8]"}`}>
+                <button type="button" onClick={() => setCalendarType("lunar")}
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${calendarType === "lunar" ? "bg-[#F2E4DC] text-[#CCB6B0] border-[#CCB6B0]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#D4CCE8]"}`}>
                   🌙 음력
                 </button>
               </div>

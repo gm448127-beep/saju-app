@@ -27,7 +27,7 @@ export default function TojeongPage() {
   const [slotHour, setSlotHour] = useState(9);
   const [exactHour, setExactHour] = useState(9);
   const [exactMinute, setExactMinute] = useState(0);
-  const [isLunar, setIsLunar] = useState(false);
+  const [calendarType, setCalendarType] = useState("solar");
   const [gender, setGender] = useState('남');
 
   const [result, setResult] = useState<any>(null);
@@ -56,7 +56,7 @@ export default function TojeongPage() {
       const res = await fetch('/api/tojeong', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ year, month, day, hour, minute, isLunar, gender }),
+        body: JSON.stringify({ year, month, day, hour, minute, isLunar: calendarType !== "solar", gender }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || '분석 실패');
@@ -177,14 +177,15 @@ export default function TojeongPage() {
           <div>
             <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: 'Jua, sans-serif' }}>달력</label>
             <div className="flex gap-2">
-              <button type="button" onClick={() => setIsLunar(false)}
+              <button type="button" onClick={() => setCalendarType("solar")}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  !isLunar ? 'bg-[#CCB6B0] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
+                  calendarType !== "lunar" ? 'bg-[#CCB6B0] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
                 }`}>☀️ 양력</button>
-              <button type="button" onClick={() => setIsLunar(true)}
+              <button type="button" onClick={() => setCalendarType("lunar")}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  isLunar ? 'bg-[#CCB6B0] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
+                  calendarType === "lunar" ? 'bg-[#CCB6B0] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
                 }`}>🌙 음력</button>
+                }`}>🌙 윤달</button>
             </div>
           </div>
 
