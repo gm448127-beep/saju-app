@@ -2,7 +2,7 @@
 
 /* ===== 기본 배경 & 폰트 ===== */
 body {
-  background: linear-gradient(135deg, #FAFAFE 0%, #F0EEF6 50%, #F5F3FA 100%);
+  background: linear-gradient(135deg, #F5EDE8 0%, #EFDED5 50%, #F2E4DC 100%);
   font-family: 'Noto Sans KR', sans-serif !important;
   color: #3D3338;
   font-size: 16px;
@@ -29,41 +29,41 @@ p, span, div, li, td, th, label, input, select, textarea, button, a {
   -webkit-backdrop-filter: blur(12px);
   border-radius: 20px;
   padding: 20px 24px;
-  border: 1px solid rgba(215, 211, 231, 0.5);
+  border: 1px solid rgba(204, 182, 176, 0.5);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 12px rgba(215, 211, 231, 0.2);
+  box-shadow: 0 2px 12px rgba(204, 182, 176, 0.2);
 }
 
 .card-hover:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(215, 211, 231, 0.35);
-  border-color: #D7D3E7;
+  box-shadow: 0 12px 32px rgba(204, 182, 176, 0.35);
+  border-color: #D9C8C0;
 }
 
 /* ===== 태그 ===== */
 .tag {
   display: inline-block;
-  background: linear-gradient(135deg, rgba(215, 211, 231, 0.3), rgba(215, 211, 231, 0.15));
-  border: 1px solid rgba(215, 211, 231, 0.5);
+  background: linear-gradient(135deg, rgba(204, 182, 176, 0.3), rgba(204, 182, 176, 0.15));
+  border: 1px solid rgba(204, 182, 176, 0.5);
   border-radius: 20px;
   padding: 6px 16px;
   font-size: 13px;
   font-weight: 500;
-  color: #6B6080;
+  color: #6B5E58;
   backdrop-filter: blur(4px);
 }
 
 /* ===== 텍스트 가독성 개선 ===== */
 .text-\[\#9B9B9B\] {
-  color: #8A8498 !important;
+  color: #8A7E78 !important;
 }
 
 .text-\[\#6B6B6B\] {
-  color: #5A5468 !important;
+  color: #5A4E48 !important;
 }
 
 .card p {
-  color: #8A8498 !important;
+  color: #8A7E78 !important;
   font-size: 14px;
 }
 
@@ -83,20 +83,20 @@ input, select, textarea {
   font-size: 16px !important;
   color: #2D2D2D;
   background: rgba(255, 255, 255, 0.9);
-  border: 1.5px solid rgba(215, 211, 231, 0.6);
+  border: 1.5px solid rgba(204, 182, 176, 0.6);
   border-radius: 12px;
   transition: all 0.2s ease;
 }
 
 input:focus, select:focus, textarea:focus {
-  border-color: #D7D3E7;
-  box-shadow: 0 0 0 3px rgba(215, 211, 231, 0.3);
+  border-color: #D9C8C0;
+  box-shadow: 0 0 0 3px rgba(204, 182, 176, 0.3);
   outline: none;
 }
 
 /* ===== 푸터 ===== */
 footer p {
-  color: #A09AAE !important;
+  color: #A09488 !important;
   font-size: 13px;
 }
 
@@ -144,25 +144,25 @@ footer p {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #D7D3E7;
+  background: #D9C8C0;
   border-radius: 3px;
 }
 
 /* ===== 그라데이션 버튼 ===== */
 .btn-gradient {
-  background: linear-gradient(135deg, #D7D3E7 0%, #C5B9E8 100%);
+  background: linear-gradient(135deg, #D9C8C0 0%, #CCB6B0 100%);
   color: white;
   border: none;
   border-radius: 16px;
   padding: 14px 28px;
   font-weight: 600;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 16px rgba(215, 211, 231, 0.4);
+  box-shadow: 0 4px 16px rgba(204, 182, 176, 0.4);
 }
 
 .btn-gradient:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(215, 211, 231, 0.5);
+  box-shadow: 0 8px 24px rgba(204, 182, 176, 0.5);
 }
 
 /* ===== 글래스 효과 ===== */
@@ -170,5 +170,5 @@ footer p {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(215, 211, 231, 0.3);
+  border: 1px solid rgba(204, 182, 176, 0.3);
 }

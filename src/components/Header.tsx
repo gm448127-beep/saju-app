@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const NAV_ITEMS = [
-  { href: "/saju", emoji: "🔮", label: "사주", color: "#9B8EC8" },
+  { href: "/saju", emoji: "🔮", label: "사주", color: "#CCB6B0" },
   { href: "/today", emoji: "🌤️", label: "오늘운세", color: "#8AAEC8" },
   { href: "/tojeong", emoji: "📜", label: "토정비결", color: "#8AC8A4" },
   { href: "/compatibility", emoji: "💕", label: "궁합", color: "#C88A9C" },
@@ -17,17 +17,17 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50" style={{
-      background: 'rgba(250, 249, 254, 0.85)',
+      background: 'rgba(245, 237, 232, 0.9)',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
-      borderBottom: '1px solid rgba(215, 211, 231, 0.4)'
+      borderBottom: '1px solid rgba(204, 182, 176, 0.4)'
     }}>
       <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
           <span className="text-2xl">✨</span>
           <span
             style={{ fontFamily: "Jua, sans-serif" }}
-            className="text-lg text-[#2D2D2D] group-hover:text-[#9B8EC8] transition-colors"
+            className="text-lg text-[#2D2D2D] group-hover:text-[#CCB6B0] transition-colors"
           >
             사주도우미
           </span>
@@ -44,7 +44,7 @@ export default function Header() {
                 className={`px-3 py-1.5 rounded-full text-sm transition-all ${
                   isActive
                     ? "bg-white shadow-sm font-bold"
-                    : "text-[#8A8498] hover:bg-white/60"
+                    : "text-[#8A7E78] hover:bg-white/60"
                 }`}
                 style={
                   isActive
@@ -62,7 +62,7 @@ export default function Header() {
         {/* 모바일 햄버거 */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden text-[#8A8498] hover:text-[#2D2D2D] p-2"
+          className="md:hidden text-[#8A7E78] hover:text-[#2D2D2D] p-2"
         >
           {menuOpen ? (
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -81,7 +81,7 @@ export default function Header() {
         <div className="md:hidden px-4 py-3" style={{
           background: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(16px)',
-          borderTop: '1px solid rgba(215, 211, 231, 0.3)'
+          borderTop: '1px solid rgba(204, 182, 176, 0.3)'
         }}>
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
@@ -92,8 +92,8 @@ export default function Header() {
                 onClick={() => setMenuOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl mb-1 transition-all ${
                   isActive
-                    ? "bg-[#F5F3FA] font-bold"
-                    : "text-[#8A8498] hover:bg-[#F5F3FA]"
+                    ? "bg-[#EFDED5] font-bold"
+                    : "text-[#8A7E78] hover:bg-[#EFDED5]"
                 }`}
                 style={isActive ? { color: item.color } : {}}
               >
