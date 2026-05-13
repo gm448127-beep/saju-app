@@ -191,8 +191,9 @@ function PersonCard({
           <label className="text-sm text-[#5A4E48] font-bold block mb-1">달력 구분</label>
           <div className="flex gap-2">
             {[
-              { value: false, label: "☀️ 양력" },
-              { value: true, label: "🌙 음력" },
+              { value: "solar", label: "☀️ 양력" },
+              { value: "lunar", label: "🌙 음력" },
+              { value: "lunarLeap", label: "🌙윤달" },
             ].map((c) => (
               <button
                 key={String(c.value)}
@@ -547,4 +548,3 @@ export default function CompatibilityPage() {
     </div>
   );
 }
-
