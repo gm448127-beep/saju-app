@@ -66,7 +66,7 @@ export default function PremiumPage() {
     lines.forEach((line, i) => {
       if (line.startsWith("## ")) {
         elements.push(
-          <h2 key={i} className="text-xl font-bold mt-8 mb-3 pb-2 border-b-2 border-purple-200" style={{ fontFamily: "Jua, sans-serif", color: "#2D2B3D" }}>
+          <h2 key={i} className="text-xl font-bold mt-8 mb-3 pb-2 border-b-2 border-purple-200" style={{ fontFamily: "Jua, sans-serif", color: "#3D3338" }}>
             {line.replace("## ", "")}
           </h2>
         );
@@ -104,10 +104,10 @@ export default function PremiumPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#F5F3FA] to-[#E8E0F0] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-b from-[#EFDED5] to-[#E8E0F0] flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4 animate-pulse">🔮</div>
-          <h2 className="text-xl font-bold mb-2" style={{ fontFamily: "Jua, sans-serif", color: "#2D2B3D" }}>
+          <h2 className="text-xl font-bold mb-2" style={{ fontFamily: "Jua, sans-serif", color: "#3D3338" }}>
             프리미엄 사주 리포트 생성 중...
           </h2>
           <p className="text-sm text-gray-500 mb-6">AI가 당신의 사주를 깊이 분석하고 있습니다</p>
@@ -125,7 +125,7 @@ export default function PremiumPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#F5F3FA] to-[#E8E0F0] flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-b from-[#EFDED5] to-[#E8E0F0] flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
           <div className="text-5xl mb-4">😔</div>
           <h2 className="text-lg font-bold mb-2 text-red-500">오류 발생</h2>
@@ -139,7 +139,7 @@ export default function PremiumPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F5F3FA] to-[#E8E0F0]">
+    <div className="min-h-screen bg-gradient-to-b from-[#EFDED5] to-[#E8E0F0]">
       <div className="text-center py-6 px-4" style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}>
         <div className="text-3xl mb-1">👑</div>
         <h1 className="text-2xl font-bold text-white" style={{ fontFamily: "Jua, sans-serif" }}>프리미엄 사주 리포트</h1>
