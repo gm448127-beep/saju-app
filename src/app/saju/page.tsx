@@ -65,7 +65,7 @@ export default function SajuPage() {
   const [exactHour, setExactHour] = useState(9);
   const [exactMinute, setExactMinute] = useState(0);
   const [gender, setGender] = useState<"남" | "여">("여");
-  const [isLunar, setIsLunar] = useState(false);
+  const [calendarType, setCalendarType] = useState("solar");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<SajuResult | null>(null);
@@ -81,7 +81,7 @@ export default function SajuPage() {
 
       const res = await fetch("/api/saju", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, year, month, day, hour: sendHour, minute: sendMinute, gender, isLunar }),
+        body: JSON.stringify({ name, year, month, day, hour: sendHour, minute: sendMinute, gender, isLunar: calendarType !== "solar" }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "분석 실패");
@@ -170,8 +170,9 @@ export default function SajuPage() {
           <div>
             <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>달력</label>
             <div className="flex gap-2">
-              <button type="button" onClick={() => setIsLunar(false)} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${!isLunar ? "bg-[#CCB6B0] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>☀️ 양력</button>
-              <button type="button" onClick={() => setIsLunar(true)} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${isLunar ? "bg-[#CCB6B0] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>🌙 음력</button>
+              <button type="button" onClick={() => setCalendarType("solar")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${calendarType === "solar" ? "bg-[#CCB6B0] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>☀️ 양력</button>
+              <button type="button" onClick={() => setCalendarType("lunar")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${calendarType === "lunar" ? "bg-[#CCB6B0] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>🌙 음력</button>
+              <button type="button" onClick={() => setCalendarType("lunarLeap")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${calendarType === "lunarLeap" ? "bg-[#CCB6B0] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>🌙 윤달</button>
             </div>
           </div>
 

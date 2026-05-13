@@ -32,7 +32,7 @@ interface PersonInput {
   month: string;
   day: string;
   gender: string;
-  isLunar: boolean;
+  calendarType: string;
   timeMode: TimeMode;
   slotHour: number | "";
   exactHour: number | "";
@@ -45,7 +45,7 @@ const defaultPerson = (gender: string): PersonInput => ({
   month: "",
   day: "",
   gender,
-  isLunar: false,
+  calendarType: "solar",
   timeMode: "none",
   slotHour: "",
   exactHour: "",
@@ -196,9 +196,9 @@ function PersonCard({
             ].map((c) => (
               <button
                 key={String(c.value)}
-                onClick={() => onChange("isLunar", c.value)}
+                onClick={() => onChange("calendarType", c.value)}
                 className={`flex-1 py-2 rounded-xl border-2 text-base font-bold transition-all ${
-                  person.isLunar === c.value
+                  person.calendarType === c.value
                     ? "border-[#CCB6B0] bg-[#CCB6B0] text-white"
                     : "border-[#D9C8C0] bg-white text-[#5A4E48] hover:border-[#CCB6B0]"
                 }`}
@@ -235,7 +235,7 @@ function PersonCard({
         {/* 시간 */}
         <TimeInput person={person} onChange={onChange} />
 
-        {person.isLunar && (
+        {person.calendarType !== "solar" && (
           <p className="text-xs text-[#CCB6B0] bg-[#F5EDE8] p-2 rounded-lg border border-[#E8DCC8]">
             🌙 음력 생년월일을 입력해주세요. 서버에서 양력으로 변환하여 계산합니다.
           </p>
@@ -318,7 +318,7 @@ export default function CompatibilityPage() {
             month: Number(person1.month),
             day: Number(person1.day),
             gender: person1.gender,
-            isLunar: person1.isLunar,
+            isLunar: person1.calendarType !== "solar",
             ...extractTime(person1),
           },
           person2: {
@@ -327,7 +327,7 @@ export default function CompatibilityPage() {
             month: Number(person2.month),
             day: Number(person2.day),
             gender: person2.gender,
-            isLunar: person2.isLunar,
+            isLunar: person2.calendarType !== "solar",
             ...extractTime(person2),
           },
         }),
