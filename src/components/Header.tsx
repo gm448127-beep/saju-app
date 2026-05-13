@@ -27,7 +27,7 @@ export default function Header() {
           <span className="text-2xl">✨</span>
           <span
             style={{ fontFamily: "Jua, sans-serif" }}
-            className="text-lg text-[#2D2D2D] group-hover:text-[#CCB6B0] transition-colors"
+            className="text-lg text-[#3D3338] group-hover:text-[#CCB6B0] transition-colors"
           >
             사주도우미
           </span>
@@ -62,7 +62,7 @@ export default function Header() {
         {/* 모바일 햄버거 */}
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden text-[#8A7E78] hover:text-[#2D2D2D] p-2"
+          className="md:hidden text-[#8A7E78] hover:text-[#3D3338] p-2"
         >
           {menuOpen ? (
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
