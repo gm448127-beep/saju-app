@@ -47,7 +47,7 @@ export default function BirthForm({
         <div>
           <label className="block text-xs text-[#9B9B9B] mb-1" style={{fontFamily:'Jua, sans-serif'}}>출생년도</label>
           <select value={year} onChange={e => setYear(Number(e.target.value))}
-            className="w-full bg-white border-2 border-[#E8E2DC] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#8B7EC8] outline-none transition-colors">
+            className="w-full bg-white border-2 border-[#E8E2DC] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#8B7EC8] outline-none transition-colors">
             {Array.from({ length: 100 }, (_, i) => currentYear - i).map(y => (
               <option key={y} value={y}>{y}년</option>
             ))}
@@ -56,7 +56,7 @@ export default function BirthForm({
         <div>
           <label className="block text-xs text-[#9B9B9B] mb-1" style={{fontFamily:'Jua, sans-serif'}}>월</label>
           <select value={month} onChange={e => setMonth(Number(e.target.value))}
-            className="w-full bg-white border-2 border-[#E8E2DC] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#8B7EC8] outline-none transition-colors">
+            className="w-full bg-white border-2 border-[#E8E2DC] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#8B7EC8] outline-none transition-colors">
             {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
               <option key={m} value={m}>{m}월</option>
             ))}
@@ -65,7 +65,7 @@ export default function BirthForm({
         <div>
           <label className="block text-xs text-[#9B9B9B] mb-1" style={{fontFamily:'Jua, sans-serif'}}>일</label>
           <select value={day} onChange={e => setDay(Number(e.target.value))}
-            className="w-full bg-white border-2 border-[#E8E2DC] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#8B7EC8] outline-none transition-colors">
+            className="w-full bg-white border-2 border-[#E8E2DC] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#8B7EC8] outline-none transition-colors">
             {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
               <option key={d} value={d}>{d}일</option>
             ))}
@@ -77,7 +77,7 @@ export default function BirthForm({
         <div>
           <label className="block text-xs text-[#9B9B9B] mb-1" style={{fontFamily:'Jua, sans-serif'}}>태어난 시간 (선택)</label>
           <select value={hour ?? ''} onChange={e => setHour(e.target.value ? Number(e.target.value) : undefined)}
-            className="w-full bg-white border-2 border-[#E8E2DC] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#8B7EC8] outline-none transition-colors">
+            className="w-full bg-white border-2 border-[#E8E2DC] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#8B7EC8] outline-none transition-colors">
             <option value="">모름 / 선택안함</option>
             <option value="0">자시 (23:00~01:00)</option>
             <option value="2">축시 (01:00~03:00)</option>
@@ -104,7 +104,7 @@ export default function BirthForm({
               ☀️ 양력
             </button>
             <button type="button" onClick={() => setIsLunar(true)}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${isLunar ? 'bg-[#F0EDF8] text-[#8B7EC8] border-[#8B7EC8]' : 'bg-white text-[#9B9B9B] border-[#E8E2DC] hover:border-[#D4CCE8]'}`}>
+              className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${isLunar ? 'bg-[#F5EDE8] text-[#8B7EC8] border-[#8B7EC8]' : 'bg-white text-[#9B9B9B] border-[#E8E2DC] hover:border-[#D4CCE8]'}`}>
               🌙 음력
             </button>
           </div>

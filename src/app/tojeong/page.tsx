@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState } from 'react';
 
@@ -92,7 +92,7 @@ export default function TojeongPage() {
             <div>
               <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: 'Jua, sans-serif' }}>출생년도</label>
               <select value={year} onChange={e => setYear(Number(e.target.value))}
-                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#CCB6B0] outline-none">
+                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#CCB6B0] outline-none">
                 {Array.from({ length: currentYear - 1927 + 1 }, (_, i) => currentYear - i).map(y => (
                   <option key={y} value={y}>{y}년</option>
                 ))}
@@ -101,7 +101,7 @@ export default function TojeongPage() {
             <div>
               <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: 'Jua, sans-serif' }}>월</label>
               <select value={month} onChange={e => setMonth(Number(e.target.value))}
-                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#CCB6B0] outline-none">
+                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#CCB6B0] outline-none">
                 {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
                   <option key={m} value={m}>{m}월</option>
                 ))}
@@ -110,7 +110,7 @@ export default function TojeongPage() {
             <div>
               <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: 'Jua, sans-serif' }}>일</label>
               <select value={day} onChange={e => setDay(Number(e.target.value))}
-                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#CCB6B0] outline-none">
+                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#CCB6B0] outline-none">
                 {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
                   <option key={d} value={d}>{d}일</option>
                 ))}
@@ -138,7 +138,7 @@ export default function TojeongPage() {
 
             {timeMode === 'slot' && (
               <select value={slotHour} onChange={e => setSlotHour(Number(e.target.value))}
-                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#CCB6B0] outline-none">
+                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#CCB6B0] outline-none">
                 {TIME_SLOTS.map(s => (
                   <option key={s.value} value={s.value}>{s.label}</option>
                 ))}
@@ -152,7 +152,7 @@ export default function TojeongPage() {
                   <div className="flex-1">
                     <label className="block text-xs text-[#6B5FA0] mb-1 font-medium">시</label>
                     <select value={exactHour} onChange={e => setExactHour(Number(e.target.value))}
-                      className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#CCB6B0] outline-none">
+                      className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#CCB6B0] outline-none">
                       {Array.from({ length: 24 }, (_, i) => i).map(h => (
                         <option key={h} value={h}>{String(h).padStart(2, '0')}시</option>
                       ))}
@@ -162,7 +162,7 @@ export default function TojeongPage() {
                   <div className="flex-1">
                     <label className="block text-xs text-[#6B5FA0] mb-1 font-medium">분</label>
                     <select value={exactMinute} onChange={e => setExactMinute(Number(e.target.value))}
-                      className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#2D2D2D] text-sm focus:border-[#CCB6B0] outline-none">
+                      className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#CCB6B0] outline-none">
                       {Array.from({ length: 12 }, (_, i) => i * 5).map(m => (
                         <option key={m} value={m}>{String(m).padStart(2, '0')}분</option>
                       ))}

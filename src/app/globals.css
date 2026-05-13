@@ -1,4 +1,4 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 
 /* ===== 기본 배경 & 폰트 ===== */
 body {
@@ -14,7 +14,7 @@ body {
 /* ===== 폰트 전역 적용 ===== */
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Noto Sans KR', sans-serif !important;
-  color: #2D2D2D;
+  color: #3D3338;
   font-weight: 600;
 }
 
@@ -70,7 +70,7 @@ p, span, div, li, td, th, label, input, select, textarea, button, a {
 .card h3 {
   font-size: 17px;
   font-weight: 600;
-  color: #2D2D2D;
+  color: #3D3338;
 }
 
 /* ===== 버튼 ===== */
@@ -81,7 +81,7 @@ button, .btn, [role="button"] {
 /* ===== 입력 폼 ===== */
 input, select, textarea {
   font-size: 16px !important;
-  color: #2D2D2D;
+  color: #3D3338;
   background: rgba(255, 255, 255, 0.9);
   border: 1.5px solid rgba(204, 182, 176, 0.6);
   border-radius: 12px;
