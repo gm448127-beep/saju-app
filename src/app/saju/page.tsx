@@ -108,24 +108,24 @@ export default function SajuPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
             <div className="mb-3">
               <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>이름</label>
-              <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="홍길동" className="w-full p-2 rounded-lg border border-[#D9C8C0] text-[#3D3338] text-sm focus:outline-none focus:border-[#CCB6B0]" style={{ fontFamily: "Jua, sans-serif" }} />
+              <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="홍길동" className="w-full p-2 rounded-lg border border-[#D9C8C0] text-[#3D3338] text-sm focus:outline-none focus:border-[#EAE5DA]" style={{ fontFamily: "Jua, sans-serif" }} />
             </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>출생년도</label>
-              <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#CCB6B0] outline-none">
+              <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#EAE5DA] outline-none">
                 {Array.from({ length: currentYear - 1927 + 1 }, (_, i) => currentYear - i).map((y) => (<option key={y} value={y}>{y}년</option>))}
               </select>
             </div>
             <div>
               <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>월</label>
-              <select value={month} onChange={(e) => setMonth(Number(e.target.value))} className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#CCB6B0] outline-none">
+              <select value={month} onChange={(e) => setMonth(Number(e.target.value))} className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#EAE5DA] outline-none">
                 {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (<option key={m} value={m}>{m}월</option>))}
               </select>
             </div>
             <div>
               <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>일</label>
-              <select value={day} onChange={(e) => setDay(Number(e.target.value))} className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#CCB6B0] outline-none">
+              <select value={day} onChange={(e) => setDay(Number(e.target.value))} className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#EAE5DA] outline-none">
                 {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (<option key={d} value={d}>{d}일</option>))}
               </select>
             </div>
@@ -135,12 +135,12 @@ export default function SajuPage() {
           <div>
             <label className="block text-xs text-[#8A7E78] mb-2" style={{ fontFamily: "Jua, sans-serif" }}>출생시간</label>
             <div className="flex gap-2 mb-3">
-              <button type="button" onClick={() => setTimeMode("none")} className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "none" ? "bg-[#CCB6B0] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>모름</button>
-              <button type="button" onClick={() => setTimeMode("slot")} className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "slot" ? "bg-[#CCB6B0] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>시간대 선택</button>
-              <button type="button" onClick={() => setTimeMode("exact")} className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "exact" ? "bg-[#CCB6B0] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>⏰ 시/분 직접입력</button>
+              <button type="button" onClick={() => setTimeMode("none")} className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "none" ? "bg-[#EAE5DA] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>모름</button>
+              <button type="button" onClick={() => setTimeMode("slot")} className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "slot" ? "bg-[#EAE5DA] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>시간대 선택</button>
+              <button type="button" onClick={() => setTimeMode("exact")} className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "exact" ? "bg-[#EAE5DA] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>⏰ 시/분 직접입력</button>
             </div>
             {timeMode === "slot" && (
-              <select value={slotValue} onChange={(e) => setSlotValue(Number(e.target.value))} className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#CCB6B0] outline-none">
+              <select value={slotValue} onChange={(e) => setSlotValue(Number(e.target.value))} className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#EAE5DA] outline-none">
                 {timeSlots.map((slot) => (<option key={slot.value} value={slot.value}>{slot.label}</option>))}
               </select>
             )}
@@ -150,14 +150,14 @@ export default function SajuPage() {
                 <div className="flex items-center gap-3">
                   <div className="flex-1">
                     <label className="block text-xs text-[#8B7968] mb-1 font-medium">시</label>
-                    <select value={exactHour} onChange={(e) => setExactHour(Number(e.target.value))} className="w-full bg-white border-2 border-[#D5CFF0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#CCB6B0] outline-none">
+                    <select value={exactHour} onChange={(e) => setExactHour(Number(e.target.value))} className="w-full bg-white border-2 border-[#D5CFF0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#EAE5DA] outline-none">
                       {Array.from({ length: 24 }, (_, i) => i).map((h) => (<option key={h} value={h}>{String(h).padStart(2, "0")}시</option>))}
                     </select>
                   </div>
                   <span className="text-[#8A7E78] font-bold text-xl mt-5">:</span>
                   <div className="flex-1">
                     <label className="block text-xs text-[#8B7968] mb-1 font-medium">분</label>
-                    <select value={exactMinute} onChange={(e) => setExactMinute(Number(e.target.value))} className="w-full bg-white border-2 border-[#D5CFF0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#CCB6B0] outline-none">
+                    <select value={exactMinute} onChange={(e) => setExactMinute(Number(e.target.value))} className="w-full bg-white border-2 border-[#D5CFF0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#EAE5DA] outline-none">
                       {Array.from({ length: 12 }, (_, i) => i * 5).map((m) => (<option key={m} value={m}>{String(m).padStart(2, "0")}분</option>))}
                     </select>
                   </div>
@@ -170,9 +170,9 @@ export default function SajuPage() {
           <div>
             <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>달력</label>
             <div className="flex gap-2">
-              <button type="button" onClick={() => setCalendarType("solar")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${calendarType === "solar" ? "bg-[#CCB6B0] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>☀️ 양력</button>
-              <button type="button" onClick={() => setCalendarType("lunar")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${calendarType === "lunar" ? "bg-[#CCB6B0] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>🌙 음력</button>
-              <button type="button" onClick={() => setCalendarType("lunarLeap")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${calendarType === "lunarLeap" ? "bg-[#CCB6B0] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>🌙 윤달</button>
+              <button type="button" onClick={() => setCalendarType("solar")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${calendarType === "solar" ? "bg-[#EAE5DA] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>☀️ 양력</button>
+              <button type="button" onClick={() => setCalendarType("lunar")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${calendarType === "lunar" ? "bg-[#EAE5DA] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>🌙 음력</button>
+              <button type="button" onClick={() => setCalendarType("lunarLeap")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${calendarType === "lunarLeap" ? "bg-[#EAE5DA] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>🌙 윤달</button>
             </div>
           </div>
 
@@ -180,12 +180,12 @@ export default function SajuPage() {
           <div>
             <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>성별</label>
             <div className="flex gap-2">
-            <button type="button" onClick={() => setGender("남")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${gender === "남" ? "bg-[#CCB6B0] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>👨 남</button>
+            <button type="button" onClick={() => setGender("남")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${gender === "남" ? "bg-[#EAE5DA] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>👨 남</button>
             <button type="button" onClick={() => setGender("여")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${gender === "여" ? "bg-[#C4A8D8] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>👩 여</button>
             </div>
           </div>
 
-            <button type="submit" disabled={loading} className="w-full py-3 rounded-xl text-white font-bold text-base transition-all bg-gradient-to-r from-[#CCB6B0] to-[#8B7968] hover:shadow-lg disabled:opacity-50" style={{ fontFamily: "Jua, sans-serif" }}>{loading ? "분석 중 ..." : "🔮 사주 분석하기"}</button>
+            <button type="submit" disabled={loading} className="w-full py-3 rounded-xl text-white font-bold text-base transition-all bg-gradient-to-r from-[#EAE5DA] to-[#8B7968] hover:shadow-lg disabled:opacity-50" style={{ fontFamily: "Jua, sans-serif" }}>{loading ? "분석 중 ..." : "🔮 사주 분석하기"}</button>
         </form>
       </div>
 
@@ -229,7 +229,7 @@ export default function SajuPage() {
                     <div className="text-2xl my-1">{p.earthEmoji}</div>
                     <div className="font-bold text-lg" style={{ color: p.earthColor }}>{p.earth}</div>
                     <div className="text-xs text-[#8A7E78]">{p.earthKo} ({p.earthElement})</div>
-                    {p.stage12 && <div className="text-[10px] mt-1 text-[#CCB6B0]">{p.stage12}</div>}
+                    {p.stage12 && <div className="text-[10px] mt-1 text-[#EAE5DA]">{p.stage12}</div>}
                   </div>
                 );
               })}
@@ -342,7 +342,7 @@ export default function SajuPage() {
                   <div key={i} className="bg-[#EFDED5] rounded-xl p-3">
                     <div className="text-xs font-bold text-[#3D3338] mb-1">{s.pillar}</div>
                     {s.twelveSal && <div className="text-xs text-[#5A5A5A]">12신살: {s.twelveSal}</div>}
-                    {s.specialSals.length > 0 && <div className="text-xs text-[#CCB6B0]">특수살: {s.specialSals.join(", ")}</div>}
+                    {s.specialSals.length > 0 && <div className="text-xs text-[#EAE5DA]">특수살: {s.specialSals.join(", ")}</div>}
                   </div>
                 ))}
               </div>
@@ -367,7 +367,7 @@ export default function SajuPage() {
           {result.daeun && result.daeun.length > 0 && (
             <div className="card">
               <h2 className="text-lg font-bold text-[#3D3338] mb-3" style={{ fontFamily: "Jua, sans-serif" }}>🔄 대운 (10년 단위)</h2>
-              {result.daeunCurrent && <p className="text-xs text-[#CCB6B0] mb-2">현재 대운: {result.daeunCurrent.ganKo}{result.daeunCurrent.jiKo} ({result.daeunCurrent.ganzhi})</p>}
+              {result.daeunCurrent && <p className="text-xs text-[#EAE5DA] mb-2">현재 대운: {result.daeunCurrent.ganKo}{result.daeunCurrent.jiKo} ({result.daeunCurrent.ganzhi})</p>}
               <div className="overflow-x-auto">
                 <table className="w-full text-xs text-center min-w-[600px]">
                   <thead>
@@ -387,7 +387,7 @@ export default function SajuPage() {
                     </tr>
                     <tr>
                       <td className="p-1 text-[#8A7E78]">십성</td>
-                      {result.daeun.map((d, i) => (<td key={i} className="p-1 text-[#CCB6B0]">{d.tenGodStem}/{d.tenGodBranch}</td>))}
+                      {result.daeun.map((d, i) => (<td key={i} className="p-1 text-[#EAE5DA]">{d.tenGodStem}/{d.tenGodBranch}</td>))}
                     </tr>
                     <tr>
                       <td className="p-1 text-[#8A7E78]">12운성</td>
@@ -422,7 +422,7 @@ export default function SajuPage() {
                     </tr>
                     <tr>
                       <td className="p-1 text-[#8A7E78]">십성</td>
-                      {result.seyun.map((s, i) => (<td key={i} className="p-1 text-[#CCB6B0]">{s.tenGodStem}/{s.tenGodBranch}</td>))}
+                      {result.seyun.map((s, i) => (<td key={i} className="p-1 text-[#EAE5DA]">{s.tenGodStem}/{s.tenGodBranch}</td>))}
                     </tr>
                     <tr>
                       <td className="p-1 text-[#8A7E78]">12운성</td>
@@ -453,7 +453,7 @@ export default function SajuPage() {
                     </tr>
                     <tr>
                       <td className="p-1 text-[#8A7E78]">십성</td>
-                      {result.wolun.map((w, i) => (<td key={i} className="p-1 text-[#CCB6B0]">{w.tenGodStem}/{w.tenGodBranch}</td>))}
+                      {result.wolun.map((w, i) => (<td key={i} className="p-1 text-[#EAE5DA]">{w.tenGodStem}/{w.tenGodBranch}</td>))}
                     </tr>
                   </tbody>
                 </table>
@@ -490,7 +490,7 @@ export default function SajuPage() {
                 <div>✨ 100페이지+ 맞춤형 리포트</div>
               </div>
               <br />
-            <button className="bg-[#CCB6B0] text-white font-bold py-3 px-8 rounded-xl shadow-md hover:bg-[#6B4D9E] transition text-sm" onClick={() => { localStorage.setItem("sajuUserName", name); localStorage.setItem("premiumSajuData", JSON.stringify({...result, userName: name})); window.location.href = "/saju/premium"; }}>
+            <button className="bg-[#EAE5DA] text-white font-bold py-3 px-8 rounded-xl shadow-md hover:bg-[#6B4D9E] transition text-sm" onClick={() => { localStorage.setItem("sajuUserName", name); localStorage.setItem("premiumSajuData", JSON.stringify({...result, userName: name})); window.location.href = "/saju/premium"; }}>
                 프리미엄 해설 보기 →
               </button>
             <p className="text-[10px] text-[#8B7BA0] mt-2">10개 챕터 심층 분석 · AI 맞춤형 리포트</p>

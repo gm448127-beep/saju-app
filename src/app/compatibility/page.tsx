@@ -55,7 +55,7 @@ const defaultPerson = (gender: string): PersonInput => ({
 /* ── 점수 색상 ── */
 function scoreColor(s: number) {
   if (s >= 80) return "#f59e0b";
-  if (s >= 60) return "#CCB6B0";
+  if (s >= 60) return "#EAE5DA";
   if (s >= 40) return "#5EA3B8";
   return "#D87A8C";
 }
@@ -76,8 +76,8 @@ function TimeInput({ person, onChange }: { person: PersonInput; onChange: (k: st
             onClick={() => onChange("timeMode", m.mode)}
             className={`flex-1 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
               person.timeMode === m.mode
-                ? "border-[#CCB6B0] bg-[#CCB6B0] text-white"
-                : "border-[#D9C8C0] bg-white text-[#5A4E48] hover:border-[#CCB6B0]"
+                ? "border-[#EAE5DA] bg-[#EAE5DA] text-white"
+                : "border-[#D9C8C0] bg-white text-[#5A4E48] hover:border-[#EAE5DA]"
             }`}
             style={{ fontFamily: "Jua, sans-serif" }}
           >
@@ -94,8 +94,8 @@ function TimeInput({ person, onChange }: { person: PersonInput; onChange: (k: st
               onClick={() => onChange("slotHour", ts.value)}
               className={`py-2 px-1 rounded-xl border-2 text-xs font-bold transition-all ${
                 person.slotHour === ts.value
-                  ? "border-[#CCB6B0] bg-[#CCB6B0] text-white"
-                  : "border-[#D9C8C0] bg-white text-[#5A4E48] hover:border-[#CCB6B0]"
+                  ? "border-[#EAE5DA] bg-[#EAE5DA] text-white"
+                  : "border-[#D9C8C0] bg-white text-[#5A4E48] hover:border-[#EAE5DA]"
               }`}
             >
               {ts.label}
@@ -160,7 +160,7 @@ function PersonCard({
             placeholder="이름 입력"
             value={person.name}
             onChange={(e) => onChange("name", e.target.value)}
-            className="w-full p-3 rounded-xl border-2 border-[#D9C8C0] bg-white text-[#3D3338] focus:border-[#CCB6B0] outline-none"
+            className="w-full p-3 rounded-xl border-2 border-[#D9C8C0] bg-white text-[#3D3338] focus:border-[#EAE5DA] outline-none"
             style={{ fontFamily: "Gaegu, cursive", fontSize: "16px", fontWeight: 700 }}
           />
         </div>
@@ -175,8 +175,8 @@ function PersonCard({
                 onClick={() => onChange("gender", g)}
                 className={`flex-1 py-2 rounded-xl border-2 text-base font-bold transition-all ${
                   person.gender === g
-                    ? "border-[#CCB6B0] bg-[#CCB6B0] text-white"
-                    : "border-[#D9C8C0] bg-white text-[#5A4E48] hover:border-[#CCB6B0]"
+                    ? "border-[#EAE5DA] bg-[#EAE5DA] text-white"
+                    : "border-[#D9C8C0] bg-white text-[#5A4E48] hover:border-[#EAE5DA]"
                 }`}
                 style={{ fontFamily: "Jua, sans-serif" }}
               >
@@ -200,8 +200,8 @@ function PersonCard({
                 onClick={() => onChange("calendarType", c.value)}
                 className={`flex-1 py-2 rounded-xl border-2 text-base font-bold transition-all ${
                   person.calendarType === c.value
-                    ? "border-[#CCB6B0] bg-[#CCB6B0] text-white"
-                    : "border-[#D9C8C0] bg-white text-[#5A4E48] hover:border-[#CCB6B0]"
+                    ? "border-[#EAE5DA] bg-[#EAE5DA] text-white"
+                    : "border-[#D9C8C0] bg-white text-[#5A4E48] hover:border-[#EAE5DA]"
                 }`}
                 style={{ fontFamily: "Jua, sans-serif" }}
               >
@@ -237,7 +237,7 @@ function PersonCard({
         <TimeInput person={person} onChange={onChange} />
 
         {person.calendarType !== "solar" && (
-          <p className="text-xs text-[#CCB6B0] bg-[#F5EDE8] p-2 rounded-lg border border-[#E8DCC8]">
+          <p className="text-xs text-[#EAE5DA] bg-[#F5EDE8] p-2 rounded-lg border border-[#E8DCC8]">
             🌙 음력 생년월일을 입력해주세요. 서버에서 양력으로 변환하여 계산합니다.
           </p>
         )}
@@ -353,7 +353,7 @@ export default function CompatibilityPage() {
       </div>
 
       {/* 인물 입력 */}
-      <PersonCard label="내 정보" emoji="💜" color="#CCB6B0" person={person1} onChange={(k, v) => setPerson1((p) => ({ ...p, [k]: v }))} />
+      <PersonCard label="내 정보" emoji="💜" color="#EAE5DA" person={person1} onChange={(k, v) => setPerson1((p) => ({ ...p, [k]: v }))} />
       <div className="text-center"><span className="text-3xl animate-bounce-soft inline-block">💘</span></div>
       <PersonCard label="상대방 정보" emoji="💖" color="#C8A0D0" person={person2} onChange={(k, v) => setPerson2((p) => ({ ...p, [k]: v }))} />
 
@@ -362,7 +362,7 @@ export default function CompatibilityPage() {
         onClick={handleSubmit}
         disabled={loading}
         className="w-full py-4 rounded-2xl text-white text-lg transition-all active:scale-[0.98] disabled:opacity-50"
-        style={{ fontFamily: "Jua, sans-serif", background: "linear-gradient(135deg, #C8A0D0, #CCB6B0)" }}
+        style={{ fontFamily: "Jua, sans-serif", background: "linear-gradient(135deg, #C8A0D0, #EAE5DA)" }}
       >
         {loading ? "분석 중... 💫" : "💕 궁합 분석하기"}
       </button>

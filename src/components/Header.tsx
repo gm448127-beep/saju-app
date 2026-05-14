@@ -1,10 +1,10 @@
-﻿"use client";
+"use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const NAV_ITEMS = [
-  { href: "/saju", emoji: "🔮", label: "사주", color: "#CCB6B0" },
+  { href: "/saju", emoji: "🔮", label: "사주", color: "#EAE5DA" },
   { href: "/today", emoji: "🌤️", label: "오늘운세", color: "#8AAEC8" },
   { href: "/tojeong", emoji: "📜", label: "토정비결", color: "#8AC8A4" },
   { href: "/compatibility", emoji: "💕", label: "궁합", color: "#C88A9C" },
@@ -27,7 +27,7 @@ export default function Header() {
           <span className="text-2xl">✨</span>
           <span
             style={{ fontFamily: "Jua, sans-serif" }}
-            className="text-lg text-[#3D3338] group-hover:text-[#CCB6B0] transition-colors"
+            className="text-lg text-[#3D3338] group-hover:text-[#EAE5DA] transition-colors"
           >
             사주도우미
           </span>

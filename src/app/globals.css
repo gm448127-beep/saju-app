@@ -150,7 +150,7 @@ footer p {
 
 /* ===== 그라데이션 버튼 ===== */
 .btn-gradient {
-  background: linear-gradient(135deg, #D9C8C0 0%, #CCB6B0 100%);
+  background: linear-gradient(135deg, #D9C8C0 0%, #EAE5DA 100%);
   color: white;
   border: none;
   border-radius: 16px;

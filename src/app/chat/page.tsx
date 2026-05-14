@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useRef, useEffect } from 'react';
 
@@ -130,11 +130,11 @@ export default function ChatPage() {
         {birthSaved && (
           <p className="text-xs text-[#8A7E78] mt-1">
             {birthData.year}년 {birthData.month}월 {birthData.day}일 ({birthData.gender === '남' ? '남' : '여'}, {birthData.isLunar ? '음력' : '양력'})
-            <button onClick={() => setShowBirthForm(true)} className="ml-2 text-[#CCB6B0] underline">수정</button>
+            <button onClick={() => setShowBirthForm(true)} className="ml-2 text-[#EAE5DA] underline">수정</button>
           </p>
         )}
         {!birthSaved && !showBirthForm && (
-          <button onClick={() => setShowBirthForm(true)} className="text-xs text-[#CCB6B0] underline mt-1">
+          <button onClick={() => setShowBirthForm(true)} className="text-xs text-[#EAE5DA] underline mt-1">
             생년월일 입력하기
           </button>
         )}
@@ -151,7 +151,7 @@ export default function ChatPage() {
                   key={g}
                   onClick={() => setBirthData(prev => ({ ...prev, gender: g }))}
                   className={`flex-1 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                    birthData.gender === g ? 'border-[#CCB6B0] bg-[#CCB6B0] text-white' : 'border-[#D9C8C0] bg-white text-[#5A4E48]'
+                    birthData.gender === g ? 'border-[#EAE5DA] bg-[#EAE5DA] text-white' : 'border-[#D9C8C0] bg-white text-[#5A4E48]'
                   }`}
                   style={{ fontFamily: 'Jua, sans-serif' }}
                 >
@@ -163,7 +163,7 @@ export default function ChatPage() {
                   key={String(lunar)}
                   onClick={() => setBirthData(prev => ({ ...prev, isLunar: lunar }))}
                   className={`flex-1 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                    birthData.isLunar === lunar ? 'border-[#CCB6B0] bg-[#CCB6B0] text-white' : 'border-[#D9C8C0] bg-white text-[#5A4E48]'
+                    birthData.isLunar === lunar ? 'border-[#EAE5DA] bg-[#EAE5DA] text-white' : 'border-[#D9C8C0] bg-white text-[#5A4E48]'
                   }`}
                   style={{ fontFamily: 'Jua, sans-serif' }}
                 >
@@ -189,7 +189,7 @@ export default function ChatPage() {
               <button
                 onClick={saveBirthData}
                 className="flex-1 py-2 rounded-xl text-white text-sm font-bold"
-                style={{ fontFamily: 'Jua, sans-serif', backgroundColor: '#CCB6B0' }}
+                style={{ fontFamily: 'Jua, sans-serif', backgroundColor: '#EAE5DA' }}
               >
                 ✅ 저장하고 상담 시작
               </button>
@@ -225,7 +225,7 @@ export default function ChatPage() {
             <div
               className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                 msg.role === 'user'
-                  ? 'bg-[#CCB6B0] text-white rounded-br-md'
+                  ? 'bg-[#EAE5DA] text-white rounded-br-md'
                   : 'bg-white border-2 border-[#D9C8C0] text-[#3D3338] rounded-bl-md'
               }`}
             >
@@ -241,9 +241,9 @@ export default function ChatPage() {
             </div>
             <div className="bg-white border-2 border-[#D9C8C0] rounded-2xl rounded-bl-md px-4 py-3">
               <div className="flex gap-1">
-                <span className="w-2 h-2 bg-[#CCB6B0] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-2 h-2 bg-[#CCB6B0] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-2 h-2 bg-[#CCB6B0] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                <span className="w-2 h-2 bg-[#EAE5DA] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-2 h-2 bg-[#EAE5DA] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-2 h-2 bg-[#EAE5DA] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
               </div>
             </div>
           </div>
@@ -261,7 +261,7 @@ export default function ChatPage() {
                 key={i}
                 onClick={() => sendMessage(q.text)}
                 disabled={loading}
-                className="px-3 py-1.5 rounded-full border-2 border-[#D9C8C0] bg-white text-sm text-[#5A4E48] hover:border-[#CCB6B0] hover:bg-[#EFDED5] transition-all disabled:opacity-50"
+                className="px-3 py-1.5 rounded-full border-2 border-[#D9C8C0] bg-white text-sm text-[#5A4E48] hover:border-[#EAE5DA] hover:bg-[#EFDED5] transition-all disabled:opacity-50"
                 style={{ fontFamily: 'Gaegu, cursive', fontWeight: 700 }}
               >
                 {q.emoji} {q.text}
@@ -282,14 +282,14 @@ export default function ChatPage() {
               onKeyDown={handleKeyDown}
               placeholder="궁금한 것을 물어보세요..."
               disabled={loading}
-              className="flex-1 p-3 rounded-2xl border-2 border-[#D9C8C0] bg-white text-[#3D3338] focus:border-[#CCB6B0] outline-none disabled:opacity-50"
+              className="flex-1 p-3 rounded-2xl border-2 border-[#D9C8C0] bg-white text-[#3D3338] focus:border-[#EAE5DA] outline-none disabled:opacity-50"
               style={{ fontFamily: 'Gaegu, cursive', fontSize: '16px', fontWeight: 700 }}
             />
             <button
               onClick={() => sendMessage()}
               disabled={loading || !input.trim()}
               className="px-5 py-3 rounded-2xl text-white text-base disabled:opacity-50 transition-all active:scale-95"
-              style={{ fontFamily: 'Jua, sans-serif', backgroundColor: '#CCB6B0' }}
+              style={{ fontFamily: 'Jua, sans-serif', backgroundColor: '#EAE5DA' }}
             >
               {loading ? '...' : '전송'}
             </button>

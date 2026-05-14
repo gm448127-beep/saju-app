@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 
@@ -201,11 +201,11 @@ export default function TodayPage() {
                   ☀️ 양력
                 </button>
                 <button type="button" onClick={() => setCalendarType("lunar")}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${calendarType === "lunar" ? "bg-[#F2E4DC] text-[#CCB6B0] border-[#CCB6B0]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#D4CCE8]"}`}>
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${calendarType === "lunar" ? "bg-[#F2E4DC] text-[#EAE5DA] border-[#EAE5DA]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#D4CCE8]"}`}>
                   🌙 음력
                 </button>
               <button type="button" onClick={() => setCalendarType("lunarLeap")}
-                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${calendarType === "lunarLeap" ? "bg-[#F2E4DC] text-[#CCB6B0] border-[#CCB6B0]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#D4CCE8]"}`}>
+                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${calendarType === "lunarLeap" ? "bg-[#F2E4DC] text-[#EAE5DA] border-[#EAE5DA]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#D4CCE8]"}`}>
                 🌙 윤달
               </button>
               </div>
@@ -295,7 +295,7 @@ export default function TodayPage() {
             {result.todaySipsin && (
               <div className="text-center mb-2">
                 <span className="inline-block px-3 py-1 rounded-full text-sm font-bold text-white"
-                  style={{ backgroundColor: "#CCB6B0" }}>
+                  style={{ backgroundColor: "#EAE5DA" }}>
                   {result.todaySipsin}
                 </span>
               </div>

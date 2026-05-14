@@ -17,7 +17,7 @@ export default function HomePage() {
           <div className="absolute top-10 left-1/4 w-20 h-20 rounded-full opacity-20"
                style={{ background: "radial-gradient(circle, #D9C8C0 0%, transparent 70%)" }} />
           <div className="absolute top-20 right-1/4 w-16 h-16 rounded-full opacity-15"
-               style={{ background: "radial-gradient(circle, #CCB6B0 0%, transparent 70%)" }} />
+               style={{ background: "radial-gradient(circle, #EAE5DA 0%, transparent 70%)" }} />
           <div className="absolute bottom-10 left-1/3 w-12 h-12 rounded-full opacity-20"
                style={{ background: "radial-gradient(circle, #D9C8C0 0%, transparent 70%)" }} />
         </div>

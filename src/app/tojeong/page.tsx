@@ -71,7 +71,7 @@ export default function TojeongPage() {
 
   function scoreColor(score: number) {
     if (score >= 80) return '#f59e0b';
-    if (score >= 60) return '#CCB6B0';
+    if (score >= 60) return '#EAE5DA';
     if (score >= 40) return '#5EA3B8';
     return '#D87A8C';
   }
@@ -92,7 +92,7 @@ export default function TojeongPage() {
             <div>
               <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: 'Jua, sans-serif' }}>출생년도</label>
               <select value={year} onChange={e => setYear(Number(e.target.value))}
-                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#CCB6B0] outline-none">
+                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#EAE5DA] outline-none">
                 {Array.from({ length: currentYear - 1927 + 1 }, (_, i) => currentYear - i).map(y => (
                   <option key={y} value={y}>{y}년</option>
                 ))}
@@ -101,7 +101,7 @@ export default function TojeongPage() {
             <div>
               <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: 'Jua, sans-serif' }}>월</label>
               <select value={month} onChange={e => setMonth(Number(e.target.value))}
-                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#CCB6B0] outline-none">
+                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#EAE5DA] outline-none">
                 {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
                   <option key={m} value={m}>{m}월</option>
                 ))}
@@ -110,7 +110,7 @@ export default function TojeongPage() {
             <div>
               <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: 'Jua, sans-serif' }}>일</label>
               <select value={day} onChange={e => setDay(Number(e.target.value))}
-                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#CCB6B0] outline-none">
+                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#EAE5DA] outline-none">
                 {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
                   <option key={d} value={d}>{d}일</option>
                 ))}
@@ -130,7 +130,7 @@ export default function TojeongPage() {
                 <button key={mode} type="button" onClick={() => setTimeMode(mode)}
                   className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${
                     timeMode === mode
-                      ? 'bg-[#CCB6B0] text-white shadow-md'
+                      ? 'bg-[#EAE5DA] text-white shadow-md'
                       : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
                   }`}>{label}</button>
               ))}
@@ -138,7 +138,7 @@ export default function TojeongPage() {
 
             {timeMode === 'slot' && (
               <select value={slotHour} onChange={e => setSlotHour(Number(e.target.value))}
-                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#CCB6B0] outline-none">
+                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#EAE5DA] outline-none">
                 {TIME_SLOTS.map(s => (
                   <option key={s.value} value={s.value}>{s.label}</option>
                 ))}
@@ -152,7 +152,7 @@ export default function TojeongPage() {
                   <div className="flex-1">
                     <label className="block text-xs text-[#6B5FA0] mb-1 font-medium">시</label>
                     <select value={exactHour} onChange={e => setExactHour(Number(e.target.value))}
-                      className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#CCB6B0] outline-none">
+                      className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#EAE5DA] outline-none">
                       {Array.from({ length: 24 }, (_, i) => i).map(h => (
                         <option key={h} value={h}>{String(h).padStart(2, '0')}시</option>
                       ))}
@@ -162,7 +162,7 @@ export default function TojeongPage() {
                   <div className="flex-1">
                     <label className="block text-xs text-[#6B5FA0] mb-1 font-medium">분</label>
                     <select value={exactMinute} onChange={e => setExactMinute(Number(e.target.value))}
-                      className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#CCB6B0] outline-none">
+                      className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#EAE5DA] outline-none">
                       {Array.from({ length: 12 }, (_, i) => i * 5).map(m => (
                         <option key={m} value={m}>{String(m).padStart(2, '0')}분</option>
                       ))}
@@ -179,16 +179,16 @@ export default function TojeongPage() {
             <div className="flex gap-2">
               <button type="button" onClick={() => setCalendarType("solar")}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  calendarType !== "lunar" ? 'bg-[#CCB6B0] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
+                  calendarType !== "lunar" ? 'bg-[#EAE5DA] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
                 }`}>☀️ 양력</button>
               <button type="button" onClick={() => setCalendarType("lunar")}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  calendarType === "lunar" ? 'bg-[#CCB6B0] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
+                  calendarType === "lunar" ? 'bg-[#EAE5DA] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
                 }`}>🌙 음력</button>
             <button type="button" onClick={() => setCalendarType("lunarLeap")}
               className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all
 ${
-                calendarType === "lunarLeap" ? 'bg-[#CCB6B0] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
+                calendarType === "lunarLeap" ? 'bg-[#EAE5DA] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
               }`}>🌙 윤달</button>
             </div>
           </div>
@@ -210,7 +210,7 @@ ${
 
           <button type="submit" disabled={loading}
             className="w-full py-3.5 rounded-2xl text-white text-lg transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ backgroundColor: '#CCB6B0', fontFamily: 'Jua, sans-serif' }}>
+            style={{ backgroundColor: '#EAE5DA', fontFamily: 'Jua, sans-serif' }}>
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
@@ -398,8 +398,8 @@ ${
                   onClick={() => setSelectedMonth(selectedMonth === mf.month ? null : mf.month)}
                   className={`p-2 rounded-xl border-2 text-center transition-all ${
                     selectedMonth === mf.month
-                      ? 'bg-[#CCB6B0] border-[#7B6CB8] text-white'
-                      : 'bg-[#F5EDE8] border-[#D9C8C0] hover:border-[#CCB6B0]'
+                      ? 'bg-[#EAE5DA] border-[#7B6CB8] text-white'
+                      : 'bg-[#F5EDE8] border-[#D9C8C0] hover:border-[#EAE5DA]'
                   }`}>
                   <p className="text-lg">{mf.emoji}</p>
                   <p style={{ fontFamily: 'Jua, sans-serif' }} className="text-sm">{mf.label}</p>
