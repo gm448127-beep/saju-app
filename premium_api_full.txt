@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 
 // 간단한 메모리 캐시 (같은 사주 데이터 반복 요청 방지)
 const cache = new Map<string, { report: string; timestamp: number }>();
@@ -84,17 +84,6 @@ export async function POST(request: NextRequest) {
 생년월일: ${birthDate}
 성별: ${gender}
 태어난 시간: ${birthTime}
-
-
-[금(金) 오행 해석 특별 가이드]
-- 금이 0개: 결단력 부족, 우유부단, 재물운 약화 가능. 일간별 차이를 반드시 설명할 것 (목일간: 현실감각 부족, 화일간: 성취 어려움, 토일간: 표현력 부족, 금일간: 의견표출 어려움, 수일간: 인복 키워야 함)
-- 금이 1~2개: 균형잡힌 결단력과 의리. 적절한 자기관리 능력
-- 금이 3개 이상: 완벽주의, 예리한 판단력, 자기관리 뛰어남. 단, 인간관계 손절 빠름, 예민함, 날카로운 언행 주의
-- 금 관련 건강: 폐, 대장, 호흡기 관련 (금이 없으면 호흡기 취약, 금이 과하면 스트레스/불면 주의)
-- 금 관련 개운법: 흰색/금색/은색 활용, 금속 소재 장신구, 호흡 운동, 배/무/마늘 등 백색 음식, 숫자 4와 9
-- 금 관련 직업: 법조계, 군검경, 공무원, 기자/작가, 비평가, 정밀 작업 분야
-- 경금일간(庚): 제련되지 않은 금속처럼 호불호 명확, 경험주의, 냉철하고 주도적, 하나에 꽂히면 끝까지
-- 신금일간(辛): 보석처럼 시선을 사로잡는 매력, 예민하고 섬세, 깔끔하고 논리적인 언어 선호
 
 위 데이터를 바탕으로 만세력을 계산하여 사주팔자(연주, 월주, 일주, 시주의 천간과 지지)를 도출한 후, 위 구조에 맞게 상세하고 따뜻한 사주 해설을 작성해주세요. 최소 2000자 이상으로 충분히 길고 상세하게 작성하세요.`;
 
@@ -193,3 +182,4 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "서버 오류: " + (error instanceof Error ? error.message : String(error)) }, { status: 500 });
   }
 }
+

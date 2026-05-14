@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+﻿import { NextRequest, NextResponse } from "next/server";
 import { calculateSaju } from "ssaju";
 import { getInterpretation } from "@/data/interpretations";
 
@@ -61,7 +61,7 @@ const ohaengDesc: Record<string, string> = {
   "목(木)": "성장·발전·인자함을 상징합니다. 목이 강하면 리더십과 추진력이 있고, 부족하면 결단력이 약할 수 있습니다.",
   "화(火)": "열정·예의·표현력을 상징합니다. 화가 강하면 활동적이고 밝지만, 부족하면 소극적일 수 있습니다.",
   "토(土)": "신뢰·중재·포용력을 상징합니다. 토가 강하면 안정적이고 듬직하지만, 과하면 고집이 셀 수 있습니다.",
-  "금(金)": "결단·의리·정의를 상징합니다. 금이 강하면 완벽주의적이고 자기관리에 뛰어나며 책임감이 강합니다. 언행이 명확하고 일처리가 꼼꼼합니다. 과하면 예민하고 인간관계에서 손절이 빠르며 내재된 날카로움이 나타날 수 있습니다. 금이 없으면 결단력이 부족하고 우유부단해질 수 있으며, 재물 관리와 현실 감각이 약해질 수 있습니다. 금은 폐·호흡기와 관련이 깊고, 계절로는 가을, 색상은 흰색, 방향은 서쪽에 해당합니다.",
+  "금(金)": "결단·의리·정의를 상징합니다. 금이 강하면 실행력이 뛰어나지만, 과하면 냉정할 수 있습니다.",
   "수(水)": "지혜·유연함·창의력을 상징합니다. 수가 강하면 총명하지만, 과하면 우유부단할 수 있습니다.",
 };
 
@@ -286,22 +286,6 @@ export async function POST(req: NextRequest) {
     if (yongshin) summary += `용신은 ${yongshin}입니다.\n\n`;
     if (maxOhaeng) summary += `오행 중 ${maxOhaeng[0]}이(가) ${maxOhaeng[1]}개로 가장 강하고, `;
     if (minOhaeng) summary += `${minOhaeng[0]}이(가) ${minOhaeng[1]}개로 가장 약합니다.\n`;
-
-    // === 금(金) 상세 분석 (유튜브 참고: 팔자에 金이 있고 없고의 큰 차이점) ===
-    const goldCount = ohaengCount["\uAE08(\u91D1)"] || 0;
-    if (goldCount === 0) {
-      const dayEl = dayGanData?.element || "";
-      let goldMsg = "\uC774 \uC0AC\uC8FC\uC5D0\uB294 \uAE08(\u91D1)\uC758 \uAE30\uC6B4\uC774 \uC5C6\uC2B5\uB2C8\uB2E4. ";
-      if (dayEl.includes("\uBAA9")) goldMsg += "\uBAA9 \uC77C\uAC04\uC5D0 \uAE08\uC774 \uC5C6\uC73C\uBA74 \uD604\uC2E4 \uAC10\uAC01\uC774 \uB5A8\uC5B4\uC9C0\uAC70\uB098 \uC774\uC0C1\uC744 \uB354 \uCD94\uAD6C\uD558\uB294 \uACBD\uD5A5\uC774 \uC788\uC2B5\uB2C8\uB2E4. ";
-      else if (dayEl.includes("\uD654")) goldMsg += "\uD654 \uC77C\uAC04\uC5D0 \uAE08\uC774 \uC5C6\uC73C\uBA74 \uC77C\uC758 \uC131\uCDE8\uC640 \uACB0\uACFC\uB97C \uAC00\uC838\uAC00\uAE30 \uC5B4\uB824\uC6B8 \uC218 \uC788\uC73C\uB2C8 \uBC29\uD5A5\uC131\uC744 \uBB50\uB837\uD558\uAC8C \uC7A1\uC544\uC57C \uD569\uB2C8\uB2E4. ";
-      else if (dayEl.includes("\uD1A0")) goldMsg += "\uD1A0 \uC77C\uAC04\uC5D0 \uAE08\uC774 \uC5C6\uC73C\uBA74 \uD45C\uD604\uB825 \uBC1C\uD604\uC744 \uC704\uD574 \uAFB8\uC900\uD788 \uB178\uB825\uD574\uC57C \uD569\uB2C8\uB2E4. ";
-      else if (dayEl.includes("\uAE08")) goldMsg += "\uAE08 \uC77C\uAC04\uC778\uB370 \uAE08\uC774 \uBD80\uC871\uD558\uBA74 \uC758\uACAC \uD45C\uCD9C\uC774 \uC5B4\uB835\uACE0 \uC0DD\uAC01\uB9CC \uD558\uACE0 \uB05D\uB098\uB294 \uACBD\uC6B0\uAC00 \uC788\uC2B5\uB2C8\uB2E4. ";
-      else if (dayEl.includes("\uC218")) goldMsg += "\uC218 \uC77C\uAC04\uC5D0 \uAE08\uC774 \uC5C6\uC73C\uBA74 \uC778\uBCF5\uC744 \uC2A4\uC2A4\uB85C \uD0A4\uC6CC\uB098\uAC00\uB294 \uB178\uB825\uC774 \uD544\uC694\uD569\uB2C8\uB2E4. ";
-      goldMsg += "\uAC1C\uC6B4\uBC95: \uD770\uC0C9/\uAE08\uC18D \uC18C\uC7AC \uD65C\uC6A9, \uD638\uD761\uAE30 \uAC74\uAC15 \uAD00\uB9AC, \uACB0\uB2E8\uB825 \uD6C8\uB828\uC774 \uB3C4\uC6C0\uB429\uB2C8\uB2E4.";
-      summary += goldMsg + "\\n";
-    } else if (goldCount >= 3) {
-      summary += "\uAE08(\u91D1)\uC774 " + goldCount + "\uAC1C\uB85C \uB9E4\uC6B0 \uAC15\uD569\uB2C8\uB2E4. \uC644\uBCBD\uC8FC\uC758 \uC131\uD5A5\uACFC \uC608\uB9AC\uD55C \uD310\uB2E8\uB825\uC774 \uC7A5\uC810\uC774\uC9C0\uB9CC, \uC778\uAC04\uAD00\uACC4\uC5D0\uC11C \uC720\uC5F0\uD568\uC744 \uAE30\uB974\uACE0 \uD0C0\uC778\uC744 \uC218\uC6A9\uD558\uB294 \uC790\uC138\uAC00 \uD544\uC694\uD569\uB2C8\uB2E4. \uC2A4\uD2B8\uB808\uC2A4\xB7\uC608\uBBFC\uD568 \uAD00\uB9AC\uC5D0 \uC2E0\uACBD \uC4F0\uC138\uC694.\\n";
-    }
     if (maxSipsin) summary += `십성 중 ${maxSipsin[0]}이(가) ${maxSipsin[1]}개로 두드러집니다. ${sipsinDesc[maxSipsin[0]] || ""}\n\n`;
     if (gilsin.length > 0) summary += `길신: ${gilsin.join(", ")}\n`;
     if (hyungsin.length > 0) summary += `흉신: ${hyungsin.join(", ")}\n`;
@@ -362,3 +346,4 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: err.message || "분석 중 오류가 발생했습니다." }, { status: 500 });
   }
 }
+
