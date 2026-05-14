@@ -180,8 +180,8 @@ export default function SajuPage() {
           <div>
             <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>성별</label>
             <div className="flex gap-2">
-            <button type="button" onClick={() => setGender("남")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${gender === "남" ? "bg-[#EAE5DA] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>👨 남</button>
-            <button type="button" onClick={() => setGender("여")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${gender === "여" ? "bg-[#C4A8D8] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>👩 여</button>
+            <button type="button" onClick={() => setGender("남")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${gender === "남" ? "bg-[#DCEAF6] text-[#3D3338] shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>👨 남</button>
+            <button type="button" onClick={() => setGender("여")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${gender === "여" ? "bg-[#F6DFDC] text-[#3D3338] shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>👩 여</button>
             </div>
           </div>
 

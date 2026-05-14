@@ -214,11 +214,11 @@ export default function TodayPage() {
               <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>성별</label>
               <div className="flex gap-2">
                 <button type="button" onClick={() => setGender("남")}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${gender === "남" ? "bg-[#EDE4DC] text-[#7EB3C8] border-[#7EB3C8]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#D4CCE8]"}`}>
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${gender === "남" ? "bg-[#DCEAF6] text-[#3D3338] border-[#DCEAF6]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#D4CCE8]"}`}>
                   👨 남
                 </button>
                 <button type="button" onClick={() => setGender("여")}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${gender === "여" ? "bg-[#F2E8DC] text-[#C8A0D0] border-[#C8A0D0]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#D4CCE8]"}`}>
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${gender === "여" ? "bg-[#F6DFDC] text-[#3D3338] border-[#F6DFDC]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#D4CCE8]"}`}>
                   👩 여
                 </button>
               </div>

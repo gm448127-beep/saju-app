@@ -199,11 +199,11 @@ ${
             <div className="flex gap-2">
               <button type="button" onClick={() => setGender('남')}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  gender === '남' ? 'bg-[#5B8AF0] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
+                  gender === '남' ? 'bg-[#DCEAF6] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
                 }`}>👨 남</button>
               <button type="button" onClick={() => setGender('여')}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  gender === '여' ? 'bg-[#F06292] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
+                  gender === '여' ? 'bg-[#F6DFDC] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
                 }`}>👩 여</button>
             </div>
           </div>
