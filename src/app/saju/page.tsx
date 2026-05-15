@@ -135,9 +135,9 @@ export default function SajuPage() {
           <div>
             <label className="block text-xs text-[#8A7E78] mb-2" style={{ fontFamily: "Jua, sans-serif" }}>출생시간</label>
             <div className="flex gap-2 mb-3">
-              <button type="button" onClick={() => setTimeMode("none")} className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "none" ? "bg-[#EAE5DA] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>모름</button>
-              <button type="button" onClick={() => setTimeMode("slot")} className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "slot" ? "bg-[#EAE5DA] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>시간대 선택</button>
-              <button type="button" onClick={() => setTimeMode("exact")} className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "exact" ? "bg-[#EAE5DA] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>⏰ 시/분 직접입력</button>
+              <button type="button" onClick={() => setTimeMode("none")} className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "none" ? "bg-[#EAE5DA] text-[#5A4E48] shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>모름</button>
+              <button type="button" onClick={() => setTimeMode("slot")} className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "slot" ? "bg-[#EAE5DA] text-[#5A4E48] shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>시간대 선택</button>
+              <button type="button" onClick={() => setTimeMode("exact")} className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "exact" ? "bg-[#EAE5DA] text-[#5A4E48] shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>⏰ 시/분 직접입력</button>
             </div>
             {timeMode === "slot" && (
               <select value={slotValue} onChange={(e) => setSlotValue(Number(e.target.value))} className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#EAE5DA] outline-none">
@@ -170,9 +170,9 @@ export default function SajuPage() {
           <div>
             <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>달력</label>
             <div className="flex gap-2">
-              <button type="button" onClick={() => setCalendarType("solar")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${calendarType === "solar" ? "bg-[#EAE5DA] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>☀️ 양력</button>
-              <button type="button" onClick={() => setCalendarType("lunar")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${calendarType === "lunar" ? "bg-[#EAE5DA] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>🌙 음력</button>
-              <button type="button" onClick={() => setCalendarType("lunarLeap")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${calendarType === "lunarLeap" ? "bg-[#EAE5DA] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>🌙 윤달</button>
+              <button type="button" onClick={() => setCalendarType("solar")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${calendarType === "solar" ? "bg-[#EAE5DA] text-[#5A4E48] shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>☀️ 양력</button>
+              <button type="button" onClick={() => setCalendarType("lunar")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${calendarType === "lunar" ? "bg-[#EAE5DA] text-[#5A4E48] shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>🌙 음력</button>
+              <button type="button" onClick={() => setCalendarType("lunarLeap")} className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${calendarType === "lunarLeap" ? "bg-[#EAE5DA] text-[#5A4E48] shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>🌙 윤달</button>
             </div>
           </div>
 
@@ -490,7 +490,7 @@ export default function SajuPage() {
                 <div>✨ 100페이지+ 맞춤형 리포트</div>
               </div>
               <br />
-            <button className="bg-[#EAE5DA] text-white font-bold py-3 px-8 rounded-xl shadow-md hover:bg-[#6B4D9E] transition text-sm" onClick={() => { localStorage.setItem("sajuUserName", name); localStorage.setItem("premiumSajuData", JSON.stringify({...result, userName: name})); window.location.href = "/saju/premium"; }}>
+            <button className="bg-[#EAE5DA] text-[#5A4E48] font-bold py-3 px-8 rounded-xl shadow-md hover:bg-[#6B4D9E] transition text-sm" onClick={() => { localStorage.setItem("sajuUserName", name); localStorage.setItem("premiumSajuData", JSON.stringify({...result, userName: name})); window.location.href = "/saju/premium"; }}>
                 프리미엄 해설 보기 →
               </button>
             <p className="text-[10px] text-[#8B7BA0] mt-2">10개 챕터 심층 분석 · AI 맞춤형 리포트</p>

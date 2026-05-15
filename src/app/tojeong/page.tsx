@@ -130,7 +130,7 @@ export default function TojeongPage() {
                 <button key={mode} type="button" onClick={() => setTimeMode(mode)}
                   className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${
                     timeMode === mode
-                      ? 'bg-[#EAE5DA] text-white shadow-md'
+                      ? 'bg-[#EAE5DA] text-[#5A4E48] shadow-md'
                       : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
                   }`}>{label}</button>
               ))}
@@ -179,16 +179,16 @@ export default function TojeongPage() {
             <div className="flex gap-2">
               <button type="button" onClick={() => setCalendarType("solar")}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  calendarType !== "lunar" ? 'bg-[#EAE5DA] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
+                  calendarType !== "lunar" ? 'bg-[#EAE5DA] text-[#5A4E48] shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
                 }`}>☀️ 양력</button>
               <button type="button" onClick={() => setCalendarType("lunar")}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  calendarType === "lunar" ? 'bg-[#EAE5DA] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
+                  calendarType === "lunar" ? 'bg-[#EAE5DA] text-[#5A4E48] shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
                 }`}>🌙 음력</button>
             <button type="button" onClick={() => setCalendarType("lunarLeap")}
               className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all
 ${
-                calendarType === "lunarLeap" ? 'bg-[#EAE5DA] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
+                calendarType === "lunarLeap" ? 'bg-[#EAE5DA] text-[#5A4E48] shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
               }`}>🌙 윤달</button>
             </div>
           </div>
@@ -199,11 +199,11 @@ ${
             <div className="flex gap-2">
               <button type="button" onClick={() => setGender('남')}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  gender === '남' ? 'bg-[#DCEAF6] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
+                  gender === '남' ? 'bg-[#DCEAF6] text-[#5A4E48] shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
                 }`}>👨 남</button>
               <button type="button" onClick={() => setGender('여')}
                 className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  gender === '여' ? 'bg-[#F6DFDC] text-white shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
+                  gender === '여' ? 'bg-[#F6DFDC] text-[#5A4E48] shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
                 }`}>👩 여</button>
             </div>
           </div>

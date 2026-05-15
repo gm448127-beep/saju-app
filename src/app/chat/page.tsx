@@ -151,7 +151,7 @@ export default function ChatPage() {
                   key={g}
                   onClick={() => setBirthData(prev => ({ ...prev, gender: g }))}
                   className={`flex-1 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                    birthData.gender === g ? 'border-[#EAE5DA] bg-[#EAE5DA] text-white' : 'border-[#D9C8C0] bg-white text-[#5A4E48]'
+                    birthData.gender === g ? 'border-[#EAE5DA] bg-[#EAE5DA] text-[#5A4E48]' : 'border-[#D9C8C0] bg-white text-[#5A4E48]'
                   }`}
                   style={{ fontFamily: 'Jua, sans-serif' }}
                 >
@@ -163,7 +163,7 @@ export default function ChatPage() {
                   key={String(lunar)}
                   onClick={() => setBirthData(prev => ({ ...prev, isLunar: lunar }))}
                   className={`flex-1 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                    birthData.isLunar === lunar ? 'border-[#EAE5DA] bg-[#EAE5DA] text-white' : 'border-[#D9C8C0] bg-white text-[#5A4E48]'
+                    birthData.isLunar === lunar ? 'border-[#EAE5DA] bg-[#EAE5DA] text-[#5A4E48]' : 'border-[#D9C8C0] bg-white text-[#5A4E48]'
                   }`}
                   style={{ fontFamily: 'Jua, sans-serif' }}
                 >
@@ -225,7 +225,7 @@ export default function ChatPage() {
             <div
               className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                 msg.role === 'user'
-                  ? 'bg-[#EAE5DA] text-white rounded-br-md'
+                  ? 'bg-[#EAE5DA] text-[#5A4E48] rounded-br-md'
                   : 'bg-white border-2 border-[#D9C8C0] text-[#3D3338] rounded-bl-md'
               }`}
             >

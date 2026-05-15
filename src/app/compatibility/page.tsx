@@ -76,7 +76,7 @@ function TimeInput({ person, onChange }: { person: PersonInput; onChange: (k: st
             onClick={() => onChange("timeMode", m.mode)}
             className={`flex-1 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
               person.timeMode === m.mode
-                ? "border-[#EAE5DA] bg-[#EAE5DA] text-white"
+                ? "border-[#EAE5DA] bg-[#EAE5DA] text-[#5A4E48]"
                 : "border-[#D9C8C0] bg-white text-[#5A4E48] hover:border-[#EAE5DA]"
             }`}
             style={{ fontFamily: "Jua, sans-serif" }}
@@ -94,7 +94,7 @@ function TimeInput({ person, onChange }: { person: PersonInput; onChange: (k: st
               onClick={() => onChange("slotHour", ts.value)}
               className={`py-2 px-1 rounded-xl border-2 text-xs font-bold transition-all ${
                 person.slotHour === ts.value
-                  ? "border-[#EAE5DA] bg-[#EAE5DA] text-white"
+                  ? "border-[#EAE5DA] bg-[#EAE5DA] text-[#5A4E48]"
                   : "border-[#D9C8C0] bg-white text-[#5A4E48] hover:border-[#EAE5DA]"
               }`}
             >
@@ -175,7 +175,7 @@ function PersonCard({
                 onClick={() => onChange("gender", g)}
                 className={`flex-1 py-2 rounded-xl border-2 text-base font-bold transition-all ${
                   person.gender === g
-                    ? "border-[#EAE5DA] bg-[#EAE5DA] text-white"
+                    ? "border-[#EAE5DA] bg-[#EAE5DA] text-[#5A4E48]"
                     : "border-[#D9C8C0] bg-white text-[#5A4E48] hover:border-[#EAE5DA]"
                 }`}
                 style={{ fontFamily: "Jua, sans-serif" }}
@@ -200,7 +200,7 @@ function PersonCard({
                 onClick={() => onChange("calendarType", c.value)}
                 className={`flex-1 py-2 rounded-xl border-2 text-base font-bold transition-all ${
                   person.calendarType === c.value
-                    ? "border-[#EAE5DA] bg-[#EAE5DA] text-white"
+                    ? "border-[#EAE5DA] bg-[#EAE5DA] text-[#5A4E48]"
                     : "border-[#D9C8C0] bg-white text-[#5A4E48] hover:border-[#EAE5DA]"
                 }`}
                 style={{ fontFamily: "Jua, sans-serif" }}

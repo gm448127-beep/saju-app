@@ -137,15 +137,15 @@ export default function TodayPage() {
             <label className="block text-xs text-[#8A7E78] mb-2" style={{ fontFamily: "Jua, sans-serif" }}>출생시간</label>
             <div className="flex gap-2 mb-3">
               <button type="button" onClick={() => setTimeMode("none")}
-                className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "none" ? "bg-[#5EA3B8] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>
+                className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "none" ? "bg-[#5EA3B8] text-[#5A4E48] shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>
                 모름
               </button>
               <button type="button" onClick={() => setTimeMode("slot")}
-                className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "slot" ? "bg-[#5EA3B8] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>
+                className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "slot" ? "bg-[#5EA3B8] text-[#5A4E48] shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>
                 시간대 선택
               </button>
               <button type="button" onClick={() => setTimeMode("exact")}
-                className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "exact" ? "bg-[#5EA3B8] text-white shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>
+                className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "exact" ? "bg-[#5EA3B8] text-[#5A4E48] shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>
                 ⏰ 시/분 직접입력
               </button>
             </div>
