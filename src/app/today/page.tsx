@@ -1,6 +1,15 @@
-"use client";
+﻿"use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import ShareButton from "@/components/ShareButton";
+import PdfButton from "@/components/PdfButton";
+import BirthDateNumberInputs, { isValidBirthDate } from "@/components/BirthDateNumberInputs";
+import HourlyFlowSection from "@/components/HourlyFlowSection";
+import SajuTriggerSection from "@/components/SajuTriggerSection";
+import TodayStatsSection from "@/components/TodayStatsSection";
+import TimeAdviceSection from "@/components/TimeAdviceSection";
+import TodayActionGuideSection from "@/components/TodayActionGuideSection";
+
 
 const TIME_SLOTS = [
   { value: 23, label: "자시 (23:00~01:00)" },
@@ -17,13 +26,219 @@ const TIME_SLOTS = [
   { value: 21, label: "해시 (21:00~23:00)" },
 ];
 
-export default function TodayPage() {
-  const currentYear = new Date().getFullYear();
+const TAB_ITEMS = [
+  { key: "summary", label: "요약" },
+  { key: "detail", label: "상세" },
+  { key: "myeongsik", label: "명식" },
+] as const;
 
+type TodayTab = (typeof TAB_ITEMS)[number]["key"];
+
+function SectionTitle({ title, caption }: { title: string; caption?: string }) {
+  return (
+    <div className="mb-4">
+      <h2 className="label mb-1">{title}</h2>
+      {caption && <p className="text-xs text-[#8A7E78]">{caption}</p>}
+    </div>
+  );
+}
+
+function TodayBriefingReport({ result }: { result: any }) {
+  const briefing = result.briefing;
+  if (!briefing) return null;
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-[28px] border border-[#E2D7D0] bg-white px-6 py-7 shadow-[0_14px_40px_rgba(61,51,56,0.06)]">
+        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs tracking-[0.18em] text-[#B8A78D]">{briefing.date}</p>
+            <h2 className="mt-3 text-2xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
+              {briefing.title}
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#5A4E48]">{briefing.headline}</p>
+          </div>
+          <div className="rounded-3xl border border-[#E2D7D0] bg-[#FAF8F5] px-6 py-4 text-center">
+            <p className="text-xs text-[#8A7E78]">종합 점수</p>
+            <p className="mt-1 text-5xl font-bold text-[#2F282B]">{result.scores.overall}</p>
+            <p className="mt-1 text-sm text-[#8B6F47]">{briefing.scoreTone}</p>
+          </div>
+        </div>
+
+        <div className="mt-6 rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] px-5 py-4">
+          <p className="text-xs tracking-[0.12em] text-[#8B6F47]">핵심 한 줄</p>
+          <p className="mt-2 text-lg leading-relaxed text-[#3D3338]" style={{ fontFamily: "Jua, sans-serif" }}>
+            {briefing.oneLine}
+          </p>
+        </div>
+      </div>
+
+      <div className="card">
+        <SectionTitle title="오늘의 브리핑" caption="십성, 일진, 합충, 시간 흐름을 종합한 요약입니다." />
+        <div className="space-y-3">
+          {briefing.executiveSummary?.map((line: string, index: number) => (
+            <div key={index} className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
+              <p className="text-sm leading-relaxed text-[#5A4E48]">{line}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+          <div className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
+            <p className="text-xs font-semibold text-[#8B6F47]">오늘의 활용법</p>
+            <p className="mt-2 text-sm leading-relaxed text-[#5A4E48]">{briefing.focus}</p>
+          </div>
+          <div className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
+            <p className="text-xs font-semibold text-[#8B6F47]">오늘의 주의점</p>
+            <p className="mt-2 text-sm leading-relaxed text-[#5A4E48]">{briefing.caution}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DomainScoreSummary({ domains }: { domains?: any[] }) {
+  if (!domains?.length) return null;
+
+  return (
+    <div className="card">
+      <SectionTitle title="영역별 점수 요약" caption="기존 운세 점수를 바탕으로 오늘 활용할 영역을 세분화했습니다." />
+      <div className="space-y-3">
+        {domains.map((domain) => (
+          <div key={domain.key} className="grid grid-cols-[72px_1fr_56px] items-center gap-3">
+            <div>
+              <p className="text-sm font-semibold text-[#3D3338]">{domain.label}</p>
+              <p className="text-[11px] text-[#8A7E78]">{domain.grade}</p>
+            </div>
+            <div className="h-2.5 overflow-hidden rounded-full bg-[#EDE4DC]">
+              <div
+                className="h-full rounded-full bg-[#8B6F47]"
+                style={{ width: `${Math.min(Math.max(domain.score, 0), 100)}%` }}
+              />
+            </div>
+            <p className="text-right text-lg font-bold text-[#2F282B]">{domain.score}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function DetailedFortuneReport({ items }: { items?: any[] }) {
+  if (!items?.length) return null;
+
+  return (
+    <div className="space-y-4">
+      {items.map((item) => (
+        <div key={item.key} className="card">
+          <div className="mb-4 flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs tracking-[0.12em] text-[#B8A78D]">DETAILED REPORT</p>
+              <h2 className="mt-1 text-2xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
+                {item.label}
+              </h2>
+              <p className="mt-1 text-xs text-[#8A7E78]">{item.desc}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-4xl font-bold text-[#2F282B]">{item.score}</p>
+              <p className="text-xs text-[#8B6F47]">{item.grade}</p>
+            </div>
+          </div>
+
+          <div className="h-3 overflow-hidden rounded-full bg-[#EDE4DC]">
+            <div className="h-full rounded-full bg-[#8B6F47]" style={{ width: `${item.score}%` }} />
+          </div>
+
+          <div className="mt-5 space-y-4 text-sm leading-relaxed text-[#5A4E48]">
+            <p>{item.overview}</p>
+            <div>
+              <p className="mb-1 font-semibold text-[#3D5838]">긍정 요소</p>
+              <p>{item.positive}</p>
+            </div>
+            <div>
+              <p className="mb-1 font-semibold text-[#7A4A3D]">주의 요소</p>
+              <p>{item.cautionText}</p>
+            </div>
+            <div className="grid grid-cols-1 gap-3 border-t border-[#E2D7D0] pt-4 md:grid-cols-2">
+              <div className="rounded-2xl bg-[#FAF8F5] px-4 py-3">
+                <p className="text-xs font-semibold text-[#8B6F47]">오늘의 행동</p>
+                <p className="mt-1">{item.action}</p>
+              </div>
+              <div className="rounded-2xl bg-[#FAF8F5] px-4 py-3">
+                <p className="text-xs font-semibold text-[#8B6F47]">피하면 좋은 것</p>
+                <p className="mt-1">{item.avoid}</p>
+              </div>
+            </div>
+            <p className="border-t border-[#E2D7D0] pt-4 text-xs text-[#8A7E78]">{item.basis}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MyeongsikReport({ report }: { report?: any }) {
+  if (!report) return null;
+
+  return (
+    <div className="space-y-4">
+      <div className="card">
+        <SectionTitle title={report.title} caption="오늘의 일진과 나의 원국을 함께 읽은 전문가용 요약입니다." />
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+          {report.natal.pillars.map((pillar: any) => (
+            <div key={pillar.key} className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-4 text-center">
+              <p className="text-xs text-[#8A7E78]">{pillar.label}</p>
+              <p className="mt-2 text-lg text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
+                {pillar.value}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="card">
+        <SectionTitle title="오늘 일진" caption="오늘 들어온 천간과 지지가 나에게 어떤 십성으로 작용하는지 정리했습니다." />
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
+          <div className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
+            <p className="text-xs text-[#8A7E78]">오늘 천간</p>
+            <p className="mt-1 text-base text-[#3D3338]">{report.today.gan}</p>
+          </div>
+          <div className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
+            <p className="text-xs text-[#8A7E78]">오늘 지지</p>
+            <p className="mt-1 text-base text-[#3D3338]">{report.today.ji}</p>
+          </div>
+          <div className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
+            <p className="text-xs text-[#8A7E78]">내 일간 기준</p>
+            <p className="mt-1 text-base text-[#3D3338]">
+              {report.today.sipsin} / {report.today.branchSipsin}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {(report.triggers?.length > 0 || report.legacyLines?.length > 0) && (
+        <div className="card">
+          <SectionTitle title="반영 요소" caption="점수와 해석에 반영된 합충, 십성, 오행 근거입니다." />
+          <div className="space-y-2">
+            {(report.triggers?.length ? report.triggers : report.legacyLines).map((item: any, index: number) => (
+              <div key={index} className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
+                <p className="text-sm leading-relaxed text-[#5A4E48]">
+                  {typeof item === "string" ? item : `${item.label || item.title || "반영"} · ${item.desc || item.description || item.reason || ""}`}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default function TodayPage() {
   // 폼 상태
-  const [year, setYear] = useState(1995);
-  const [month, setMonth] = useState(1);
-  const [day, setDay] = useState(1);
+  const [year, setYear] = useState("1995");
+  const [month, setMonth] = useState("1");
+  const [day, setDay] = useState("1");
   const [timeMode, setTimeMode] = useState<"none" | "slot" | "exact">("none");
   const [slotHour, setSlotHour] = useState(9);
   const [exactHour, setExactHour] = useState(9);
@@ -35,12 +250,20 @@ export default function TodayPage() {
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState<TodayTab>("summary");
+  const resultRef = useRef<HTMLDivElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
     setResult(null);
+
+    if (!isValidBirthDate(year, month, day)) {
+      setError("생년월일을 숫자로 정확히 입력해주세요.");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       let hour: number | undefined;
@@ -58,13 +281,14 @@ export default function TodayPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          year, month, day, hour, minute,
+          year: Number(year), month: Number(month), day: Number(day), hour, minute,
           isLunar: calendarType !== "solar", gender,
         }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "분석 실패");
       setResult(json);
+      setActiveTab("summary");
     } catch (err) {
       setError(err instanceof Error ? err.message : "오류가 발생했습니다.");
     } finally {
@@ -74,27 +298,23 @@ export default function TodayPage() {
 
   const statItems = result
     ? [
-        { label: "재물운", key: "wealth", color: "#E8A87C", emoji: "💰" },
-        { label: "애정운", key: "love", color: "#D87A8C", emoji: "💕" },
-        { label: "직장운", key: "career", color: "#5EA3B8", emoji: "💼" },
-        { label: "건강운", key: "health", color: "#5FB88A", emoji: "💪" },
-        { label: "행운", key: "luck", color: "#7B6CB8", emoji: "🍀" },
+        { label: "재물운", key: "wealth", color: "#8B6F47", emoji: "" },
+        { label: "애정운", key: "love", color: "#8B6F47", emoji: "" },
+        { label: "직장운", key: "career", color: "#8B6F47", emoji: "" },
+        { label: "건강운", key: "health", color: "#8B6F47", emoji: "" },
+        { label: "행운", key: "luck", color: "#8B6F47", emoji: "" },
       ]
     : [];
 
   return (
     <div className="space-y-6">
-      {/* 헤더 */}
-      <div className="text-center py-4">
-        <span className="text-5xl">🌤️</span>
-        <h1
-          style={{ fontFamily: "Jua, sans-serif" }}
-          className="text-2xl text-[#3D3338] mt-3"
-        >
+      <div className="rounded-[24px] border border-[#E2D7D0] bg-white px-5 py-5 shadow-[0_10px_30px_rgba(61,51,56,0.05)]">
+        <p className="text-xs tracking-[0.08em] text-[#B8A78D] mb-2">매일 보는 운명 리포트</p>
+        <h1 style={{ fontFamily: "Jua, sans-serif" }} className="text-2xl text-[#2F282B]">
           오늘의 운세
         </h1>
         <p className="text-[#8A7E78] text-sm mt-1">
-          생년월일시를 입력하면 오늘의 운세를 분석합니다
+          생년월일시를 입력하면 오늘의 흐름과 실천 포인트를 정리합니다.
         </p>
       </div>
 
@@ -102,58 +322,37 @@ export default function TodayPage() {
       <div className="card">
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* 년 / 월 / 일 */}
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>출생년도</label>
-              <select value={year} onChange={e => setYear(Number(e.target.value))}
-                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#7EB3C8] outline-none transition-colors">
-                {Array.from({ length: currentYear - 1927 + 1 }, (_, i) => currentYear - i).map(y => (
-                  <option key={y} value={y}>{y}년</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>월</label>
-              <select value={month} onChange={e => setMonth(Number(e.target.value))}
-                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#7EB3C8] outline-none transition-colors">
-                {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
-                  <option key={m} value={m}>{m}월</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>일</label>
-              <select value={day} onChange={e => setDay(Number(e.target.value))}
-                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#7EB3C8] outline-none transition-colors">
-                {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
-                  <option key={d} value={d}>{d}일</option>
-                ))}
-              </select>
-            </div>
-          </div>
+          <BirthDateNumberInputs
+            year={year}
+            month={month}
+            day={day}
+            onYearChange={setYear}
+            onMonthChange={setMonth}
+            onDayChange={setDay}
+          />
 
           {/* 출생시간 — 사주보기와 동일한 3가지 모드 */}
           <div>
             <label className="block text-xs text-[#8A7E78] mb-2" style={{ fontFamily: "Jua, sans-serif" }}>출생시간</label>
             <div className="flex gap-2 mb-3">
               <button type="button" onClick={() => setTimeMode("none")}
-                className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "none" ? "bg-[#5EA3B8] text-[#5A4E48] shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>
+                className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all border ${timeMode === "none" ? "bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]" : "bg-white border-[#D9C8C0] text-[#8A7E78]"}`}>
                 모름
               </button>
               <button type="button" onClick={() => setTimeMode("slot")}
-                className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "slot" ? "bg-[#5EA3B8] text-[#5A4E48] shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>
+                className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all border ${timeMode === "slot" ? "bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]" : "bg-white border-[#D9C8C0] text-[#8A7E78]"}`}>
                 시간대 선택
               </button>
               <button type="button" onClick={() => setTimeMode("exact")}
-                className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${timeMode === "exact" ? "bg-[#5EA3B8] text-[#5A4E48] shadow-md" : "bg-white border-2 border-[#D9C8C0] text-[#8A7E78]"}`}>
-                ⏰ 시/분 직접입력
+                className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all border ${timeMode === "exact" ? "bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]" : "bg-white border-[#D9C8C0] text-[#8A7E78]"}`}>
+                시/분 직접입력
               </button>
             </div>
 
             {/* 시간대 선택 모드 */}
             {timeMode === "slot" && (
               <select value={slotHour} onChange={e => setSlotHour(Number(e.target.value))}
-                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#7EB3C8] outline-none transition-colors">
+                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#B8A78D] outline-none transition-colors">
                 {TIME_SLOTS.map(s => (
                   <option key={s.value} value={s.value}>{s.label}</option>
                 ))}
@@ -162,15 +361,15 @@ export default function TodayPage() {
 
             {/* 시/분 직접입력 모드 */}
             {timeMode === "exact" && (
-              <div className="bg-[#EDE4DC] rounded-xl p-4 space-y-3">
-                <p className="text-xs text-[#5EA3B8]">
+              <div className="bg-[#FAF8F5] border border-[#E2D7D0] rounded-xl p-4 space-y-3">
+                <p className="text-xs text-[#8A7E78]">
                   정확한 출생 시각을 입력하면 시주까지 포함한 정밀 분석이 가능합니다.
                 </p>
                 <div className="flex items-center gap-3">
                   <div className="flex-1">
-                    <label className="block text-xs text-[#5EA3B8] mb-1 font-medium">시</label>
+                    <label className="block text-xs text-[#8A7E78] mb-1 font-medium">시</label>
                     <select value={exactHour} onChange={e => setExactHour(Number(e.target.value))}
-                      className="w-full bg-white border-2 border-[#C8DFE8] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#7EB3C8] outline-none">
+                      className="w-full bg-white border-2 border-[#E8D9C8] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#B8A78D] outline-none">
                       {Array.from({ length: 24 }, (_, i) => i).map(h => (
                         <option key={h} value={h}>{String(h).padStart(2, "0")}시</option>
                       ))}
@@ -178,9 +377,9 @@ export default function TodayPage() {
                   </div>
                   <span className="text-[#8A7E78] font-bold text-xl mt-5">:</span>
                   <div className="flex-1">
-                    <label className="block text-xs text-[#5EA3B8] mb-1 font-medium">분</label>
+                    <label className="block text-xs text-[#8A7E78] mb-1 font-medium">분</label>
                     <select value={exactMinute} onChange={e => setExactMinute(Number(e.target.value))}
-                      className="w-full bg-white border-2 border-[#C8DFE8] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#7EB3C8] outline-none">
+                      className="w-full bg-white border-2 border-[#E8D9C8] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#B8A78D] outline-none">
                       {Array.from({ length: 12 }, (_, i) => i * 5).map(m => (
                         <option key={m} value={m}>{String(m).padStart(2, "0")}분</option>
                       ))}
@@ -197,16 +396,17 @@ export default function TodayPage() {
               <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>달력</label>
               <div className="flex gap-2">
                 <button type="button" onClick={() => setCalendarType("solar")}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${calendarType !== "lunar" ? "bg-[#EFDED5] text-[#E5C100] border-[#FFD700]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#D4CCE8]"}`}>
-                  ☀️ 양력
-                </button>
+  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border ${calendarType === "solar" ? "bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#8B6F47]"}`}>
+  양력
+</button>
+
                 <button type="button" onClick={() => setCalendarType("lunar")}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${calendarType === "lunar" ? "bg-[#F2E4DC] text-[#EAE5DA] border-[#EAE5DA]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#D4CCE8]"}`}>
-                  🌙 음력
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border ${calendarType === "lunar" ? "bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#8B6F47]"}`}>
+                  음력
                 </button>
               <button type="button" onClick={() => setCalendarType("lunarLeap")}
-                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${calendarType === "lunarLeap" ? "bg-[#F2E4DC] text-[#EAE5DA] border-[#EAE5DA]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#D4CCE8]"}`}>
-                🌙 윤달
+                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border ${calendarType === "lunarLeap" ? "bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#8B6F47]"}`}>
+                윤달
               </button>
               </div>
             </div>
@@ -214,12 +414,12 @@ export default function TodayPage() {
               <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>성별</label>
               <div className="flex gap-2">
                 <button type="button" onClick={() => setGender("남")}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${gender === "남" ? "bg-[#DCEAF6] text-[#3D3338] border-[#DCEAF6]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#D4CCE8]"}`}>
-                  👨 남
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border ${gender === "남" ? "bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#8B6F47]"}`}>
+                남
                 </button>
                 <button type="button" onClick={() => setGender("여")}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${gender === "여" ? "bg-[#F6DFDC] text-[#3D3338] border-[#F6DFDC]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#D4CCE8]"}`}>
-                  👩 여
+                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border ${gender === "여" ? "bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#8B6F47]"}`}>
+                여
                 </button>
               </div>
             </div>
@@ -227,8 +427,12 @@ export default function TodayPage() {
 
           {/* 제출 버튼 */}
           <button type="submit" disabled={loading}
-            className="w-full py-3.5 rounded-2xl text-white text-lg transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ backgroundColor: "#5EA3B8", fontFamily: "Jua, sans-serif" }}>
+  className="w-full py-3.5 rounded-2xl text-white text-lg transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+  style={{ 
+    background: "#2F282B",
+    fontFamily: "Jua, sans-serif" 
+  }}>
+
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
@@ -237,7 +441,7 @@ export default function TodayPage() {
                 </svg>
                 분석 중...
               </span>
-            ) : "🌤️ 오늘의 운세 보기"}
+            ) : "오늘의 운세 보기"}
           </button>
         </form>
       </div>
@@ -251,227 +455,88 @@ export default function TodayPage() {
 
       {/* ────────── 결과 영역 ────────── */}
       {result && (
-        <div className="space-y-6 animate-fade-in">
-          {/* ① 종합 등급 & 점수 */}
-          <div className="card text-center">
-            <p className="text-sm text-[#8A7E78] mb-1">{result.date}</p>
-            <p className="text-sm text-[#5A4E48] mb-3">
-              오늘의 간지: {result.todayGan}{result.todayJi} {result.todayEmoji}
-            </p>
-            <div className="inline-block px-8 py-4 rounded-2xl mb-3"
-              style={{ backgroundColor: `${result.gradeColor}18` }}>
-              <p className="text-4xl font-bold pixel-text" style={{ color: result.gradeColor }}>
-                {result.grade}
-              </p>
+        <div ref={resultRef} className="space-y-6 animate-fade-in">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" data-pdf-ignore>
+            <div>
+              <p className="text-xs tracking-[0.12em] text-[#B8A78D]">TODAY REPORT</p>
+              <p className="text-sm text-[#5A4E48]">전문 비서형 오늘의 운세 리포트</p>
             </div>
-            <p className="text-3xl mb-1">{result.gradeEmoji}</p>
-            <p style={{ fontFamily: "Jua, sans-serif" }} className="text-xl text-[#3D3338]">
-              종합 점수: <span style={{ color: result.gradeColor }}>{result.scores.overall}점</span>
-            </p>
-          </div>
-
-          {/* ② 오늘의 명언 */}
-          <div className="card text-center" style={{ backgroundColor: "#F5EDE8", borderColor: "#E8DCC8" }}>
-            <p className="text-lg text-[#5A4E48] italic leading-relaxed">
-              &ldquo;{result.todayQuote.text}&rdquo;
-            </p>
-            <p className="text-sm text-[#8A7E78] mt-2">— {result.todayQuote.author}</p>
-          </div>
-
-          {/* ③ 오늘과 나의 관계 */}
-          <div className="card">
-            <h2 className="label mb-3">오늘과 나의 관계</h2>
-            <div className="flex items-center justify-center gap-6 mb-3">
-              <div className="text-center">
-                <span className="text-3xl">{result.myEmoji}</span>
-                <p className="text-sm text-[#5A4E48] mt-1">나 ({result.myElement})</p>
-              </div>
-              <span className="text-[#D87A8C] text-xl">⚡</span>
-              <div className="text-center">
-                <span className="text-3xl">{result.todayEmoji}</span>
-                <p className="text-sm text-[#5A4E48] mt-1">오늘 ({result.todayGanOhaeng})</p>
-              </div>
+            <div className="flex w-full flex-nowrap gap-1 sm:w-auto sm:min-w-[340px] sm:gap-2">
+              <PdfButton targetRef={resultRef} fileName="today-fortune" />
+              <ShareButton targetRef={resultRef} fileName="today-fortune" />
             </div>
-            {result.todaySipsin && (
-              <div className="text-center mb-2">
-                <span className="inline-block px-3 py-1 rounded-full text-sm font-bold text-white"
-                  style={{ backgroundColor: "#EAE5DA" }}>
-                  {result.todaySipsin}
-                </span>
-              </div>
-            )}
-            <p style={{ fontFamily: "Jua, sans-serif" }} className="text-base text-[#3D3338] text-center mb-2">
-              {result.relation}
-            </p>
-            <p className="text-sm text-[#5A4E48] text-center">{result.relationDetail}</p>
           </div>
 
-          {/* ④ 톱니바퀴 분석 */}
-          {result.gearAnalysis && result.gearAnalysis.length > 0 && (
-            <div className="card" style={{ backgroundColor: "#F5F0FF", borderColor: "#D4CCE8" }}>
-              <h2 className="label mb-2">⚙️ 사주 톱니바퀴 분석</h2>
-              <p className="text-xs text-[#8A7E78] mb-4">
-                내 사주 8글자와 오늘의 일진이 어떻게 맞물리는지 보여줍니다
-              </p>
-              <div className="space-y-2">
-                {result.gearAnalysis.map((line: string, i: number) => {
-                  let icon = "⚙️";
-                  if (line.includes("⬆⬆")) icon = "🔥";
-                  else if (line.includes("⬆")) icon = "✨";
-                  else if (line.includes("⬇⬇")) icon = "💥";
-                  else if (line.includes("⬇")) icon = "⚡";
-                  let bgColor = "bg-white/60";
-                  if (line.includes("⬆")) bgColor = "bg-green-50";
-                  else if (line.includes("⬇")) bgColor = "bg-red-50";
-                  return (
-                    <div key={i} className={`flex items-start gap-2 ${bgColor} border border-[#D9C8C0] rounded-xl px-3 py-2.5`}>
-                      <span className="text-base mt-0.5">{icon}</span>
-                      <p className="text-sm text-[#3D3338] flex-1 leading-relaxed">
-                        {line.replace(/^⚙️\s*/, "")}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-              {result.pillars && (
-                <div className="mt-4 pt-3 border-t border-[#D9C8C0]">
-                  <p className="text-xs text-[#8A7E78] mb-2 text-center">내 사주 원국</p>
-                  <div className="grid grid-cols-4 gap-2 text-center">
-                    {[
-                      { label: "년주", value: result.pillars.year },
-                      { label: "월주", value: result.pillars.month },
-                      { label: "일주", value: result.pillars.day },
-                      { label: "시주", value: result.pillars.hour },
-                    ].map((p) => (
-                      <div key={p.label} className="bg-white border border-[#D9C8C0] rounded-lg py-2">
-                        <p className="text-[10px] text-[#8A7E78]">{p.label}</p>
-                        <p className="text-sm font-bold text-[#3D3338] mt-0.5">{p.value || "-"}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+          <div className="rounded-xl border border-[#E2D7D0] bg-white/95 p-0.5 shadow-[0_6px_18px_rgba(61,51,56,0.05)] backdrop-blur sm:sticky sm:top-16 sm:z-10 sm:rounded-2xl sm:p-1" data-pdf-ignore>
+            <div className="grid grid-cols-3 gap-0.5 sm:gap-1">
+              {TAB_ITEMS.map((tab) => (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`rounded-lg px-2 py-1.5 text-xs font-semibold transition sm:rounded-xl sm:px-3 sm:py-2.5 sm:text-sm ${
+                    activeTab === tab.key
+                      ? "bg-[#2F282B] text-white"
+                      : "text-[#8A7E78] hover:bg-[#FAF8F5] hover:text-[#3D3338]"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {activeTab === "summary" && (
+            <div className="space-y-6">
+              <TodayBriefingReport result={result} />
+              <DomainScoreSummary domains={result.domainScores} />
             </div>
           )}
 
-          {/* ⑤ 세부 운세 스탯 */}
-          <div className="card">
-            <h2 className="label mb-4">세부 운세 스탯</h2>
-            <div className="space-y-4">
-              {statItems.map((item) => {
-                const score = result.scores[item.key];
-                return (
-                  <div key={item.key}>
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-sm text-[#5A4E48]">{item.emoji} {item.label}</span>
-                      <span className="text-base font-bold" style={{ color: item.color }}>{score}</span>
-                    </div>
-                    <div className="progress-bar">
-                      <div className="progress-fill" style={{ width: `${score}%`, backgroundColor: item.color }} />
-                    </div>
-                  </div>
-                );
-              })}
+          {activeTab === "detail" && (
+            <div className="space-y-6">
+              <TodayStatsSection
+                overall={result.scores.overall}
+                items={statItems.map((item) => ({
+                  ...item,
+                  score: result.scores[item.key],
+                }))}
+              />
+              <DetailedFortuneReport items={result.detailedFortunes} />
+              {result.hourlyFlow && (
+                <HourlyFlowSection
+                  hourlyFlow={result.hourlyFlow}
+                  hourlyFlowIntro={result.hourlyFlowIntro}
+                  hourlyPeak={result.hourlyPeak}
+                  hourlyCaution={result.hourlyCaution}
+                />
+              )}
+              <TimeAdviceSection items={result.timeAdvice ?? []} />
+              <TodayActionGuideSection
+                dos={result.todayDos}
+                donts={result.todayDonts}
+                dosDetailed={result.todayDosDetailed}
+                dontsDetailed={result.todayDontsDetailed}
+                luckyItems={result.luckyItems}
+                tip={result.tip}
+                warning={result.warning}
+                sipsinTitle={result.sipsinTitle}
+              />
             </div>
-          </div>
+          )}
 
-          {/* ⑥ 시간대별 운세 */}
-          <div className="card">
-            <h2 className="label mb-4">⏰ 시간대별 운세</h2>
-            <div className="space-y-3">
-              {result.timeAdvice && !Array.isArray(result.timeAdvice) &&
-                [
-                  { time: "🌅 오전", emoji: "🌅", advice: result.timeAdvice.morning },
-                  { time: "☀️ 오후", emoji: "☀️", advice: result.timeAdvice.afternoon },
-                  { time: "🌙 저녁", emoji: "🌙", advice: result.timeAdvice.evening },
-                ].map((item) => (
-                  <div key={item.time} className="bg-[#F5EDE8] border-2 border-[#D9C8C0] rounded-xl p-3 flex items-start gap-3">
-                    <span className="text-2xl">{item.emoji}</span>
-                    <div className="flex-1">
-                      <p style={{ fontFamily: "Jua, sans-serif" }} className="text-sm text-[#3D3338] mb-1">{item.time}</p>
-                      <p className="text-sm text-[#5A4E48]">{item.advice}</p>
-                    </div>
-                  </div>
-                ))}
-              {result.timeAdvice && Array.isArray(result.timeAdvice) &&
-                result.timeAdvice.map((item: any) => (
-                  <div key={item.time} className="bg-[#F5EDE8] border-2 border-[#D9C8C0] rounded-xl p-3 flex items-start gap-3">
-                    <span className="text-2xl">{item.emoji}</span>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-center mb-1">
-                        <p style={{ fontFamily: "Jua, sans-serif" }} className="text-sm text-[#3D3338]">{item.time}</p>
-                        <span className="text-sm font-bold" style={{ color: item.score >= 70 ? "#5FB88A" : item.score >= 50 ? "#E8A87C" : "#D87A8C" }}>
-                          {item.score}점
-                        </span>
-                      </div>
-                      <p className="text-sm text-[#5A4E48]">{item.advice}</p>
-                    </div>
-                  </div>
-                ))}
+          {activeTab === "myeongsik" && (
+            <div className="space-y-6">
+              <MyeongsikReport report={result.myeongsikReport} />
+              {(result.sajuTriggers?.length > 0 || result.gearAnalysis?.length > 0) && (
+                <SajuTriggerSection
+                  intro={result.sajuTriggerIntro}
+                  triggers={result.sajuTriggers?.length ? result.sajuTriggers : []}
+                  pillars={result.pillars}
+                />
+              )}
             </div>
-          </div>
-
-          {/* ⑦ 하면 좋은 것 / 피할 것 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="card" style={{ backgroundColor: "#F0E8DC", borderColor: "#C8E8D4" }}>
-              <h2 className="label mb-3">✅ 오늘 하면 좋은 것</h2>
-              <div className="space-y-2">
-                {result.todayDos?.map((item: string, i: number) => (
-                  <p key={i} className="text-sm text-[#3D5838]">{item}</p>
-                ))}
-              </div>
-            </div>
-            <div className="card" style={{ backgroundColor: "#F8F0F0", borderColor: "#E8C8C8" }}>
-              <h2 className="label mb-3">❌ 오늘 피할 것</h2>
-              <div className="space-y-2">
-                {result.todayDonts?.map((item: string, i: number) => (
-                  <p key={i} className="text-sm text-[#583838]">{item}</p>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* ⑧ 행운 아이템 */}
-          <div className="card">
-            <h2 className="label mb-4">🍀 행운 아이템</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {result.luckyItems && !Array.isArray(result.luckyItems) &&
-                [
-                  { emoji: "🎨", label: "행운의 색", value: result.luckyItems.color },
-                  { emoji: "🔢", label: "행운의 숫자", value: result.luckyItems.number },
-                  { emoji: "🧭", label: "행운의 방향", value: result.luckyItems.direction },
-                  { emoji: "🍽️", label: "행운의 음식", value: result.luckyItems.food },
-                  { emoji: "📍", label: "행운의 장소", value: result.luckyItems.place },
-                  { emoji: "⏰", label: "행운의 시간", value: result.luckyItems.time },
-                ].map((item) => (
-                  <div key={item.label} className="bg-[#F5EDE8] border-2 border-[#D9C8C0] rounded-2xl p-4 text-center">
-                    <span className="text-2xl">{item.emoji}</span>
-                    <p className="text-xs text-[#8A7E78] mt-1">{item.label}</p>
-                    <p className="text-base font-bold text-[#3D3338] mt-1">{item.value}</p>
-                  </div>
-                ))}
-              {result.luckyItems && Array.isArray(result.luckyItems) &&
-                result.luckyItems.map((item: any) => (
-                  <div key={item.label} className="bg-[#F5EDE8] border-2 border-[#D9C8C0] rounded-2xl p-4 text-center">
-                    <span className="text-2xl">{item.emoji}</span>
-                    <p className="text-xs text-[#8A7E78] mt-1">{item.label}</p>
-                    <p className="text-base font-bold text-[#3D3338] mt-1">{item.value}</p>
-                  </div>
-                ))}
-            </div>
-          </div>
-
-          {/* ⑨ 팁 & 주의사항 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="card" style={{ backgroundColor: "#F0E8DC", borderColor: "#C8E8D4" }}>
-              <h2 className="label mb-2">💡 오늘의 팁</h2>
-              <p className="text-base text-[#3D5838]">{result.tip}</p>
-            </div>
-            <div className="card" style={{ backgroundColor: "#F8F0F0", borderColor: "#E8C8C8" }}>
-              <h2 className="label mb-2">⚠️ 주의사항</h2>
-              <p className="text-base text-[#583838]">{result.warning}</p>
-            </div>
-          </div>
+          )}
         </div>
       )}
     </div>

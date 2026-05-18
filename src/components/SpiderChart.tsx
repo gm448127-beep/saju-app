@@ -3,7 +3,7 @@
 interface SpiderDataItem { label: string; value: number; max: number; }
 interface SpiderChartProps { data: SpiderDataItem[]; size?: number; color?: string; }
 
-export default function SpiderChart({ data, size = 250, color = '#8B7EC8' }: SpiderChartProps) {
+export default function SpiderChart({ data, size = 250, color = '#8B6F47' }: SpiderChartProps) {
   const cx = size / 2; const cy = size / 2;
   const radius = size * 0.35; const levels = 5;
   const angleStep = (2 * Math.PI) / data.length;

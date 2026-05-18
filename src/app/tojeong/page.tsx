@@ -1,6 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import ShareButton from '@/components/ShareButton';
+import BirthDateNumberInputs, { isValidBirthDate } from '@/components/BirthDateNumberInputs';
+import TojeongResultSection from '@/components/TojeongResultSection';
 
 const TIME_SLOTS = [
   { value: 23, label: '자시 (23:00~01:00)' },
@@ -18,11 +21,11 @@ const TIME_SLOTS = [
 ];
 
 export default function TojeongPage() {
-  const currentYear = new Date().getFullYear();
+  const resultRef = useRef<HTMLDivElement | null>(null);
 
-  const [year, setYear] = useState(1995);
-  const [month, setMonth] = useState(1);
-  const [day, setDay] = useState(1);
+  const [year, setYear] = useState('1995');
+  const [month, setMonth] = useState('1');
+  const [day, setDay] = useState('1');
   const [timeMode, setTimeMode] = useState<'none' | 'slot' | 'exact'>('none');
   const [slotHour, setSlotHour] = useState(9);
   const [exactHour, setExactHour] = useState(9);
@@ -37,9 +40,15 @@ export default function TojeongPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
     setResult(null);
+
+    if (!isValidBirthDate(year, month, day)) {
+      setError('생년월일을 숫자로 정확히 입력해주세요.');
+      return;
+    }
+
+    setLoading(true);
 
     let hour: number | undefined;
     let minute: number | undefined;
@@ -56,7 +65,7 @@ export default function TojeongPage() {
       const res = await fetch('/api/tojeong', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ year, month, day, hour, minute, isLunar: calendarType !== "solar", gender }),
+        body: JSON.stringify({ year: Number(year), month: Number(month), day: Number(day), hour, minute, isLunar: calendarType !== "solar", gender }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || '분석 실패');
@@ -78,45 +87,23 @@ export default function TojeongPage() {
 
   return (
     <div className="space-y-6">
-      {/* 헤더 */}
-      <div className="text-center py-4">
-        <span className="text-5xl">📜</span>
-        <h1 style={{ fontFamily: 'Jua, sans-serif' }} className="text-2xl text-[#3D3338] mt-3">토정비결</h1>
-        <p className="text-[#8A7E78] text-sm mt-1">조선시대 토정 이지함 선생의 한 해 운세</p>
+      <div className="rounded-[24px] border border-[#E2D7D0] bg-white px-5 py-5 shadow-[0_10px_30px_rgba(61,51,56,0.05)]">
+        <p className="text-xs tracking-[0.08em] text-[#B8A78D] mb-2">한 해를 정리하는 운명 리포트</p>
+        <h1 style={{ fontFamily: 'Jua, sans-serif' }} className="text-2xl text-[#2F282B]">토정비결</h1>
+        <p className="text-[#8A7E78] text-sm mt-1">올해의 흐름과 월별 기회를 차분하게 정리합니다.</p>
       </div>
 
       {/* 입력 폼 */}
       <div className="card">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-3 gap-3">
-            <div>
-              <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: 'Jua, sans-serif' }}>출생년도</label>
-              <select value={year} onChange={e => setYear(Number(e.target.value))}
-                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#EAE5DA] outline-none">
-                {Array.from({ length: currentYear - 1927 + 1 }, (_, i) => currentYear - i).map(y => (
-                  <option key={y} value={y}>{y}년</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: 'Jua, sans-serif' }}>월</label>
-              <select value={month} onChange={e => setMonth(Number(e.target.value))}
-                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#EAE5DA] outline-none">
-                {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
-                  <option key={m} value={m}>{m}월</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: 'Jua, sans-serif' }}>일</label>
-              <select value={day} onChange={e => setDay(Number(e.target.value))}
-                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#EAE5DA] outline-none">
-                {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
-                  <option key={d} value={d}>{d}일</option>
-                ))}
-              </select>
-            </div>
-          </div>
+          <BirthDateNumberInputs
+            year={year}
+            month={month}
+            day={day}
+            onYearChange={setYear}
+            onMonthChange={setMonth}
+            onDayChange={setDay}
+          />
 
           {/* 시간 입력 (사주보기와 동일 3모드) */}
           <div>
@@ -125,13 +112,13 @@ export default function TojeongPage() {
               {([
                 { mode: 'none' as const, label: '모름' },
                 { mode: 'slot' as const, label: '시간대 선택' },
-                { mode: 'exact' as const, label: '⏰ 시/분 직접입력' },
+                { mode: 'exact' as const, label: '시/분 직접입력' },
               ]).map(({ mode, label }) => (
                 <button key={mode} type="button" onClick={() => setTimeMode(mode)}
-                  className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all ${
+                  className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all border ${
                     timeMode === mode
-                      ? 'bg-[#EAE5DA] text-[#5A4E48] shadow-md'
-                      : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
+                      ? 'bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]'
+                      : 'bg-white border-[#D9C8C0] text-[#8A7E78]'
                   }`}>{label}</button>
               ))}
             </div>
@@ -146,11 +133,11 @@ export default function TojeongPage() {
             )}
 
             {timeMode === 'exact' && (
-              <div className="bg-[#F2E4DC] rounded-xl p-4 space-y-3">
-                <p className="text-xs text-[#6B5FA0]">정확한 출생 시각을 입력하면 진태양시 보정이 자동 적용됩니다.</p>
+              <div className="bg-[#FAF8F5] border border-[#E2D7D0] rounded-xl p-4 space-y-3">
+                <p className="text-xs text-[#8A7E78]">정확한 출생 시각을 입력하면 진태양시 보정이 자동 적용됩니다.</p>
                 <div className="flex items-center gap-3">
                   <div className="flex-1">
-                    <label className="block text-xs text-[#6B5FA0] mb-1 font-medium">시</label>
+                    <label className="block text-xs text-[#8A7E78] mb-1 font-medium">시</label>
                     <select value={exactHour} onChange={e => setExactHour(Number(e.target.value))}
                       className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#EAE5DA] outline-none">
                       {Array.from({ length: 24 }, (_, i) => i).map(h => (
@@ -160,7 +147,7 @@ export default function TojeongPage() {
                   </div>
                   <span className="text-[#8A7E78] font-bold text-xl mt-5">:</span>
                   <div className="flex-1">
-                    <label className="block text-xs text-[#6B5FA0] mb-1 font-medium">분</label>
+                    <label className="block text-xs text-[#8A7E78] mb-1 font-medium">분</label>
                     <select value={exactMinute} onChange={e => setExactMinute(Number(e.target.value))}
                       className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#EAE5DA] outline-none">
                       {Array.from({ length: 12 }, (_, i) => i * 5).map(m => (
@@ -178,18 +165,18 @@ export default function TojeongPage() {
             <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: 'Jua, sans-serif' }}>달력</label>
             <div className="flex gap-2">
               <button type="button" onClick={() => setCalendarType("solar")}
-                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  calendarType !== "lunar" ? 'bg-[#EAE5DA] text-[#5A4E48] shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
-                }`}>☀️ 양력</button>
+                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border ${
+                  calendarType === "solar" ? 'bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]' : 'bg-white border-[#D9C8C0] text-[#8A7E78]'
+                }`}>양력</button>
               <button type="button" onClick={() => setCalendarType("lunar")}
-                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  calendarType === "lunar" ? 'bg-[#EAE5DA] text-[#5A4E48] shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
-                }`}>🌙 음력</button>
+                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border ${
+                  calendarType === "lunar" ? 'bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]' : 'bg-white border-[#D9C8C0] text-[#8A7E78]'
+                }`}>음력</button>
             <button type="button" onClick={() => setCalendarType("lunarLeap")}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all
+              className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border
 ${
-                calendarType === "lunarLeap" ? 'bg-[#EAE5DA] text-[#5A4E48] shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
-              }`}>🌙 윤달</button>
+                calendarType === "lunarLeap" ? 'bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]' : 'bg-white border-[#D9C8C0] text-[#8A7E78]'
+              }`}>윤달</button>
             </div>
           </div>
 
@@ -198,19 +185,19 @@ ${
             <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: 'Jua, sans-serif' }}>성별</label>
             <div className="flex gap-2">
               <button type="button" onClick={() => setGender('남')}
-                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  gender === '남' ? 'bg-[#DCEAF6] text-[#5A4E48] shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
-                }`}>👨 남</button>
+                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border ${
+                  gender === '남' ? 'bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]' : 'bg-white border-[#D9C8C0] text-[#8A7E78]'
+                }`}>남</button>
               <button type="button" onClick={() => setGender('여')}
-                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  gender === '여' ? 'bg-[#F6DFDC] text-[#5A4E48] shadow-md' : 'bg-white border-2 border-[#D9C8C0] text-[#8A7E78]'
-                }`}>👩 여</button>
+                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border ${
+                  gender === '여' ? 'bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]' : 'bg-white border-[#D9C8C0] text-[#8A7E78]'
+                }`}>여</button>
             </div>
           </div>
 
           <button type="submit" disabled={loading}
             className="w-full py-3.5 rounded-2xl text-white text-lg transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ backgroundColor: '#EAE5DA', fontFamily: 'Jua, sans-serif' }}>
+            style={{ backgroundColor: '#2F282B', fontFamily: 'Jua, sans-serif' }}>
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
@@ -219,7 +206,7 @@ ${
                 </svg>
                 분석 중...
               </span>
-            ) : '📜 토정비결 보기'}
+            ) : '토정비결 보기'}
           </button>
         </form>
       </div>
@@ -230,6 +217,29 @@ ${
 
       {/* 결과 */}
       {result && (
+        <div className="space-y-3 animate-fade-in">
+          <div className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3 shadow-[0_10px_30px_rgba(61,51,56,0.05)]" data-pdf-ignore>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-xs tracking-[0.12em] text-[#B8A78D]">TOJEONG REPORT</p>
+                <p className="text-sm text-[#5A4E48]">토정비결 결과를 이미지로 저장하거나 공유할 수 있습니다.</p>
+              </div>
+              <ShareButton targetRef={resultRef} fileName="tojeong-report" />
+            </div>
+          </div>
+
+          <div ref={resultRef}>
+            <TojeongResultSection
+              result={result}
+              selectedMonth={selectedMonth}
+              setSelectedMonth={setSelectedMonth}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* 이전 결과 UI 보관 */}
+      {false && result && (
         <div className="space-y-6 animate-fade-in">
 
           {/* 기본 정보 + 사주원국 + 등급 */}
@@ -299,11 +309,11 @@ ${
             )}
           </div>
 
-          {/* 톱니바퀴 분석 */}
+          {/* 기운의 상호작용 */}
           {result.gearAnalysis && result.gearAnalysis.length > 0 && (
             <div className="card" style={{ backgroundColor: '#F5F0FF', borderColor: '#D4CCE8' }}>
-              <h2 className="label mb-2">⚙️ 사주 톱니바퀴 분석</h2>
-              <p className="text-xs text-[#8A7E78] mb-3">내 사주 8글자와 2026 병오(丙午)년이 어떻게 맞물리는지 보여줍니다</p>
+              <h2 className="label mb-2">기운의 상호작용</h2>
+              <p className="text-xs text-[#8A7E78] mb-3">내 사주 8글자와 2026 병오(丙午)년이 만나는 지점을 보여줍니다</p>
               <div className="space-y-2">
                 {result.gearAnalysis.map((line: string, i: number) => {
                   const isBigUp = line.includes('⬆⬆');

@@ -4,13 +4,13 @@ import "./globals.css";
 import Header from "@/components/Header";
 
 export const metadata: Metadata = {
-  title: "사주도우미 - AI 사주 분석",
+  title: "운명비서 - AI 사주 분석",
   description: "데이터 기반 사주팔자, 오늘의 운세, 토정비결, 궁합 분석, AI 사주상담",
   openGraph: {
-    title: "🏮 사주도우미 - AI 맞춤 사주 분석",
+    title: "🏮 운명비서 - AI 맞춤 사주 분석",
     description: "나만을 위한 사주팔자, 오늘의 운세, 토정비결, 궁합, AI 사주상담까지! 무료로 바로 확인하세요 ✨",
     url: "https://saju-app-vert.vercel.app",
-    siteName: "사주도우미",
+    siteName: "운명비서",
     locale: "ko_KR",
     type: "website",
     images: [
@@ -18,13 +18,13 @@ export const metadata: Metadata = {
         url: "https://saju-app-vert.vercel.app/og-image.png",
         width: 1200,
         height: 630,
-        alt: "사주도우미 - AI 맞춤 사주 분석",
+        alt: "운명비서 - AI 맞춤 사주 분석",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "🏮 사주도우미 - AI 맞춤 사주 분석",
+    title: "🏮 운명비서 - AI 맞춤 사주 분석",
     description: "나만을 위한 사주팔자, 오늘의 운세, 토정비결, 궁합, AI 사주상담까지!",
     images: ["https://saju-app-vert.vercel.app/og-image.png"],
   },
@@ -75,7 +75,7 @@ export default function HomePage() {
     <div className="space-y-8">
       <section className="text-center py-16">
         <div className="text-6xl mb-6 animate-bounce-soft">🏮</div>
-        <h1 style={{fontFamily:'Jua, sans-serif'}} className="text-4xl text-[#2D2D2D] mb-3">사주도우미</h1>
+        <h1 style={{fontFamily:'Jua, sans-serif'}} className="text-4xl text-[#2D2D2D] mb-3">운명비서</h1>
         <p className="text-[#6B6B6B] text-lg mb-2">오로지 당신만을 위한</p>
         <p className="text-[#6B6B6B] text-lg">맞춤형 사주 분석을 진행합니다.</p>
         <div className="mt-6 flex justify-center gap-3">
@@ -108,7 +108,7 @@ export default function HomePage() {
       </section>
 
       <footer className="text-center py-10 text-sm text-[#9B9B9B]">
-        <p>사주도우미는 재미와 참고용입니다 ☺️</p>
+        <p>운명비서는 재미와 참고용입니다 ☺️</p>
         <p className="mt-1">중요한 결정은 전문가와 상담하세요.</p>
       </footer>
     </div>

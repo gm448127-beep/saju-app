@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import BirthDateNumberInputs, { isValidBirthDate } from '@/components/BirthDateNumberInputs';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -12,27 +13,56 @@ interface BirthData {
   month: string;
   day: string;
   gender: string;
+  calendarType: 'solar' | 'lunar' | 'lunarLeap';
   isLunar: boolean;
+  timeMode: 'none' | 'slot' | 'exact';
+  slotHour: string;
+  exactHour: string;
+  exactMinute: string;
 }
 
 const QUICK_QUESTIONS = [
-  { emoji: '💰', text: '내 재물운은 어때?' },
-  { emoji: '💕', text: '연애운이 궁금해' },
-  { emoji: '💼', text: '직업 적성이 뭘까?' },
-  { emoji: '💪', text: '건강 조심할 부분은?' },
-  { emoji: '📅', text: '오늘의 운세 알려줘' },
-  { emoji: '🌟', text: '올해 운세 전체적으로 어때?' },
+  { text: '내 재물운은 어때?' },
+  { text: '연애운이 궁금해' },
+  { text: '직업 적성이 뭘까?' },
+  { text: '건강 조심할 부분은?' },
+  { text: '오늘의 운세 알려줘' },
+  { text: '올해 운세 전체적으로 어때?' },
 ];
 
-const YEARS = Array.from({ length: 80 }, (_, i) => 2010 - i);
-const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
-const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
+const HOURS = Array.from({ length: 24 }, (_, i) => i);
+const MINUTES = Array.from({ length: 12 }, (_, i) => i * 5);
+const TIME_SLOTS = [
+  { value: 23, label: '자시 (23:00~01:00)' },
+  { value: 1, label: '축시 (01:00~03:00)' },
+  { value: 3, label: '인시 (03:00~05:00)' },
+  { value: 5, label: '묘시 (05:00~07:00)' },
+  { value: 7, label: '진시 (07:00~09:00)' },
+  { value: 9, label: '사시 (09:00~11:00)' },
+  { value: 11, label: '오시 (11:00~13:00)' },
+  { value: 13, label: '미시 (13:00~15:00)' },
+  { value: 15, label: '신시 (15:00~17:00)' },
+  { value: 17, label: '유시 (17:00~19:00)' },
+  { value: 19, label: '술시 (19:00~21:00)' },
+  { value: 21, label: '해시 (21:00~23:00)' },
+];
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const [birthData, setBirthData] = useState<BirthData>({ year: '', month: '', day: '', gender: '남', isLunar: false });
+  const [birthData, setBirthData] = useState<BirthData>({
+    year: '',
+    month: '',
+    day: '',
+    gender: '남',
+    calendarType: 'solar',
+    isLunar: false,
+    timeMode: 'none',
+    slotHour: '9',
+    exactHour: '9',
+    exactMinute: '0',
+  });
   const [showBirthForm, setShowBirthForm] = useState(true);
   const [birthSaved, setBirthSaved] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -42,8 +72,8 @@ export default function ChatPage() {
   }, [messages]);
 
   const saveBirthData = () => {
-    if (!birthData.year || !birthData.month || !birthData.day) {
-      alert('생년월일을 모두 입력해주세요!');
+    if (!isValidBirthDate(birthData.year, birthData.month, birthData.day)) {
+      alert('생년월일을 숫자로 정확히 입력해주세요!');
       return;
     }
     setBirthSaved(true);
@@ -51,15 +81,25 @@ export default function ChatPage() {
     // 환영 메시지
     setMessages([{
       role: 'assistant',
-      content: `안녕하세요! 🙏 **사주도우미**입니다!\n\n${birthData.year}년 ${birthData.month}월 ${birthData.day}일생 (${birthData.gender === '남' ? '남성' : '여성'}, ${birthData.isLunar ? '음력' : '양력'}) 정보를 확인했어요!\n\n이제 맞춤형 사주 상담을 받으실 수 있습니다. 😊\n\n💡 아래 버튼을 눌러 빠르게 질문하거나, 궁금한 점을 직접 입력해보세요!`,
+      content: `안녕하세요. **운명비서**입니다.\n\n${birthData.year}년 ${birthData.month}월 ${birthData.day}일생 (${birthData.gender === '남' ? '남성' : '여성'}, ${birthData.calendarType === 'solar' ? '양력' : birthData.calendarType === 'lunarLeap' ? '윤달' : '음력'}, ${getBirthTimeLabel(birthData)}) 정보를 확인했습니다.\n\n이제 맞춤형 사주 상담을 받을 수 있습니다.\n\n아래 버튼을 눌러 빠르게 질문하거나, 궁금한 점을 직접 입력해보세요.`,
     }]);
   };
+
+  function getBirthTimeLabel(data: BirthData) {
+    if (data.timeMode === 'slot') {
+      return TIME_SLOTS.find((slot) => String(slot.value) === data.slotHour)?.label || '시간대 선택';
+    }
+    if (data.timeMode === 'exact') {
+      return `${String(data.exactHour).padStart(2, '0')}:${String(data.exactMinute).padStart(2, '0')}`;
+    }
+    return '출생시간 모름';
+  }
 
   const skipBirthData = () => {
     setShowBirthForm(false);
     setMessages([{
       role: 'assistant',
-      content: '안녕하세요! 🙏 **사주도우미**입니다!\n\n생년월일 없이도 일반적인 운세 상담이 가능해요.\n더 정확한 맞춤 상담을 원하시면 언제든 상단의 "생년월일 입력" 버튼을 눌러주세요!\n\n💡 무엇이 궁금하신가요?',
+      content: '안녕하세요. **운명비서**입니다.\n\n생년월일 없이도 일반적인 운세 상담이 가능합니다.\n더 정확한 맞춤 상담을 원하시면 언제든 상단의 "생년월일 입력" 버튼을 눌러주세요.\n\n무엇이 궁금하신가요?',
     }]);
   };
 
@@ -86,7 +126,7 @@ export default function ChatPage() {
       const assistantMessage: Message = { role: 'assistant', content: data.reply || data.error || '응답을 받지 못했습니다.' };
       setMessages(prev => [...prev, assistantMessage]);
     } catch (error) {
-      setMessages(prev => [...prev, { role: 'assistant', content: '죄송합니다, 오류가 발생했어요. 다시 시도해주세요! 🙏' }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: '죄송합니다. 오류가 발생했습니다. 다시 시도해주세요.' }]);
     } finally {
       setLoading(false);
     }
@@ -101,7 +141,8 @@ export default function ChatPage() {
 
   // 마크다운 간단 렌더링
   function renderContent(content: string) {
-    return content.split('\n').map((line, i) => {
+    const plainContent = content.replace(/[\p{Extended_Pictographic}\uFE0F]/gu, '').replace(/[•]{2,}/g, '•').trim();
+    return plainContent.split('\n').map((line, i) => {
       // 볼드 처리
       const parts = line.split(/(\*\*.*?\*\*)/g);
       const rendered = parts.map((part, j) => {
@@ -121,20 +162,17 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col" style={{ height: 'calc(100vh - 80px)' }}>
-      {/* 헤더 */}
-      <div className="text-center py-3 shrink-0">
-        <div className="flex items-center justify-center gap-2">
-          <span className="text-3xl">🔮</span>
-          <h1 style={{ fontFamily: 'Jua, sans-serif' }} className="text-xl text-[#3D3338]">AI 사주 상담</h1>
-        </div>
+      <div className="mx-4 mb-3 rounded-[24px] border border-[#E2D7D0] bg-white px-5 py-4 shadow-[0_10px_30px_rgba(61,51,56,0.05)] shrink-0">
+        <p className="text-xs tracking-[0.08em] text-[#B8A78D] mb-1">대화형 운명 상담</p>
+        <h1 style={{ fontFamily: 'Jua, sans-serif' }} className="text-xl text-[#2F282B]">AI 사주 상담</h1>
         {birthSaved && (
           <p className="text-xs text-[#8A7E78] mt-1">
-            {birthData.year}년 {birthData.month}월 {birthData.day}일 ({birthData.gender === '남' ? '남' : '여'}, {birthData.isLunar ? '음력' : '양력'})
-            <button onClick={() => setShowBirthForm(true)} className="ml-2 text-[#EAE5DA] underline">수정</button>
+            {birthData.year}년 {birthData.month}월 {birthData.day}일 ({birthData.gender === '남' ? '남' : '여'}, {birthData.calendarType === 'solar' ? '양력' : birthData.calendarType === 'lunarLeap' ? '윤달' : '음력'}, {getBirthTimeLabel(birthData)})
+            <button onClick={() => setShowBirthForm(true)} className="ml-2 text-[#8B6F47] underline">수정</button>
           </p>
         )}
         {!birthSaved && !showBirthForm && (
-          <button onClick={() => setShowBirthForm(true)} className="text-xs text-[#EAE5DA] underline mt-1">
+          <button onClick={() => setShowBirthForm(true)} className="text-xs text-[#8B6F47] underline mt-1">
             생년월일 입력하기
           </button>
         )}
@@ -142,60 +180,118 @@ export default function ChatPage() {
 
       {/* 생년월일 입력 폼 */}
       {showBirthForm && (
-        <div className="mx-4 mb-3 card shrink-0" style={{ backgroundColor: '#EFDED5', borderColor: '#D4CCE8' }}>
-          <p style={{ fontFamily: 'Jua, sans-serif' }} className="text-base text-[#5C4B8A] mb-3">🎂 생년월일을 입력하면 맞춤 상담이 가능해요!</p>
+        <div className="mx-4 mb-3 card shrink-0">
+          <p style={{ fontFamily: 'Jua, sans-serif' }} className="text-base text-[#3D3338] mb-3">생년월일을 입력하면 맞춤 상담이 가능합니다.</p>
           <div className="space-y-3">
             <div className="flex gap-2">
               {['남', '여'].map((g) => (
                 <button
                   key={g}
                   onClick={() => setBirthData(prev => ({ ...prev, gender: g }))}
-                  className={`flex-1 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                    birthData.gender === g ? 'border-[#EAE5DA] bg-[#EAE5DA] text-[#5A4E48]' : 'border-[#D9C8C0] bg-white text-[#5A4E48]'
+                  className={`flex-1 py-2 rounded-xl border text-sm font-bold transition-all ${
+                    birthData.gender === g ? 'border-[#8B6F47] bg-[#FAF8F5] text-[#2F282B]' : 'border-[#D9C8C0] bg-white text-[#5A4E48]'
                   }`}
                   style={{ fontFamily: 'Jua, sans-serif' }}
                 >
-                  {g === '남' ? '👨 남' : '👩 여'}
+                  {g}
                 </button>
               ))}
-              {[false, true].map((lunar) => (
+              {[
+                { value: 'solar' as const, label: '양력' },
+                { value: 'lunar' as const, label: '음력' },
+                { value: 'lunarLeap' as const, label: '윤달' },
+              ].map((calendar) => (
                 <button
-                  key={String(lunar)}
-                  onClick={() => setBirthData(prev => ({ ...prev, isLunar: lunar }))}
-                  className={`flex-1 py-2 rounded-xl border-2 text-sm font-bold transition-all ${
-                    birthData.isLunar === lunar ? 'border-[#EAE5DA] bg-[#EAE5DA] text-[#5A4E48]' : 'border-[#D9C8C0] bg-white text-[#5A4E48]'
+                  key={calendar.value}
+                  onClick={() => setBirthData(prev => ({
+                    ...prev,
+                    calendarType: calendar.value,
+                    isLunar: calendar.value !== 'solar',
+                  }))}
+                  className={`flex-1 py-2 rounded-xl border text-sm font-bold transition-all ${
+                    birthData.calendarType === calendar.value ? 'border-[#8B6F47] bg-[#FAF8F5] text-[#2F282B]' : 'border-[#D9C8C0] bg-white text-[#5A4E48]'
                   }`}
                   style={{ fontFamily: 'Jua, sans-serif' }}
                 >
-                  {lunar ? '🌙 음력' : '☀️ 양력'}
+                  {calendar.label}
                 </button>
               ))}
             </div>
-            <div className="grid grid-cols-3 gap-2">
-              <select value={birthData.year} onChange={(e) => setBirthData(prev => ({ ...prev, year: e.target.value }))} className="p-2 rounded-xl text-sm">
-                <option value="">년도</option>
-                {YEARS.map((y) => <option key={y} value={y}>{y}년</option>)}
-              </select>
-              <select value={birthData.month} onChange={(e) => setBirthData(prev => ({ ...prev, month: e.target.value }))} className="p-2 rounded-xl text-sm">
-                <option value="">월</option>
-                {MONTHS.map((m) => <option key={m} value={m}>{m}월</option>)}
-              </select>
-              <select value={birthData.day} onChange={(e) => setBirthData(prev => ({ ...prev, day: e.target.value }))} className="p-2 rounded-xl text-sm">
-                <option value="">일</option>
-                {DAYS.map((d) => <option key={d} value={d}>{d}일</option>)}
-              </select>
+            <BirthDateNumberInputs
+              year={birthData.year}
+              month={birthData.month}
+              day={birthData.day}
+              onYearChange={(value) => setBirthData(prev => ({ ...prev, year: value }))}
+              onMonthChange={(value) => setBirthData(prev => ({ ...prev, month: value }))}
+              onDayChange={(value) => setBirthData(prev => ({ ...prev, day: value }))}
+            />
+            <div className="space-y-2">
+              <p className="text-xs font-semibold text-[#5A4E48]">태어난 시간</p>
+              <div className="flex gap-2">
+                {[
+                  { value: 'none' as const, label: '모름' },
+                  { value: 'slot' as const, label: '시간대' },
+                  { value: 'exact' as const, label: '정확히' },
+                ].map((mode) => (
+                  <button
+                    key={mode.value}
+                    type="button"
+                    onClick={() => setBirthData(prev => ({ ...prev, timeMode: mode.value }))}
+                    className={`flex-1 py-2 rounded-xl border text-xs font-bold transition-all ${
+                      birthData.timeMode === mode.value ? 'border-[#8B6F47] bg-[#FAF8F5] text-[#2F282B]' : 'border-[#D9C8C0] bg-white text-[#5A4E48]'
+                    }`}
+                    style={{ fontFamily: 'Jua, sans-serif' }}
+                  >
+                    {mode.label}
+                  </button>
+                ))}
+              </div>
+              {birthData.timeMode === 'slot' && (
+                <select
+                  value={birthData.slotHour}
+                  onChange={(e) => setBirthData(prev => ({ ...prev, slotHour: e.target.value }))}
+                  className="w-full p-2 rounded-xl text-sm"
+                >
+                  {TIME_SLOTS.map((slot) => (
+                    <option key={slot.value} value={slot.value}>{slot.label}</option>
+                  ))}
+                </select>
+              )}
+              {birthData.timeMode === 'exact' && (
+                <div className="grid grid-cols-2 gap-2">
+                  <select
+                    value={birthData.exactHour}
+                    onChange={(e) => setBirthData(prev => ({ ...prev, exactHour: e.target.value }))}
+                    className="p-2 rounded-xl text-sm"
+                  >
+                    {HOURS.map((h) => <option key={h} value={h}>{String(h).padStart(2, '0')}시</option>)}
+                  </select>
+                  <select
+                    value={birthData.exactMinute}
+                    onChange={(e) => setBirthData(prev => ({ ...prev, exactMinute: e.target.value }))}
+                    className="p-2 rounded-xl text-sm"
+                  >
+                    {MINUTES.map((m) => <option key={m} value={m}>{String(m).padStart(2, '0')}분</option>)}
+                  </select>
+                </div>
+              )}
+              {birthData.timeMode === 'none' && (
+                <p className="rounded-xl border border-[#E2D7D0] bg-[#FAF8F5] px-3 py-2 text-xs text-[#8A7E78]">
+                  출생 시간을 모르면 시주는 제외하고 상담합니다.
+                </p>
+              )}
             </div>
             <div className="flex gap-2">
               <button
                 onClick={saveBirthData}
                 className="flex-1 py-2 rounded-xl text-white text-sm font-bold"
-                style={{ fontFamily: 'Jua, sans-serif', backgroundColor: '#EAE5DA' }}
+                style={{ fontFamily: 'Jua, sans-serif', backgroundColor: '#2F282B' }}
               >
-                ✅ 저장하고 상담 시작
+                저장하고 상담 시작
               </button>
               <button
                 onClick={skipBirthData}
-                className="py-2 px-4 rounded-xl text-sm font-bold border-2 border-[#D9C8C0] text-[#8A7E78]"
+                className="py-2 px-4 rounded-xl text-sm font-bold border border-[#D9C8C0] text-[#8A7E78]"
                 style={{ fontFamily: 'Jua, sans-serif' }}
               >
                 건너뛰기
@@ -209,8 +305,7 @@ export default function ChatPage() {
       <div className="flex-1 overflow-y-auto px-4 space-y-3 pb-2">
         {messages.length === 0 && !showBirthForm && (
           <div className="text-center py-10">
-            <span className="text-5xl block mb-3">🔮</span>
-            <p style={{ fontFamily: 'Jua, sans-serif' }} className="text-lg text-[#3D3338]">사주도우미와 대화해보세요!</p>
+            <p style={{ fontFamily: 'Jua, sans-serif' }} className="text-lg text-[#3D3338]">운명비서와 대화해보세요!</p>
             <p className="text-sm text-[#8A7E78]">아래 버튼이나 직접 입력으로 질문하세요</p>
           </div>
         )}
@@ -218,15 +313,13 @@ export default function ChatPage() {
         {messages.map((msg, idx) => (
           <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'assistant' && (
-              <div className="w-8 h-8 rounded-full bg-[#EFDED5] flex items-center justify-center text-sm shrink-0 mr-2 mt-1">
-                🔮
-              </div>
+              <div className="w-8 h-8 rounded-full bg-[#FAF8F5] border border-[#E2D7D0] shrink-0 mr-2 mt-1" />
             )}
             <div
               className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                 msg.role === 'user'
-                  ? 'bg-[#EAE5DA] text-[#5A4E48] rounded-br-md'
-                  : 'bg-white border-2 border-[#D9C8C0] text-[#3D3338] rounded-bl-md'
+                  ? 'bg-[#2F282B] text-white rounded-br-md'
+                  : 'bg-white border border-[#E2D7D0] text-[#3D3338] rounded-bl-md'
               }`}
             >
               {msg.role === 'assistant' ? renderContent(msg.content) : msg.content}
@@ -236,14 +329,12 @@ export default function ChatPage() {
 
         {loading && (
           <div className="flex justify-start">
-            <div className="w-8 h-8 rounded-full bg-[#EFDED5] flex items-center justify-center text-sm shrink-0 mr-2">
-              🔮
-            </div>
-            <div className="bg-white border-2 border-[#D9C8C0] rounded-2xl rounded-bl-md px-4 py-3">
+            <div className="w-8 h-8 rounded-full bg-[#FAF8F5] border border-[#E2D7D0] shrink-0 mr-2" />
+            <div className="bg-white border border-[#E2D7D0] rounded-2xl rounded-bl-md px-4 py-3">
               <div className="flex gap-1">
-                <span className="w-2 h-2 bg-[#EAE5DA] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-2 h-2 bg-[#EAE5DA] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-2 h-2 bg-[#EAE5DA] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                <span className="w-2 h-2 bg-[#8B6F47] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                <span className="w-2 h-2 bg-[#8B6F47] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                <span className="w-2 h-2 bg-[#8B6F47] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
               </div>
             </div>
           </div>
@@ -261,10 +352,10 @@ export default function ChatPage() {
                 key={i}
                 onClick={() => sendMessage(q.text)}
                 disabled={loading}
-                className="px-3 py-1.5 rounded-full border-2 border-[#D9C8C0] bg-white text-sm text-[#5A4E48] hover:border-[#EAE5DA] hover:bg-[#EFDED5] transition-all disabled:opacity-50"
-                style={{ fontFamily: 'Gaegu, cursive', fontWeight: 700 }}
+                className="px-3 py-1.5 rounded-full border border-[#D9C8C0] bg-white text-sm text-[#5A4E48] hover:border-[#8B6F47] hover:bg-[#FAF8F5] transition-all disabled:opacity-50"
+                style={{ fontWeight: 600 }}
               >
-                {q.emoji} {q.text}
+                {q.text}
               </button>
             ))}
           </div>
@@ -273,7 +364,7 @@ export default function ChatPage() {
 
       {/* 입력 영역 */}
       {!showBirthForm && (
-        <div className="px-4 py-3 shrink-0 border-t-2 border-[#D9C8C0] bg-[#F5EDE8]">
+        <div className="px-4 py-3 shrink-0 border-t border-[#E2D7D0] bg-white">
           <div className="flex gap-2">
             <input
               type="text"
@@ -282,14 +373,14 @@ export default function ChatPage() {
               onKeyDown={handleKeyDown}
               placeholder="궁금한 것을 물어보세요..."
               disabled={loading}
-              className="flex-1 p-3 rounded-2xl border-2 border-[#D9C8C0] bg-white text-[#3D3338] focus:border-[#EAE5DA] outline-none disabled:opacity-50"
-              style={{ fontFamily: 'Gaegu, cursive', fontSize: '16px', fontWeight: 700 }}
+              className="flex-1 p-3 rounded-2xl border border-[#D9C8C0] bg-white text-[#3D3338] focus:border-[#8B6F47] outline-none disabled:opacity-50"
+              style={{ fontSize: '16px', fontWeight: 500 }}
             />
             <button
               onClick={() => sendMessage()}
               disabled={loading || !input.trim()}
               className="px-5 py-3 rounded-2xl text-white text-base disabled:opacity-50 transition-all active:scale-95"
-              style={{ fontFamily: 'Jua, sans-serif', backgroundColor: '#EAE5DA' }}
+              style={{ fontFamily: 'Jua, sans-serif', backgroundColor: '#2F282B' }}
             >
               {loading ? '...' : '전송'}
             </button>

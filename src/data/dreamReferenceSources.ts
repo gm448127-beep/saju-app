@@ -1,0 +1,51 @@
+export const DREAM_REFERENCE_SOURCES = [
+  {
+    title: '어젯밤 물꿈을 꾸셨다면 꼭 확인하셔야 될 영상 꿈풀이 물꿈 이것이 중요합니다',
+    url: 'https://youtu.be/4tdUCXyeaSM?si=N-9tpDmLdSRJQZo-',
+    type: 'youtube',
+    topic: '물꿈',
+    status: 'title-reflected',
+  },
+  {
+    title: "우리가 몰랐던 '꿈 해몽' 이야기",
+    url: 'https://youtu.be/JXG0h1rbi9s?si=WaJipAPax3WWYWKZ',
+    type: 'youtube',
+    topic: '꿈해몽 일반론',
+    status: 'pending-detail-summary',
+  },
+  {
+    title: '이 꿈 꾸면 돈 들어옵니다',
+    url: 'https://youtu.be/QQBskQ-t2VQ?si=Q2YA-nh2vpn5wOo9',
+    type: 'youtube',
+    topic: '재물꿈',
+    status: 'title-reflected',
+  },
+  {
+    title: '절대 무시해서는 안되는 13가지 소 꿈 해몽',
+    url: 'https://youtu.be/M61ywhJAnjs?si=X-YbLOVfFse9gsf6',
+    type: 'youtube',
+    topic: '소꿈',
+    status: 'title-reflected',
+  },
+  {
+    title: '꿈에 죽은 사람이 나왔을 때 4가지',
+    url: 'https://youtube.com/shorts/4pEs55YepDM?si=mrxlNUMlIdLRxWLG',
+    type: 'youtube-shorts',
+    topic: '죽은 사람 꿈',
+    status: 'title-reflected',
+  },
+  {
+    title: '똥을 많이 싸는 꿈은 어떤 의미인가요?',
+    url: 'https://youtube.com/shorts/hdknsEOnw1Y?si=7C-bHa66YuRVPvuD',
+    type: 'youtube-shorts',
+    topic: '똥꿈',
+    status: 'title-reflected',
+  },
+  {
+    title: '조상 덕 대운 터지는 꿈 7가지',
+    url: 'https://youtube.com/shorts/wCx3o6WPxEI?si=_6OvWGQlVqi-L0wF',
+    type: 'youtube-shorts',
+    topic: '조상꿈',
+    status: 'title-reflected',
+  },
+] as const;

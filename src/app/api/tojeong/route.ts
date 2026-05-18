@@ -268,7 +268,7 @@ export async function POST(request: NextRequest) {
       const rel = findBranchRelation(myBranches[i], SEYUN_JI);
       if (rel) {
         branchBonus += rel.score;
-        branchDescs.push(`[톱니 3-${i+1}] 내 ${labels[i]}(${myBranches[i]}${JIJI_HANJA[myBranches[i]]}) × 세운(${SEYUN_JI}${JIJI_HANJA[SEYUN_JI]}) = ${rel.type} → ${rel.desc}`);
+        branchDescs.push(`[흐름 3-${i+1}] 내 ${labels[i]}(${myBranches[i]}${JIJI_HANJA[myBranches[i]]}) × 세운(${SEYUN_JI}${JIJI_HANJA[SEYUN_JI]}) = ${rel.type} → ${rel.desc}`);
       }
     }
 
@@ -282,7 +282,7 @@ export async function POST(request: NextRequest) {
       const rel = findStemRelation(myStems[sIdxs[i]], SEYUN_GAN);
       if (rel) {
         stemBonus += rel.score;
-        stemDescs.push(`[톱니 4] 내 ${sLabels[i]}(${myStems[sIdxs[i]]}${CHEONGAN_HANJA[myStems[sIdxs[i]]]}) × 세운(${SEYUN_GAN}${CHEONGAN_HANJA[SEYUN_GAN]}) = ${rel.desc}`);
+        stemDescs.push(`[흐름 4] 내 ${sLabels[i]}(${myStems[sIdxs[i]]}${CHEONGAN_HANJA[myStems[sIdxs[i]]]}) × 세운(${SEYUN_GAN}${CHEONGAN_HANJA[SEYUN_GAN]}) = ${rel.desc}`);
       }
     }
 
@@ -300,7 +300,7 @@ export async function POST(request: NextRequest) {
         : `${yearJiKo}띠는 2026년 삼재에 해당하지 않습니다.`,
     };
 
-    /* ═══ 8) 톱니바퀴 분석 텍스트 ═══ */
+    /* ═══ 8) 기운의 상호작용 분석 텍스트 ═══ */
     // 세운 지지(午)의 지장간 정기 = 丁(정화)
     const seyunJiJeonggi = "정";
     const seyunJiJeonggiOh = GAN_OHAENG[seyunJiJeonggi]; // 화
@@ -308,19 +308,19 @@ export async function POST(request: NextRequest) {
     const seyunJiSipsin = getSipsin(dayGanOh, seyunJiJeonggiOh, seyunJiSameYY);
 
     const gearAnalysis: string[] = [
-      `⚙️ [톱니 1] 내 일간 ${dayGan}${CHEONGAN_HANJA[dayGan]}(${dayGanOh}) × 세운 천간 ${SEYUN_GAN}${CHEONGAN_HANJA[SEYUN_GAN]}(${SEYUN_GAN_OH}) = ${seyunSipsin} ${seyunBonus > 0 ? "⬆" : seyunBonus < 0 ? "⬇" : ""} (${seyunBonus > 0 ? "+" : ""}${seyunBonus}점)`,
-      `⚙️ [톱니 2] 내 일간 ${dayGan}${CHEONGAN_HANJA[dayGan]}(${dayGanOh}) × 세운 지지 ${SEYUN_JI}${JIJI_HANJA[SEYUN_JI]}(정기 ${seyunJiJeonggi}${CHEONGAN_HANJA[seyunJiJeonggi]}·${seyunJiJeonggiOh}) = ${seyunJiSipsin}`,
+      `⚙️ [흐름 1] 내 일간 ${dayGan}${CHEONGAN_HANJA[dayGan]}(${dayGanOh}) × 세운 천간 ${SEYUN_GAN}${CHEONGAN_HANJA[SEYUN_GAN]}(${SEYUN_GAN_OH}) = ${seyunSipsin} ${seyunBonus > 0 ? "⬆" : seyunBonus < 0 ? "⬇" : ""} (${seyunBonus > 0 ? "+" : ""}${seyunBonus}점)`,
+      `⚙️ [흐름 2] 내 일간 ${dayGan}${CHEONGAN_HANJA[dayGan]}(${dayGanOh}) × 세운 지지 ${SEYUN_JI}${JIJI_HANJA[SEYUN_JI]}(정기 ${seyunJiJeonggi}${CHEONGAN_HANJA[seyunJiJeonggi]}·${seyunJiJeonggiOh}) = ${seyunJiSipsin}`,
       ...branchDescs.map(d => `⚙️ ${d}`),
       ...stemDescs.map(d => `⚙️ ${d}`),
     ];
     if (branchDescs.length === 0 && stemDescs.length === 0) {
-      gearAnalysis.push("⚙️ [톱니 3-4] 원국과 세운 사이 특별한 합충형 없음 → 평온한 흐름");
+      gearAnalysis.push("⚙️ [흐름 3-4] 원국과 세운 사이 특별한 합충형 없음 → 평온한 흐름");
     }
     if (samjaeActive) {
       gearAnalysis.push(`⚙️ [삼재] ${samjae.type} 해당 → ${samjaeIdx === 1 ? "가장 주의 필요 ⬇⬇" : "주의 필요 ⬇"} (${samjaeBonus}점)`);
     }
     if (!hasHour) {
-      gearAnalysis.push("⚙️ [톱니 5] 시주 미입력 → 시간을 입력하면 더 정밀한 분석이 가능합니다");
+      gearAnalysis.push("⚙️ [흐름 5] 시주 미입력 → 시간을 입력하면 더 정밀한 분석이 가능합니다");
     }
 
     /* ═══ 9) 최종 점수 계산 (결정론적) ═══ */

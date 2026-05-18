@@ -2,41 +2,50 @@
 
 /* ===== 기본 배경 & 폰트 ===== */
 body {
-  background: linear-gradient(135deg, #F5EDE8 0%, #EFDED5 50%, #F2E4DC 100%);
+  background: linear-gradient(180deg, #FFFFFF 0%, #FAF8F5 100%);
   font-family: 'Noto Sans KR', sans-serif !important;
-  color: #3D3338;
+  color: #2F282B;
   font-size: 16px;
-  line-height: 1.7;
-  letter-spacing: -0.02em;
+  line-height: 1.75;
+  letter-spacing: -0.015em;
   min-height: 100vh;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 /* ===== 폰트 전역 적용 ===== */
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Noto Sans KR', sans-serif !important;
-  color: #3D3338;
-  font-weight: 600;
+  color: #2F282B;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.03em;
 }
 
 p, span, div, li, td, th, label, input, select, textarea, button, a {
   font-family: 'Noto Sans KR', sans-serif !important;
 }
 
+p, li, td, th {
+  line-height: 1.75;
+}
+
 /* ===== 카드 스타일 ===== */
 .card {
-  background: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-radius: 20px;
   padding: 20px 24px;
   border: 1px solid rgba(204, 182, 176, 0.5);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 2px 12px rgba(204, 182, 176, 0.2);
+  box-shadow: 0 8px 28px rgba(61, 51, 56, 0.06);
+  color: #3D3338;
 }
 
 .card-hover:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(204, 182, 176, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(61, 51, 56, 0.09);
   border-color: #D9C8C0;
 }
 
@@ -48,34 +57,64 @@ p, span, div, li, td, th, label, input, select, textarea, button, a {
   border-radius: 20px;
   padding: 6px 16px;
   font-size: 13px;
-  font-weight: 500;
-  color: #6B5E58;
+  font-weight: 600;
+  color: #5A4E48;
   backdrop-filter: blur(4px);
 }
 
 /* ===== 텍스트 가독성 개선 ===== */
+.text-\[\#B8A78D\] {
+  color: #8B6F47 !important;
+}
+
 .text-\[\#9B9B9B\] {
-  color: #8A7E78 !important;
+  color: #6B5E58 !important;
+}
+
+.text-\[\#8A7E78\] {
+  color: #6B5E58 !important;
 }
 
 .text-\[\#6B6B6B\] {
   color: #5A4E48 !important;
 }
 
+.text-\[\#5A4E48\] {
+  color: #4A403B !important;
+}
+
 .card p {
-  color: #8A7E78 !important;
-  font-size: 14px;
+  color: #4A403B !important;
+  line-height: 1.78;
 }
 
 .card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2F282B;
+}
+
+.label {
+  color: #2F282B !important;
   font-size: 17px;
-  font-weight: 600;
-  color: #3D3338;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+}
+
+.text-xs {
+  font-size: 13px !important;
+  line-height: 1.6 !important;
+}
+
+.text-sm {
+  font-size: 15px !important;
+  line-height: 1.7 !important;
 }
 
 /* ===== 버튼 ===== */
 button, .btn, [role="button"] {
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* ===== 입력 폼 ===== */
@@ -96,8 +135,27 @@ input:focus, select:focus, textarea:focus {
 
 /* ===== 푸터 ===== */
 footer p {
-  color: #A09488 !important;
+  color: #6B5E58 !important;
   font-size: 13px;
+}
+
+@media (max-width: 640px) {
+  body {
+    font-size: 16px;
+    line-height: 1.78;
+  }
+
+  .card {
+    padding: 18px 18px;
+  }
+
+  .card p {
+    line-height: 1.82;
+  }
+
+  h1 {
+    font-size: 26px;
+  }
 }
 
 /* ===== 애니메이션 ===== */

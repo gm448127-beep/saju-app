@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import BirthDateNumberInputs, { isValidBirthDate } from './BirthDateNumberInputs';
 
 export interface BirthFormData {
   year: number;
@@ -28,50 +29,32 @@ export default function BirthForm({
   buttonText = '분석하기',
   buttonColor = '#8B7EC8',
 }: BirthFormProps) {
-  const currentYear = new Date().getFullYear();
-  const [year, setYear] = useState(1995);
-  const [month, setMonth] = useState(1);
-  const [day, setDay] = useState(1);
+  const [year, setYear] = useState('1995');
+  const [month, setMonth] = useState('1');
+  const [day, setDay] = useState('1');
   const [hour, setHour] = useState<number | undefined>(undefined);
   const [isLunar, setIsLunar] = useState(false);
   const [gender, setGender] = useState<'남' | '여'>('남');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit({ year, month, day, hour, isLunar, gender });
+    if (!isValidBirthDate(year, month, day)) {
+      alert('생년월일을 숫자로 정확히 입력해주세요.');
+      return;
+    }
+    onSubmit({ year: Number(year), month: Number(month), day: Number(day), hour, isLunar, gender });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-3 gap-3">
-        <div>
-          <label className="block text-xs text-[#9B9B9B] mb-1" style={{fontFamily:'Jua, sans-serif'}}>출생년도</label>
-          <select value={year} onChange={e => setYear(Number(e.target.value))}
-            className="w-full bg-white border-2 border-[#E8E2DC] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#8B7EC8] outline-none transition-colors">
-            {Array.from({ length: 100 }, (_, i) => currentYear - i).map(y => (
-              <option key={y} value={y}>{y}년</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-xs text-[#9B9B9B] mb-1" style={{fontFamily:'Jua, sans-serif'}}>월</label>
-          <select value={month} onChange={e => setMonth(Number(e.target.value))}
-            className="w-full bg-white border-2 border-[#E8E2DC] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#8B7EC8] outline-none transition-colors">
-            {Array.from({ length: 12 }, (_, i) => i + 1).map(m => (
-              <option key={m} value={m}>{m}월</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-xs text-[#9B9B9B] mb-1" style={{fontFamily:'Jua, sans-serif'}}>일</label>
-          <select value={day} onChange={e => setDay(Number(e.target.value))}
-            className="w-full bg-white border-2 border-[#E8E2DC] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#8B7EC8] outline-none transition-colors">
-            {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
-              <option key={d} value={d}>{d}일</option>
-            ))}
-          </select>
-        </div>
-      </div>
+      <BirthDateNumberInputs
+        year={year}
+        month={month}
+        day={day}
+        onYearChange={setYear}
+        onMonthChange={setMonth}
+        onDayChange={setDay}
+      />
 
       {showHour && (
         <div>

@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
       const JIJI = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
       const GAN_OHAENG: Record<string,string> = {갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수'};
       const GAN_EUMYANG: Record<string,string> = {갑:'양',을:'음',병:'양',정:'음',무:'양',기:'음',경:'양',신:'음',임:'양',계:'음'};
+      const JI_OHAENG: Record<string,string> = {자:'수',축:'토',인:'목',묘:'목',진:'토',사:'화',오:'화',미:'토',신:'금',유:'금',술:'토',해:'수'};
       const DDI = ['쥐','소','호랑이','토끼','용','뱀','말','양','원숭이','닭','개','돼지'];
       const SANGSAENG: Record<string,string> = {목:'화',화:'토',토:'금',금:'수',수:'목'};
       const SANGGEUK: Record<string,string> = {목:'토',화:'금',토:'수',금:'목',수:'화'};
@@ -32,6 +33,43 @@ export async function POST(request: NextRequest) {
       const ddi = DDI[yearJiIdx];
       const yearGanji = `${CHEONGAN[yearGanIdx]}${JIJI[yearJiIdx]}`;
 
+      const getBirthHour = () => {
+        if (birthData.timeMode === 'slot' && birthData.slotHour !== '') return Number(birthData.slotHour);
+        if (birthData.timeMode === 'exact' && birthData.exactHour !== '') return Number(birthData.exactHour);
+        return null;
+      };
+      const getBirthMinute = () => {
+        if (birthData.timeMode === 'exact' && birthData.exactMinute !== '') return Number(birthData.exactMinute);
+        return 0;
+      };
+      const getHourJiIdx = (hour: number) => {
+        if (hour === 23 || hour === 0) return 0;
+        if (hour === 1 || hour === 2) return 1;
+        if (hour === 3 || hour === 4) return 2;
+        if (hour === 5 || hour === 6) return 3;
+        if (hour === 7 || hour === 8) return 4;
+        if (hour === 9 || hour === 10) return 5;
+        if (hour === 11 || hour === 12) return 6;
+        if (hour === 13 || hour === 14) return 7;
+        if (hour === 15 || hour === 16) return 8;
+        if (hour === 17 || hour === 18) return 9;
+        if (hour === 19 || hour === 20) return 10;
+        return 11;
+      };
+
+      const birthHour = getBirthHour();
+      const birthMinute = getBirthMinute();
+      const hasBirthTime = birthHour !== null;
+      const hourJiIdx = hasBirthTime ? getHourJiIdx(birthHour) : null;
+      const hourGanIdx = hourJiIdx !== null ? ((dayGanIdx % 5) * 2 + hourJiIdx) % 10 : null;
+      const hourGanji = hourGanIdx !== null && hourJiIdx !== null ? `${CHEONGAN[hourGanIdx]}${JIJI[hourJiIdx]}` : '';
+      const birthTimeLabel =
+        birthData.timeMode === 'slot' && hasBirthTime
+          ? `${JIJI[hourJiIdx as number]}시 (${String(birthHour).padStart(2, '0')}:00 전후 시간대)`
+          : birthData.timeMode === 'exact' && hasBirthTime
+            ? `${String(birthHour).padStart(2, '0')}:${String(birthMinute).padStart(2, '0')}`
+            : '모름';
+
       // 오행 카운트
       const monthGanBase = (yearGanIdx % 5) * 2 + 2;
       const monthGanIdx = (monthGanBase + (m - 1)) % 10;
@@ -41,20 +79,28 @@ export async function POST(request: NextRequest) {
         { g: yearGanIdx, j: yearJiIdx },
         { g: monthGanIdx, j: monthJiIdx },
         { g: dayGanIdx, j: dayJiIdx },
+        ...(hourGanIdx !== null && hourJiIdx !== null ? [{ g: hourGanIdx, j: hourJiIdx }] : []),
       ].forEach(({ g, j }) => {
         ohaengCount[GAN_OHAENG[CHEONGAN[g % 10]]]++;
-        const JI_OHAENG: Record<string,string> = {자:'수',축:'토',인:'목',묘:'목',진:'토',사:'화',오:'화',미:'토',신:'금',유:'금',술:'토',해:'수'};
         ohaengCount[JI_OHAENG[JIJI[j % 12]]]++;
       });
 
       const sorted = Object.entries(ohaengCount).sort((a,b) => b[1] - a[1]);
       const strongest = sorted[0][0];
       const weakest = sorted[sorted.length - 1][0];
+      const calendarLabel =
+        birthData.calendarType === 'lunarLeap'
+          ? '음력 윤달'
+          : birthData.isLunar
+            ? '음력'
+            : '양력';
 
       sajuContext = `
 [상담자의 사주 정보]
-- 생년월일: ${y}년 ${m}월 ${d}일 (${birthData.gender === '여' ? '여성' : '남성'})
+- 생년월일: ${y}년 ${m}월 ${d}일 (${calendarLabel}, ${birthData.gender === '여' ? '여성' : '남성'})
+- 태어난 시간: ${birthTimeLabel}
 - 연간지: ${yearGanji}
+- 시간지/시주: ${hasBirthTime ? `${hourGanji} (${JIJI[hourJiIdx as number]}시 기준)` : '출생시간 미입력으로 시주 제외'}
 - 일간(주 오행): ${dayGan} (${mainElement}, ${eumyang})
 - 띠: ${ddi}띠
 - 오행 분포: 목=${ohaengCount['목']}, 화=${ohaengCount['화']}, 토=${ohaengCount['토']}, 금=${ohaengCount['금']}, 수=${ohaengCount['수']}
@@ -64,11 +110,11 @@ export async function POST(request: NextRequest) {
 `;
     }
 
-    const systemPrompt = `당신은 '사주도우미'라는 이름의 친근하고 전문적인 사주/운세 상담 AI입니다.
+    const systemPrompt = `당신은 '운명비서'라는 이름의 친근하고 전문적인 사주/운세 상담 AI입니다.
 
 당신의 성격과 말투:
 - 친근하고 따뜻한 말투를 사용합니다 (존댓말 사용)
-- 이모지를 적절히 사용하여 친근함을 더합니다
+- 이모지는 사용하지 않거나 꼭 필요한 경우에만 최소한으로 사용합니다
 - 전문 용어를 쓸 때는 쉬운 설명을 함께 합니다
 - 긍정적이고 희망적인 조언을 우선하되, 주의사항도 균형있게 전합니다
 - 답변은 충분히 상세하게 하되, 읽기 쉽게 구성합니다
@@ -90,6 +136,9 @@ export async function POST(request: NextRequest) {
 - 의학적, 법적 조언은 전문가 상담을 권합니다
 - 부정적인 내용도 희망적인 대안과 함께 전달합니다
 - 질문에 맞는 구체적이고 실용적인 조언을 합니다
+- 사용자가 추가 질문을 하면 이전 대화의 맥락을 이어서 답합니다
+- 질문이 짧거나 애매해도 바로 되묻기만 하지 말고, 가능한 해석을 먼저 제시한 뒤 필요한 경우 보충 질문을 덧붙입니다
+- 앱 개발, 사업 방향, 현재 선택에 대한 질문도 사주 정보와 현실 조언을 연결해 답합니다
 
 ${sajuContext}
 
@@ -115,7 +164,7 @@ ${sajuContext}
 
     if (!apiKey) {
       // API 키가 없으면 내장 응답 사용
-      const builtInResponse = getBuiltInResponse(message, sajuContext);
+      const builtInResponse = getBuiltInResponse(message, sajuContext, chatHistory);
       return NextResponse.json({ reply: builtInResponse });
     }
 
@@ -128,7 +177,7 @@ ${sajuContext}
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 1500,
+        max_tokens: 2200,
         system: systemPrompt,
         messages: messages.filter(m => m.role !== 'system').map(m => ({
           role: m.role === 'system' ? 'user' : m.role,
@@ -138,7 +187,7 @@ ${sajuContext}
     });
 
     if (!response.ok) {
-      const builtInResponse = getBuiltInResponse(message, sajuContext);
+      const builtInResponse = getBuiltInResponse(message, sajuContext, chatHistory);
       return NextResponse.json({ reply: builtInResponse });
     }
 
@@ -154,7 +203,11 @@ ${sajuContext}
 }
 
 // API 키가 없을 때 사용하는 내장 응답
-function getBuiltInResponse(message: string, sajuContext: string): string {
+function getBuiltInResponse(
+  message: string,
+  sajuContext: string,
+  chatHistory?: Array<{ role: string; content: string }>
+): string {
   const msg = message.toLowerCase();
 
   // 사주 정보 파싱
@@ -169,6 +222,12 @@ function getBuiltInResponse(message: string, sajuContext: string): string {
 
   const elementEmoji: Record<string,string> = {목:'🌳',화:'🔥',토:'🏔️',금:'⚔️',수:'💧'};
   const emoji = element ? (elementEmoji[element] || '✨') : '✨';
+  const previousAssistantMessage = chatHistory
+    ?.slice()
+    .reverse()
+    .find((item) => item.role === 'assistant')?.content
+    ?.replace(/\*\*/g, '')
+    .slice(0, 260);
 
   // 재물운
   if (msg.includes('재물') || msg.includes('돈') || msg.includes('재산') || msg.includes('투자') || msg.includes('부자')) {
@@ -244,7 +303,7 @@ function getBuiltInResponse(message: string, sajuContext: string): string {
 
   // 인사
   if (msg.includes('안녕') || msg.includes('하이') || msg.includes('hello') || msg.includes('시작')) {
-    return `안녕하세요! 🙏 **사주도우미**에 오신 것을 환영합니다!\n\n저는 사주팔자, 운세, 궁합 등을 상담해드리는 AI 상담사예요. 😊\n\n${element ? `\n이미 생년월일을 입력해주셨네요! ${emoji} ${element} 기운의 ${ddi}띠시군요.\n\n` : '\n상단에서 **생년월일**을 입력하시면 더 정확한 맞춤 상담이 가능해요!\n\n'}💡 **이런 것들을 물어보실 수 있어요:**\n- "오늘의 운세 알려줘"\n- "내 재물운은 어때?"\n- "연애운이 궁금해"\n- "직업 적성이 뭘까?"\n- "건강 조심할 부분은?"\n- "올해 운세 전체적으로 어때?"\n\n무엇이든 편하게 물어보세요! 🔮`;
+    return `안녕하세요! 🙏 **운명비서**에 오신 것을 환영합니다!\n\n저는 사주팔자, 운세, 궁합 등을 상담해드리는 AI 상담사예요. 😊\n\n${element ? `\n이미 생년월일을 입력해주셨네요! ${emoji} ${element} 기운의 ${ddi}띠시군요.\n\n` : '\n상단에서 **생년월일**을 입력하시면 더 정확한 맞춤 상담이 가능해요!\n\n'}💡 **이런 것들을 물어보실 수 있어요:**\n- "오늘의 운세 알려줘"\n- "내 재물운은 어때?"\n- "연애운이 궁금해"\n- "직업 적성이 뭘까?"\n- "건강 조심할 부분은?"\n- "올해 운세 전체적으로 어때?"\n\n무엇이든 편하게 물어보세요! 🔮`;
   }
 
   // 올해 운세
@@ -255,6 +314,62 @@ function getBuiltInResponse(message: string, sajuContext: string): string {
     return '📅 올해의 운세가 궁금하시군요!\n\n생년월일을 입력해주시면 맞춤형 올해 운세를 상세히 알려드릴 수 있어요!';
   }
 
+  // 앱 개발/사업 방향처럼 정해진 운세 키워드가 아니어도, 사주 맥락으로 이어서 답변
+  if (
+    msg.includes('앱') ||
+    msg.includes('개발') ||
+    msg.includes('사업') ||
+    msg.includes('창업') ||
+    msg.includes('서비스') ||
+    msg.includes('잘하고') ||
+    msg.includes('방향') ||
+    msg.includes('될까') ||
+    msg.includes('괜찮')
+  ) {
+    if (element) {
+      const elementAdvice: Record<string, string> = {
+        목: '목 기운은 새로 만들고 키우는 힘이 강합니다. 앱 개발처럼 아이디어를 제품으로 성장시키는 일과 잘 맞습니다. 다만 처음부터 크게 벌이기보다 작은 기능을 빠르게 만들고, 사용자 반응을 보면서 가지를 뻗는 방식이 좋습니다.',
+        화: '화 기운은 사람들의 관심을 끌고 알리는 힘이 강합니다. 앱을 만드는 것뿐 아니라 브랜딩, 홍보, 콘텐츠 확산에서 강점이 살아납니다. 다만 속도가 빠르면 쉽게 지칠 수 있으니 일정과 휴식을 함께 관리하는 것이 중요합니다.',
+        토: '토 기운은 신뢰와 안정, 구조를 만드는 힘이 강합니다. 사용자가 계속 믿고 쓰는 서비스, 상담 기록, 리포트 보관, 전문가용 관리 기능처럼 기반을 쌓는 앱과 잘 맞습니다. 다만 너무 완벽하게 준비하려다 출시가 늦어지지 않게 해야 합니다.',
+        금: '금 기운은 정리, 판단, 완성도를 높이는 힘이 강합니다. 앱의 기능을 선명하게 다듬고 유료 상품으로 정리하는 데 강점이 있습니다. 다만 기준이 너무 엄격하면 시작이 늦어질 수 있으니, 핵심 기능부터 출시하고 개선하는 흐름이 좋습니다.',
+        수: '수 기운은 정보, 상담, 흐름을 읽는 힘이 강합니다. AI 상담, 운세 리포트, 사용자 질문에 따라 답이 깊어지는 서비스와 잘 맞습니다. 다만 생각이 많아 방향이 흩어질 수 있으니, 지금은 기능을 하나씩 검증하는 방식이 유리합니다.',
+      };
+
+      return `좋은 질문입니다. 지금 질문은 단순한 운세보다 **지금 하고 있는 일의 방향이 맞는지**를 묻는 흐름으로 보입니다.
+
+사주 흐름으로 보면, ${elementAdvice[element] || '지금처럼 하나씩 만들고 반응을 확인하는 방식이 가장 안정적입니다.'}
+
+**지금 앱 개발은 잘하고 있나요?**
+네, 방향은 좋습니다. 특히 지금처럼 사용자가 실제로 불편해하는 지점, 예를 들면 입력 피로감, 모바일 가독성, 버튼 크기, 리포트 저장 기능을 하나씩 고치는 방식은 서비스 운을 현실로 끌어오는 움직임입니다. 사주적으로도 “생각만 하는 단계”보다 “작게 고치고 바로 확인하는 단계”가 훨씬 강합니다.
+
+**다만 조심할 점도 있습니다.**
+기능을 계속 추가하다 보면 앱의 핵심이 흐려질 수 있습니다. 지금 운명비서의 중심은 “쉽게 입력하고, 보기 좋게 해석받고, 저장하거나 공유할 수 있는 운세 리포트”입니다. 이 중심에서 벗어나는 기능은 나중으로 미루는 편이 좋습니다.
+
+**앞으로의 좋은 순서**
+- 무료 사용자는 오늘의 운세, 사주, 토정비결을 쉽게 보게 만들기
+- 공유 이미지와 간단 PDF로 자연스럽게 퍼지게 하기
+- 유료는 긴 PDF 리포트와 전문가용 관리 기능으로 분리하기
+- 사주 계산 정확도는 별도 검증표로 꾸준히 맞춰가기
+
+${previousAssistantMessage ? `이전 상담 흐름까지 이어서 보면, 방금 전 대화의 핵심은 “${previousAssistantMessage}”였습니다. 여기에 덧붙이면, 지금은 더 크게 벌리기보다 사용자가 막히는 지점을 줄이는 쪽이 가장 좋은 선택입니다.` : ''}
+
+정리하면, **지금 하고 있는 방향은 맞습니다.** 다만 “더 많이 넣는 앱”보다 “더 편하게 믿고 쓰는 앱”으로 가야 오래 갑니다.`;
+    }
+
+    return `좋은 질문입니다. 지금 하고 있는 앱 개발 방향은 “사용자가 실제로 불편해하는 부분을 하나씩 줄이는 단계”로 보입니다.
+
+이 단계에서는 기능을 크게 늘리는 것보다, 입력이 쉬운지, 모바일에서 잘 보이는지, 결과가 이해되는지, 저장과 공유가 자연스러운지를 다듬는 것이 더 중요합니다.
+
+추천 순서는 이렇습니다.
+- 입력 피로감 줄이기
+- 모바일 가독성 정리
+- 결과 리포트의 중복 제거
+- PDF와 이미지 저장 품질 확인
+- 그 다음 유료 리포트와 전문가 모드 설계
+
+즉, 지금처럼 고치고 확인하는 방식은 좋습니다. 다만 한 번에 너무 많은 기능을 넣기보다 “오늘의 운세, 사주, 토정비결이 편하게 읽힌다”는 기준을 먼저 완성하는 것이 좋습니다.`;
+  }
+
   // 감사
   if (msg.includes('고마') || msg.includes('감사') || msg.includes('ㄱㅅ') || msg.includes('thank')) {
     return '천만에요! 😊 도움이 되셨다면 기뻐요!\n\n더 궁금한 것이 있으시면 언제든 물어보세요. 재물운, 연애운, 건강운, 직업운 등 무엇이든 상담해드릴게요! 🔮✨';
@@ -262,8 +377,23 @@ function getBuiltInResponse(message: string, sajuContext: string): string {
 
   // 기본 응답
   if (element) {
-    return `${emoji} 좋은 질문이에요!\n\n${element} 기운의 ${ddi}띠이신 당신에게 맞는 답변을 드리고 싶어요. 조금 더 구체적으로 질문해주시면 더 정확한 상담이 가능합니다!\n\n💡 **이런 질문을 해보세요:**\n- "내 재물운은 어때?"\n- "연애운이 궁금해"\n- "올해 운세 알려줘"\n- "직업 적성이 뭘까?"\n- "건강 조심할 부분은?"\n- "오늘의 운세 알려줘"\n\n무엇이든 편하게 물어보세요! 😊`;
+    return `좋은 질문입니다. 질문을 넓게 보면, 지금 상황에서 어떤 선택이 나에게 더 맞는지를 묻는 흐름으로 보입니다.
+
+${element} 기운의 ${ddi}띠 흐름으로 보면, 지금은 무작정 밀어붙이기보다 **내 강점을 살릴 방향을 정하고, 작은 실행을 반복하는 것**이 좋습니다.
+
+**이 질문에 대한 기본 답**
+지금 궁금해하신 문제는 한 번에 결론을 내리기보다, 현실에서 바로 확인할 수 있는 기준을 세우는 것이 중요합니다. 사주는 방향을 보는 도구이고, 실제 결과는 작은 선택들이 쌓이면서 만들어집니다.
+
+**실천 조언**
+- 오늘 당장 할 수 있는 작은 행동을 하나 정하세요.
+- 돈, 관계, 일, 건강 중 어떤 영역의 고민인지 먼저 구분하세요.
+- 마음이 불안할수록 큰 결정보다 점검과 정리가 우선입니다.
+- 최근에 반복해서 떠오르는 생각이 있다면 그 부분이 지금 가장 중요한 신호일 수 있습니다.
+
+${previousAssistantMessage ? `이전 답변의 흐름을 이어서 보면, “${previousAssistantMessage}”라는 맥락이 있었습니다. 이번 질문도 그 연장선에서 보면 더 깊게 볼 수 있습니다.` : ''}
+
+더 구체적으로 묻지 않아도 괜찮습니다. 지금 질문만 놓고 보면, 답은 **급하게 결론 내리지 말고 작은 실행으로 확인해보는 쪽이 좋다**입니다.`;
   }
 
-  return '안녕하세요! 🔮 사주도우미입니다!\n\n더 정확한 맞춤 상담을 위해 **상단에서 생년월일을 입력**해주세요!\n\n입력 후 재물운, 연애운, 건강운, 직업운 등 무엇이든 물어보실 수 있어요. 😊\n\n💡 예시: "내 재물운 알려줘", "오늘 운세는?", "연애운이 궁금해"';
+  return '안녕하세요! 🔮 운명비서입니다!\n\n더 정확한 맞춤 상담을 위해 **상단에서 생년월일을 입력**해주세요!\n\n입력 후 재물운, 연애운, 건강운, 직업운 등 무엇이든 물어보실 수 있어요. 😊\n\n💡 예시: "내 재물운 알려줘", "오늘 운세는?", "연애운이 궁금해"';
 }
