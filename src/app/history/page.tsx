@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
+import HistoryEmptyPreviews from "@/components/pattern/HistoryEmptyPreviews";
+import HistoryOtherRecords from "@/components/pattern/HistoryOtherRecords";
+import HistoryPageSkeleton from "@/components/pattern/HistoryPageSkeleton";
 import PatternDots from "@/components/pattern/PatternDots";
 import {
   getSajuHistory,
@@ -29,6 +32,7 @@ import {
   buildToneClusters,
   buildTopToneLabels,
   buildWeekInsight,
+  dedupeRecordsByDate,
   dateKeyToSlug,
   filterTodayRecords,
   formatShortDate,
@@ -58,6 +62,7 @@ function HistoryPageContent() {
 
   const [records, setRecords] = useState<SavedTodayRecord[]>([]);
   const [ready, setReady] = useState(false);
+  const [showSkeleton, setShowSkeleton] = useState(false);
   const [filter, setFilter] = useState<HistoryFilter>(initialFilter);
   const [toneFilter, setToneFilter] = useState<string | null>(initialTone);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -69,7 +74,9 @@ function HistoryPageContent() {
   };
 
   useEffect(() => {
+    const skeletonTimer = window.setTimeout(() => setShowSkeleton(true), 200);
     loadRecords();
+    return () => window.clearTimeout(skeletonTimer);
   }, []);
 
   const stats = getUnifiedArchiveStats(records, getSajuHistory().length, getTarotFavorites().length);
@@ -80,6 +87,9 @@ function HistoryPageContent() {
   const weekInsight = buildWeekInsight(records);
   const transitionLine = buildTodayTransitionLine(records);
   const emptyState = getPatternEmptyState(records);
+  const recordCount = useMemo(() => dedupeRecordsByDate(records).length, [records]);
+  const isFullyEmpty = recordCount === 0;
+  const filterEnabled = recordCount > 0;
 
   const filteredRecords = useMemo(
     () => filterTodayRecords(records, filter, toneFilter),
@@ -111,11 +121,8 @@ function HistoryPageContent() {
   };
 
   if (!ready) {
-    return (
-      <div className="rounded-[28px] border border-[#E2D7D0] bg-white px-5 py-8 text-center text-sm text-[#8A7E78]">
-        {HISTORY_HEADER_COPY.loading}
-      </div>
-    );
+    if (showSkeleton) return <HistoryPageSkeleton />;
+    return <div className="min-h-[40vh]" aria-hidden="true" />;
   }
 
   return (
@@ -126,59 +133,76 @@ function HistoryPageContent() {
         <div className="relative flex items-start justify-between gap-3">
           <div>
             <Link href="/" className="text-xs font-semibold text-[#8A7E78] hover:text-[#8B6F47]">
-              {HISTORY_HEADER_COPY.backHome}
+              {HISTORY_HEADER_COPY.backBrand}
             </Link>
             <h1 className="mt-2 text-2xl text-[#2F282B] sm:text-3xl" style={{ fontFamily: "Jua, sans-serif" }}>
               {HISTORY_HEADER_COPY.title}
             </h1>
             <p className="mt-2 text-xs leading-relaxed text-[#8A7E78]">{HISTORY_HEADER_COPY.subtitle}</p>
           </div>
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setFilterOpen((o) => !o)}
-              className="rounded-full border border-[#D9C8C0] bg-[#FAF8F5] px-3 py-1.5 text-xs font-bold text-[#2F282B]"
-            >
-              {HISTORY_HEADER_COPY.filterTrigger}
-            </button>
-            {filterOpen && (
-              <div className="absolute right-0 top-full z-20 mt-2 min-w-[160px] rounded-2xl border border-[#E2D7D0] bg-white py-2 shadow-lg">
-                {HISTORY_FILTER_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.value}
-                    type="button"
-                    onClick={() => applyFilter(opt.value)}
-                    className={`block w-full px-4 py-2 text-left text-xs font-semibold ${
-                      filter === opt.value ? "bg-[#FFF8EE] text-[#8B6F47]" : "text-[#5A4E48]"
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+          {filterEnabled ? (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setFilterOpen((o) => !o)}
+                className="rounded-full border border-[#D9C8C0] bg-[#FAF8F5] px-3 py-1.5 text-xs font-bold text-[#2F282B]"
+              >
+                {HISTORY_HEADER_COPY.filterTrigger}
+              </button>
+              {filterOpen && (
+                <div className="absolute right-0 top-full z-20 mt-2 min-w-[160px] rounded-2xl border border-[#E2D7D0] bg-white py-2 shadow-lg">
+                  {HISTORY_FILTER_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => applyFilter(opt.value)}
+                      className={`block w-full px-4 py-2 text-left text-xs font-semibold ${
+                        filter === opt.value ? "bg-[#FFF8EE] text-[#8B6F47]" : "text-[#5A4E48]"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : null}
         </div>
       </section>
 
-      {emptyState ? (
-        <section className="rounded-[26px] border border-[#E8D7C4] bg-[#FFFDF8] px-5 py-8 text-center">
-          <SectionLabel>{HISTORY_PAGE_EMPTY_COPY.sectionLabel}</SectionLabel>
-          <h2 className="mt-3 text-xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-            {emptyState.headline}
-          </h2>
-          <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-[#6B5E58]">{emptyState.body}</p>
-          {emptyState.showCta && (
+      {isFullyEmpty ? (
+        <>
+          <section className="rounded-[26px] border border-[#E8D7C4] bg-[#FFFDF8] px-5 py-8 text-center">
+            <SectionLabel>{HISTORY_PAGE_EMPTY_COPY.sectionLabel}</SectionLabel>
+            <h2 className="mt-3 text-xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
+              {HISTORY_PAGE_EMPTY_COPY.headline}
+            </h2>
+            <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-[#6B5E58]">
+              {HISTORY_PAGE_EMPTY_COPY.body}
+            </p>
             <Link
               href="/today"
               className="mt-6 inline-flex rounded-2xl bg-[#2F282B] px-5 py-3 text-sm font-bold text-white"
             >
               {HISTORY_PAGE_EMPTY_COPY.cta}
             </Link>
-          )}
-        </section>
+            <p className="mt-6 border-t border-[#E2D7D0]/60 pt-5 text-xs leading-relaxed text-[#A09488]">
+              {HISTORY_FOOTER_COPY.note}
+            </p>
+          </section>
+          <HistoryEmptyPreviews />
+        </>
       ) : (
         <>
+          {emptyState && !emptyState.showCta && (
+            <section className="rounded-[26px] border border-[#E8D7C4] bg-[#FFFDF8] px-5 py-4">
+              <h2 className="text-base text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
+                {emptyState.headline}
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-[#6B5E58]">{emptyState.body}</p>
+            </section>
+          )}
+
           {/* PATTERN REPORT */}
           <section className="rounded-[26px] border border-[#E8D7C4] bg-[#FFFDF8] px-5 py-5">
             <SectionLabel>{PATTERN_REPORT_COPY.sectionLabel}</SectionLabel>
@@ -394,36 +418,22 @@ function HistoryPageContent() {
         </>
       )}
 
-      {/* 보조: 다른 기록 (접힌 영역) */}
-      <details className="rounded-[24px] border border-[#E2D7D0] bg-[#FAF8F5] px-5 py-4">
-        <summary className="cursor-pointer text-sm font-bold text-[#6B5E58]">
-          {HISTORY_ARCHIVE_COPY.summary(stats.sajuCount, stats.tarotCount)}
-        </summary>
-        <p className="mt-3 text-xs text-[#8A7E78]">{HISTORY_ARCHIVE_COPY.hint}</p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-[#8B6F47]">
-            {HISTORY_ARCHIVE_COPY.sajuCount(stats.sajuCount)}
-          </span>
-          <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-[#6B5E58]">
-            {HISTORY_ARCHIVE_COPY.tarotCount(stats.tarotCount)}
-          </span>
-        </div>
-      </details>
+      <HistoryOtherRecords
+        sajuCount={stats.sajuCount}
+        tarotCount={stats.tarotCount}
+        muted={isFullyEmpty}
+      />
 
-      <p className="text-center text-xs text-[#A09488]">{HISTORY_FOOTER_COPY.note}</p>
+      {!isFullyEmpty && (
+        <p className="text-center text-xs text-[#A09488]">{HISTORY_FOOTER_COPY.note}</p>
+      )}
     </div>
   );
 }
 
 export default function HistoryPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="rounded-[28px] border border-[#E2D7D0] bg-white px-5 py-8 text-center text-sm text-[#8A7E78]">
-          {HISTORY_HEADER_COPY.loading}
-        </div>
-      }
-    >
+    <Suspense fallback={<HistoryPageSkeleton />}>
       <HistoryPageContent />
     </Suspense>
   );

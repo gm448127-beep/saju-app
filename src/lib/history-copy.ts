@@ -31,7 +31,7 @@ export const HISTORY_COMPONENT_IDS = {
 /** §1 헤더 */
 export const HISTORY_HEADER_COPY = {
   back: "←",
-  backHome: "← 홈",
+  backBrand: "← 운명비서",
   title: "나의 패턴",
   subtitle: "이 브라우저에 쌓인 흐름입니다. 기기를 바꾸면 기록이 이어지지 않습니다.",
   filterLabelEn: "FILTER",
@@ -190,6 +190,18 @@ export const HISTORY_SECTION_EMPTY_COPY = {
   recentRecords: RECENT_RECORDS_COPY.empty,
 } as const;
 
+/** 빈 상태 섹션 미리보기 (구조 안내) */
+export const HISTORY_PREVIEW_COPY = {
+  recurringTones: "여기에 자주 나타나는 결 키워드가 쌓입니다",
+  last7Days: "최근 7일의 흐름이 이곳에 이어집니다",
+  savedSentences: "저장한 문장이 이곳에 모입니다",
+  recentRecords: "읽은 날의 흐름이 자동으로 기록됩니다",
+  sampleQuote: "맞는 말보다 부드러운 말이 멀리 간다",
+  sampleDate: "05.19 · 조율",
+  sampleRecordLine: "부드러움이 오늘의 가장 단단한 무기입니다",
+  sampleScores: "종합 · · 관계 · · 결정 ·",
+} as const;
+
 /** §10 상태 라벨 */
 export const HISTORY_STATUS_LABELS = {
   dots: "●●●●● ~ ●○○○○ (종합 점수 5단계)",
@@ -217,12 +229,12 @@ export const HISTORY_FOOTER_COPY = {
   note: "운명비서는 매일의 흐름을 조용히 기록하고 있어요",
 } as const;
 
-/** 보조: 사주·타로 접이 영역 */
+/** OTHER RECORDS — 사주·타로 보조 영역 */
 export const HISTORY_ARCHIVE_COPY = {
-  summary(saju: number, tarot: number) {
-    return `사주 · 타로 기록 (${saju + tarot}건)`;
-  },
-  hint: "오늘의 흐름 외 분석 기록은 여기서 확인할 수 있습니다.",
+  sectionLabel: "OTHER RECORDS",
+  headline: "사주 · 타로 기록",
+  body: "오늘의 흐름 외의 기록도 함께 정리됩니다.",
+  emptyBody: "지금은 비어 있어요.",
   sajuCount: (n: number) => `사주 ${n}건`,
   tarotCount: (n: number) => `타로 ${n}건`,
 } as const;
