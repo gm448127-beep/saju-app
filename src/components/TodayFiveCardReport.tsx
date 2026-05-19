@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import {
-  buildAreaScores,
   buildComparisonInsight,
   buildOverallComparison,
   buildThreeDayTrendFromHistory,
@@ -49,26 +48,47 @@ function CardShell({
 
 interface TodayFiveCardReportProps {
   report: DailyFortuneContent;
-  result: {
+  mode?: "common" | "personalized";
+  result?: {
     scores?: Record<string, number>;
     briefing?: { oneLine?: string; scoreTone?: string };
   };
-  birthKey: string;
+  birthKey?: string;
+  dateLabel?: string;
 }
 
-export default function TodayFiveCardReport({ report, result, birthKey }: TodayFiveCardReportProps) {
+function buildOverallFromAxis(report: DailyFortuneContent) {
+  return clampScore(
+    report.axisScores.relation * 0.3 +
+      report.axisScores.decision * 0.3 +
+      report.axisScores.emotion * 0.2 +
+      report.axisScores.balance * 0.2,
+  );
+}
+
+export default function TodayFiveCardReport({
+  report,
+  mode = "personalized",
+  result,
+  birthKey = "common",
+  dateLabel,
+}: TodayFiveCardReportProps) {
+  const isPersonalized = mode === "personalized" && Boolean(result);
   const dateKey = report.seedKey.split("-")[0] ?? "";
   const scores = result?.scores ?? {};
-  const overall = clampScore(scores.overall ?? 70);
-  const status = getTodayStatus(overall);
-  const interpretation = result.briefing?.scoreTone || getScoreInterpretation(overall, status);
-  const areas = report.axisScores
-    ? [
-        { key: "relation", label: "관계", score: clampScore(report.axisScores.relation) },
-        { key: "decision", label: "결정", score: clampScore(report.axisScores.decision) },
-        { key: "emotion", label: "감정", score: clampScore(report.axisScores.emotion) },
-      ]
-    : buildAreaScores(scores, overall);
+  const axisOverall = buildOverallFromAxis(report);
+  const overall = isPersonalized ? clampScore(scores.overall ?? axisOverall) : axisOverall;
+  const status = isPersonalized ? getTodayStatus(overall) : report.toneLabel;
+  const interpretation = isPersonalized
+    ? result?.briefing?.scoreTone || getScoreInterpretation(overall, getTodayStatus(overall))
+    : report.emotionPoint.description;
+  const tonePrefix = isPersonalized ? "나의 오늘" : "오늘의 결";
+  const areas = [
+    { key: "relation", label: "관계", score: clampScore(report.axisScores.relation) },
+    { key: "decision", label: "결정", score: clampScore(report.axisScores.decision) },
+    { key: "emotion", label: "감정", score: clampScore(report.axisScores.emotion) },
+    { key: "balance", label: "균형", score: clampScore(report.axisScores.balance) },
+  ];
   const savedAreas = {
     relation: areas.find((area) => area.key === "relation")?.score ?? overall,
     decision: areas.find((area) => area.key === "decision")?.score ?? overall,
@@ -91,7 +111,7 @@ export default function TodayFiveCardReport({ report, result, birthKey }: TodayF
     status,
     report.seedKey,
   );
-  const hasRealYesterday = Boolean(previousRecord);
+  const hasRealYesterday = isPersonalized && Boolean(previousRecord);
 
   const [saved, setSaved] = useState(false);
   const [savePulse, setSavePulse] = useState(false);
@@ -101,10 +121,12 @@ export default function TodayFiveCardReport({ report, result, birthKey }: TodayF
   const timeSlots = report.timeSlots.slice(0, 3);
 
   useEffect(() => {
+    if (!isPersonalized) return;
     setSaved(hasSavedToday(dateKey, birthKey));
-  }, [dateKey, birthKey]);
+  }, [birthKey, dateKey, isPersonalized]);
 
   useEffect(() => {
+    if (!isPersonalized) return;
     saveTodayRecord({
       savedAt: new Date().toISOString(),
       dateKey,
@@ -119,9 +141,10 @@ export default function TodayFiveCardReport({ report, result, birthKey }: TodayF
       areas: savedAreas,
     });
     setSaved(true);
-  }, [birthKey, dateKey, overall, report.flow, report.sentence, savedAreas.decision, savedAreas.emotion, savedAreas.relation, status]);
+  }, [birthKey, dateKey, isPersonalized, overall, report.flow, report.sentence, savedAreas.decision, savedAreas.emotion, savedAreas.relation, status]);
 
   const handleSave = () => {
+    if (!isPersonalized) return;
     const ok = saveTodayRecord({
       savedAt: new Date().toISOString(),
       dateKey,
@@ -144,35 +167,65 @@ export default function TodayFiveCardReport({ report, result, birthKey }: TodayF
 
   return (
     <section className="space-y-4">
+      {!isPersonalized && (
+        <div className="mb-1">
+          <h1 className="text-2xl text-[#2F282B] sm:text-3xl" style={{ fontFamily: "Jua, sans-serif" }}>
+            오늘의 흐름
+          </h1>
+          {dateLabel && <p className="mt-1 text-sm text-[#8A7E78]">{dateLabel}</p>}
+        </div>
+      )}
+
       {/* 점수 + 어제 대비 */}
       <div className="rounded-[28px] border border-[#E2D7D0] bg-white px-5 py-5 shadow-[0_14px_38px_rgba(61,51,56,0.06)]">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <div className="flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">오늘의 상태</p>
-              <span className="rounded-full border border-[#E2D7D0] bg-[#FFF8EE] px-2 py-0.5 text-[10px] font-bold text-[#8B6F47]">
-                오늘의 결 · {report.toneLabel}
+              <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">
+                {isPersonalized ? "MY TODAY" : "TODAY REPORT"}
+              </p>
+              <span className="rounded-full border border-[#E2D7D0] bg-[#FFF8EE] px-2.5 py-0.5 text-[10px] font-bold text-[#8B6F47]">
+                {tonePrefix} · {report.toneLabel}
               </span>
+              {!isPersonalized && (
+                <span className="rounded-full border border-[#E2D7D0] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#8A7E78]">
+                  공통 흐름
+                </span>
+              )}
             </div>
-            <div className="mt-2 flex items-end gap-3">
+            <div className="mt-4 flex items-end gap-3">
               <p className="text-5xl font-bold leading-none text-[#2F282B]">{overall}</p>
               <div>
                 <p className="text-lg font-bold text-[#8B6F47]">{status}</p>
-                <p className="mt-1 max-w-xs text-sm leading-relaxed text-[#5A4E48]">{interpretation}</p>
+                <p className="mt-1 max-w-md text-sm leading-relaxed text-[#5A4E48]">{interpretation}</p>
               </div>
             </div>
           </div>
-          <div className="min-w-[200px] flex-1 space-y-2.5 rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-3">
-            {areas.map((area) => (
-              <div key={area.key} className="grid grid-cols-[72px_34px_1fr] items-center gap-2">
-                <p className="text-sm font-semibold text-[#3D3338]">{area.label}</p>
-                <p className="text-sm font-bold text-[#8B6F47]">{area.score}</p>
-                <ScoreBlocks score={area.score} />
+
+          <div className="w-full rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4 lg:max-w-sm">
+            <div className="border-b border-[#E2D7D0]/70 pb-3">
+              <div className="flex items-end justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-bold text-[#8B6F47]">종합</p>
+                  <p className="mt-1 text-3xl font-bold leading-none text-[#2F282B]">{overall}</p>
+                </div>
+                <ScoreBlocks score={overall} />
               </div>
-            ))}
+            </div>
+            <div className="mt-3 space-y-2">
+              {areas.map((area) => (
+                <div key={area.key} className="grid grid-cols-[42px_28px_1fr] items-center gap-2">
+                  <p className="text-xs font-semibold text-[#6B5E58]">{area.label}</p>
+                  <p className="text-xs font-bold text-[#8B6F47]">{area.score}</p>
+                  <ScoreBlocks score={area.score} />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
+        {isPersonalized && (
+          <>
         <div className="mt-4 rounded-2xl border border-[#E8D7C4] bg-[#FFF8EE] px-4 py-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <p className="text-xs font-bold text-[#8B6F47]">어제보다 오늘</p>
@@ -244,8 +297,12 @@ export default function TodayFiveCardReport({ report, result, birthKey }: TodayF
             </div>
           ))}
         </div>
+          </>
+        )}
       </div>
 
+      {isPersonalized && (
+      <>
       {/* 인터랙션 */}
       <div className="sticky bottom-3 z-20 flex flex-wrap gap-2 rounded-2xl border border-[#E2D7D0] bg-white/95 p-2 shadow-[0_8px_24px_rgba(61,51,56,0.1)] backdrop-blur sm:static sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none">
         <button
@@ -296,6 +353,8 @@ export default function TodayFiveCardReport({ report, result, birthKey }: TodayF
             );
           })}
         </div>
+      )}
+      </>
       )}
 
       {/* 카드 1: 오늘의 한 줄 */}

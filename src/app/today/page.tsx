@@ -1,32 +1,17 @@
 ﻿"use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import ShareButton from "@/components/ShareButton";
 import PdfButton from "@/components/PdfButton";
-import BirthDateNumberInputs, { isValidBirthDate } from "@/components/BirthDateNumberInputs";
 import HourlyFlowSection from "@/components/HourlyFlowSection";
 import SajuTriggerSection from "@/components/SajuTriggerSection";
 import TodayStatsSection, { type TodayStatItem } from "@/components/TodayStatsSection";
 import TimeAdviceSection from "@/components/TimeAdviceSection";
 import TodayActionGuideSection from "@/components/TodayActionGuideSection";
 import TodayFiveCardReport from "@/components/TodayFiveCardReport";
+import TodayPersonalizeForm, { isValidBirthDate } from "@/components/TodayPersonalizeForm";
+import { buildDailyFortuneContent } from "@/lib/today-content-engine";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
-
-
-const TIME_SLOTS = [
-  { value: 23, label: "자시 (23:00~01:00)" },
-  { value: 1, label: "축시 (01:00~03:00)" },
-  { value: 3, label: "인시 (03:00~05:00)" },
-  { value: 5, label: "묘시 (05:00~07:00)" },
-  { value: 7, label: "진시 (07:00~09:00)" },
-  { value: 9, label: "사시 (09:00~11:00)" },
-  { value: 11, label: "오시 (11:00~13:00)" },
-  { value: 13, label: "미시 (13:00~15:00)" },
-  { value: 15, label: "신시 (15:00~17:00)" },
-  { value: 17, label: "유시 (17:00~19:00)" },
-  { value: 19, label: "술시 (19:00~21:00)" },
-  { value: 21, label: "해시 (21:00~23:00)" },
-];
 
 const TAB_ITEMS = [
   { key: "summary", label: "요약" },
@@ -34,13 +19,12 @@ const TAB_ITEMS = [
   { key: "myeongsik", label: "명식" },
 ] as const;
 
-const SAMPLE_GAUGES = [
-  { label: "관계", score: 78 },
-  { label: "결정", score: 70 },
-  { label: "감정 안정", score: 65 },
-];
-
 type TodayTab = (typeof TAB_ITEMS)[number]["key"];
+
+function formatTodayLabel(date = new Date()) {
+  const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")} (${weekdays[date.getDay()]})`;
+}
 
 function SectionTitle({ title, caption }: { title: string; caption?: string }) {
   return (
@@ -243,7 +227,8 @@ function MyeongsikReport({ report }: { report?: any }) {
 }
 
 export default function TodayPage() {
-  // 폼 상태
+  const commonReport = useMemo(() => buildDailyFortuneContent(), []);
+
   const [year, setYear] = useState("1995");
   const [month, setMonth] = useState("1");
   const [day, setDay] = useState("1");
@@ -254,17 +239,20 @@ export default function TodayPage() {
   const [calendarType, setCalendarType] = useState("solar");
   const [gender, setGender] = useState("남");
 
-  // 결과 상태
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState<TodayTab>("summary");
   const resultRef = useRef<HTMLDivElement>(null);
 
+  const isPersonalized = Boolean(result?.dailyReport);
+  const personalizedReport = isPersonalized ? (result.dailyReport as DailyFortuneContent) : null;
+  const birthKey = `${year}-${month}-${day}-${gender}`;
+  const todayLabel = formatTodayLabel();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setResult(null);
 
     if (!isValidBirthDate(year, month, day)) {
       setError("생년월일을 숫자로 정확히 입력해주세요.");
@@ -289,14 +277,22 @@ export default function TodayPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          year: Number(year), month: Number(month), day: Number(day), hour, minute,
-          isLunar: calendarType !== "solar", gender,
+          year: Number(year),
+          month: Number(month),
+          day: Number(day),
+          hour,
+          minute,
+          isLunar: calendarType !== "solar",
+          gender,
         }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "분석 실패");
       setResult(json);
       setActiveTab("summary");
+      window.setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 80);
     } catch (err) {
       setError(err instanceof Error ? err.message : "오류가 발생했습니다.");
     } finally {
@@ -315,205 +311,32 @@ export default function TodayPage() {
     : [];
 
   return (
-    <div className="space-y-6">
-      <div className="rounded-[24px] border border-[#E2D7D0] bg-white px-5 py-5 shadow-[0_10px_30px_rgba(61,51,56,0.05)]">
-        <p className="text-xs tracking-[0.08em] text-[#B8A78D] mb-2">TODAY REPORT</p>
-        <h1 style={{ fontFamily: "Jua, sans-serif" }} className="text-2xl text-[#2F282B]">
-          오늘의 흐름
-        </h1>
-        <p className="text-[#8A7E78] text-sm mt-1">
-          생년월일을 입력하면 오늘의 해석을 5장의 리포트로 정리합니다.
-        </p>
-      </div>
-
-      {!result && (
-        <section className="relative overflow-hidden rounded-[28px] border border-[#E2D7D0] bg-white px-5 py-6 shadow-[0_14px_38px_rgba(61,51,56,0.06)]">
-          <div className="absolute -right-12 -top-16 h-40 w-40 rounded-full bg-[#F1E7DE]" />
-          <div className="absolute -bottom-16 left-8 h-36 w-36 rounded-full bg-[#FAF8F5]" />
-          <div className="relative">
-            <p className="mb-2 text-xs font-bold tracking-[0.14em] text-[#8B6F47]">TODAY PREVIEW</p>
-            <h2 className="text-2xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-              오늘의 흐름은 이렇게 읽힙니다
-            </h2>
-            <div className="relative mt-4 overflow-hidden rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4">
-              <div className="pointer-events-none absolute inset-x-4 bottom-4 top-16 rounded-2xl bg-white/35 backdrop-blur-[1.5px]" />
-              <div className="relative">
-                <p className="text-lg leading-relaxed text-[#3D3338]" style={{ fontFamily: "Jua, sans-serif" }}>
-                  결정은 오후가 유리하고, 말 한마디가 운을 좌우합니다.
-                </p>
-                <div className="mt-4 grid grid-cols-3 gap-2">
-                  {SAMPLE_GAUGES.map((item) => (
-                    <div key={item.label} className="rounded-xl border border-[#E2D7D0] bg-white/85 px-3 py-3">
-                      <div className="flex items-center justify-between gap-2">
-                        <p className="text-[11px] font-semibold text-[#6B5E58]">{item.label}</p>
-                        <p className="text-xs font-bold text-[#8B6F47]">{item.score}</p>
-                      </div>
-                      <div className="mt-2 h-2 rounded-full bg-[#EDE4DC]">
-                        <div className="h-full rounded-full bg-[#8B6F47]" style={{ width: `${item.score}%` }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <p className="mt-3 text-[11px] text-[#8A7E78]">입력 후 내 사주 기준으로 다시 읽힙니다</p>
-              </div>
-            </div>
-            <p className="mt-4 rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3 text-sm leading-relaxed text-[#5A4E48]">
-              생년월일을 입력하면 내 사주 기준 5카드 리포트가 열립니다.
-            </p>
-          </div>
+    <div className="space-y-10">
+      <div ref={resultRef} className="space-y-6">
+        <section aria-label="공통 오늘의 흐름">
+          <TodayFiveCardReport report={commonReport} mode="common" dateLabel={todayLabel} />
         </section>
-      )}
-
-      {/* ────────── 입력 폼 (사주보기와 동일 구조) ────────── */}
-      <div className="card">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* 년 / 월 / 일 */}
-          <BirthDateNumberInputs
-            year={year}
-            month={month}
-            day={day}
-            onYearChange={setYear}
-            onMonthChange={setMonth}
-            onDayChange={setDay}
-          />
-
-          {/* 출생시간 — 사주보기와 동일한 3가지 모드 */}
-          <div>
-            <label className="block text-xs text-[#8A7E78] mb-2" style={{ fontFamily: "Jua, sans-serif" }}>출생시간</label>
-            <div className="flex gap-2 mb-3">
-              <button type="button" onClick={() => setTimeMode("none")}
-                className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all border ${timeMode === "none" ? "bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]" : "bg-white border-[#D9C8C0] text-[#8A7E78]"}`}>
-                모름
-              </button>
-              <button type="button" onClick={() => setTimeMode("slot")}
-                className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all border ${timeMode === "slot" ? "bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]" : "bg-white border-[#D9C8C0] text-[#8A7E78]"}`}>
-                시간대 선택
-              </button>
-              <button type="button" onClick={() => setTimeMode("exact")}
-                className={`flex-1 py-2 rounded-xl text-xs font-medium transition-all border ${timeMode === "exact" ? "bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]" : "bg-white border-[#D9C8C0] text-[#8A7E78]"}`}>
-                시/분 직접입력
-              </button>
+        {isPersonalized && personalizedReport && (
+          <section aria-label="나의 오늘의 흐름" className="space-y-6 border-t border-[#E2D7D0] pt-8">
+            <div className="rounded-[24px] border border-[#E8D7C4] bg-[#FFFDF8] px-5 py-4">
+              <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">MY TODAY</p>
+              <h2 className="mt-1 text-xl text-[#2F282B] sm:text-2xl" style={{ fontFamily: "Jua, sans-serif" }}>
+                나의 오늘의 흐름
+              </h2>
             </div>
-
-            {/* 시간대 선택 모드 */}
-            {timeMode === "slot" && (
-              <select value={slotHour} onChange={e => setSlotHour(Number(e.target.value))}
-                className="w-full bg-white border-2 border-[#D9C8C0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#B8A78D] outline-none transition-colors">
-                {TIME_SLOTS.map(s => (
-                  <option key={s.value} value={s.value}>{s.label}</option>
-                ))}
-              </select>
-            )}
-
-            {/* 시/분 직접입력 모드 */}
-            {timeMode === "exact" && (
-              <div className="bg-[#FAF8F5] border border-[#E2D7D0] rounded-xl p-4 space-y-3">
-                <p className="text-xs text-[#8A7E78]">
-                  정확한 출생 시각을 입력하면 시주까지 포함한 정밀 분석이 가능합니다.
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1">
-                    <label className="block text-xs text-[#8A7E78] mb-1 font-medium">시</label>
-                    <select value={exactHour} onChange={e => setExactHour(Number(e.target.value))}
-                      className="w-full bg-white border-2 border-[#E8D9C8] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#B8A78D] outline-none">
-                      {Array.from({ length: 24 }, (_, i) => i).map(h => (
-                        <option key={h} value={h}>{String(h).padStart(2, "0")}시</option>
-                      ))}
-                    </select>
-                  </div>
-                  <span className="text-[#8A7E78] font-bold text-xl mt-5">:</span>
-                  <div className="flex-1">
-                    <label className="block text-xs text-[#8A7E78] mb-1 font-medium">분</label>
-                    <select value={exactMinute} onChange={e => setExactMinute(Number(e.target.value))}
-                      className="w-full bg-white border-2 border-[#E8D9C8] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#B8A78D] outline-none">
-                      {Array.from({ length: 12 }, (_, i) => i * 5).map(m => (
-                        <option key={m} value={m}>{String(m).padStart(2, "0")}분</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* 달력 / 성별 */}
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>달력</label>
-              <div className="flex gap-2">
-                <button type="button" onClick={() => setCalendarType("solar")}
-  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border ${calendarType === "solar" ? "bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#8B6F47]"}`}>
-  양력
-</button>
-
-                <button type="button" onClick={() => setCalendarType("lunar")}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border ${calendarType === "lunar" ? "bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#8B6F47]"}`}>
-                  음력
-                </button>
-              <button type="button" onClick={() => setCalendarType("lunarLeap")}
-                className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border ${calendarType === "lunarLeap" ? "bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#8B6F47]"}`}>
-                윤달
-              </button>
-              </div>
-            </div>
-            <div className="flex-1">
-              <label className="block text-xs text-[#8A7E78] mb-1" style={{ fontFamily: "Jua, sans-serif" }}>성별</label>
-              <div className="flex gap-2">
-                <button type="button" onClick={() => setGender("남")}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border ${gender === "남" ? "bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#8B6F47]"}`}>
-                남
-                </button>
-                <button type="button" onClick={() => setGender("여")}
-                  className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-all border ${gender === "여" ? "bg-[#FAF8F5] text-[#2F282B] border-[#8B6F47]" : "bg-white text-[#8A7E78] border-[#D9C8C0] hover:border-[#8B6F47]"}`}>
-                여
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* 제출 버튼 */}
-          <button type="submit" disabled={loading}
-  className="w-full py-3.5 rounded-2xl text-white text-lg transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-  style={{ 
-    background: "#2F282B",
-    fontFamily: "Jua, sans-serif" 
-  }}>
-
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                분석 중...
-              </span>
-            ) : "오늘의 흐름 읽기"}
-          </button>
-        </form>
-      </div>
-
-      {/* 에러 */}
-      {error && (
-        <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4 text-red-600 text-sm text-center">
-          {error}
-        </div>
-      )}
-
-      {/* ────────── 결과 영역 ────────── */}
-      {result && (
-        <div ref={resultRef} className="space-y-6 animate-fade-in">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" data-pdf-ignore>
-            <div>
-              <p className="text-xs tracking-[0.12em] text-[#B8A78D]">TODAY REPORT</p>
-              <p className="text-sm text-[#5A4E48]">5카드 리포트 · 점수와 흐름을 함께 읽습니다</p>
-            </div>
+            <p className="text-sm text-[#5A4E48]">점수 · 어제 비교 · 상세 리포트</p>
             <div id="today-share-actions" className="flex w-full flex-nowrap gap-1 sm:w-auto sm:min-w-[340px] sm:gap-2">
               <PdfButton targetRef={resultRef} fileName="today-fortune" />
               <ShareButton targetRef={resultRef} fileName="today-fortune" />
             </div>
           </div>
 
-          <div className="rounded-xl border border-[#E2D7D0] bg-white/95 p-0.5 shadow-[0_6px_18px_rgba(61,51,56,0.05)] backdrop-blur sm:sticky sm:top-16 sm:z-10 sm:rounded-2xl sm:p-1" data-pdf-ignore>
+        {isPersonalized && personalizedReport && (
+          <div
+            className="rounded-xl border border-[#E2D7D0] bg-white/95 p-0.5 shadow-[0_6px_18px_rgba(61,51,56,0.05)] backdrop-blur sm:sticky sm:top-16 sm:z-10 sm:rounded-2xl sm:p-1"
+            data-pdf-ignore
+          >
             <div className="grid grid-cols-3 gap-0.5 sm:gap-1">
               {TAB_ITEMS.map((tab) => (
                 <button
@@ -531,63 +354,93 @@ export default function TodayPage() {
               ))}
             </div>
           </div>
+        )}
 
-          {activeTab === "summary" && result.dailyReport && (
-            <TodayFiveCardReport
-              report={result.dailyReport as DailyFortuneContent}
-              result={result}
-              birthKey={`${year}-${month}-${day}-${gender}`}
+        {isPersonalized && personalizedReport && activeTab === "summary" && (
+          <TodayFiveCardReport
+            report={personalizedReport}
+            mode="personalized"
+            result={result}
+            birthKey={birthKey}
+          />
+        )}
+
+        {isPersonalized && activeTab === "detail" && (
+          <div className="space-y-6">
+            <TodayBriefingReport result={result} />
+            <DomainScoreSummary domains={result.domainScores} />
+            <TodayStatsSection
+              overall={result.scores.overall}
+              items={statItems.map((item) => ({
+                ...item,
+                score: result.scores[item.key],
+              }))}
             />
-          )}
-
-          {activeTab === "detail" && (
-            <div className="space-y-6">
-              <TodayBriefingReport result={result} />
-              <DomainScoreSummary domains={result.domainScores} />
-              <TodayStatsSection
-                overall={result.scores.overall}
-                items={statItems.map((item) => ({
-                  ...item,
-                  score: result.scores[item.key],
-                }))}
+            <DetailedFortuneReport items={result.detailedFortunes} />
+            {result.hourlyFlow && (
+              <HourlyFlowSection
+                hourlyFlow={result.hourlyFlow}
+                hourlyFlowIntro={result.hourlyFlowIntro}
+                hourlyPeak={result.hourlyPeak}
+                hourlyCaution={result.hourlyCaution}
               />
-              <DetailedFortuneReport items={result.detailedFortunes} />
-              {result.hourlyFlow && (
-                <HourlyFlowSection
-                  hourlyFlow={result.hourlyFlow}
-                  hourlyFlowIntro={result.hourlyFlowIntro}
-                  hourlyPeak={result.hourlyPeak}
-                  hourlyCaution={result.hourlyCaution}
-                />
-              )}
-              <TimeAdviceSection items={result.timeAdvice ?? []} />
-              <TodayActionGuideSection
-                dos={result.todayDos}
-                donts={result.todayDonts}
-                dosDetailed={result.todayDosDetailed}
-                dontsDetailed={result.todayDontsDetailed}
-                luckyItems={result.luckyItems}
-                tip={result.tip}
-                warning={result.warning}
-                sipsinTitle={result.sipsinTitle}
-              />
-            </div>
-          )}
+            )}
+            <TimeAdviceSection items={result.timeAdvice ?? []} />
+            <TodayActionGuideSection
+              dos={result.todayDos}
+              donts={result.todayDonts}
+              dosDetailed={result.todayDosDetailed}
+              dontsDetailed={result.todayDontsDetailed}
+              luckyItems={result.luckyItems}
+              tip={result.tip}
+              warning={result.warning}
+              sipsinTitle={result.sipsinTitle}
+            />
+          </div>
+        )}
 
-          {activeTab === "myeongsik" && (
-            <div className="space-y-6">
-              <MyeongsikReport report={result.myeongsikReport} />
-              {(result.sajuTriggers?.length > 0 || result.gearAnalysis?.length > 0) && (
-                <SajuTriggerSection
-                  intro={result.sajuTriggerIntro}
-                  triggers={result.sajuTriggers?.length ? result.sajuTriggers : []}
-                  pillars={result.pillars}
-                />
-              )}
-            </div>
-          )}
-        </div>
-      )}
+        {isPersonalized && activeTab === "myeongsik" && (
+          <div className="space-y-6">
+            <MyeongsikReport report={result.myeongsikReport} />
+            {(result.sajuTriggers?.length > 0 || result.gearAnalysis?.length > 0) && (
+              <SajuTriggerSection
+                intro={result.sajuTriggerIntro}
+                triggers={result.sajuTriggers?.length ? result.sajuTriggers : []}
+                pillars={result.pillars}
+              />
+            )}
+          </div>
+        )}
+          </section>
+        )}
+      </div>
+
+      <div className="border-t border-[#E2D7D0] pt-2" aria-hidden="true" />
+
+      <TodayPersonalizeForm
+        year={year}
+        month={month}
+        day={day}
+        timeMode={timeMode}
+        slotHour={slotHour}
+        exactHour={exactHour}
+        exactMinute={exactMinute}
+        calendarType={calendarType}
+        gender={gender}
+        loading={loading}
+        error={error}
+        isPersonalized={isPersonalized}
+        onYearChange={setYear}
+        onMonthChange={setMonth}
+        onDayChange={setDay}
+        onTimeModeChange={setTimeMode}
+        onSlotHourChange={setSlotHour}
+        onExactHourChange={setExactHour}
+        onExactMinuteChange={setExactMinute}
+        onCalendarTypeChange={setCalendarType}
+        onGenderChange={setGender}
+        onSubmit={handleSubmit}
+      />
     </div>
   );
 }
