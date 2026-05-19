@@ -57,6 +57,7 @@ interface TodayFiveCardReportProps {
 }
 
 export default function TodayFiveCardReport({ report, result, birthKey }: TodayFiveCardReportProps) {
+  const dateKey = report.seedKey.split("-")[0] ?? "";
   const scores = result?.scores ?? {};
   const overall = clampScore(scores.overall ?? 70);
   const status = getTodayStatus(overall);
@@ -81,7 +82,6 @@ export default function TodayFiveCardReport({ report, result, birthKey }: TodayF
     if (index !== 2 || !previousRecord) return item;
     return { ...item, score: overall, status };
   });
-  const dateKey = report.seedKey.split("-")[0] ?? "";
 
   const [saved, setSaved] = useState(false);
   const [savePulse, setSavePulse] = useState(false);
