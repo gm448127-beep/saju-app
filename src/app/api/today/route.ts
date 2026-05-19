@@ -7,6 +7,7 @@ import { HOURLY_FLOW_INTRO, SCORE_LABEL_DESC, SIJIN_META } from "@/data/sijinDic
 import { SIPSIN_DICT } from "@/data/wisdomDict";
 import { buildSajuTriggers, triggersToLegacyLines } from "@/lib/saju-triggers";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
+import { computeOhaengCountFromPillars } from "@/lib/today-tone-engine";
 
 /* ─── 상수 정의 ─── */
 const CHEONGAN = ["갑","을","병","정","무","기","경","신","임","계"] as const;
@@ -1183,10 +1184,12 @@ export async function POST(request: NextRequest) {
       sajuTriggers,
       gearAnalysis,
     });
+    const ohaengCount = computeOhaengCountFromPillars(myStems, myBranches);
     const dailyReport = buildDailyFortuneContent(today, {
       sipsin: todaySipsin,
-      element: myDayOh,
+      dayElement: myDayOh,
       scores,
+      ohaengCount,
     });
 
     const response = {

@@ -1,3 +1,6 @@
+import type { ToneKey } from "@/lib/today-tone-types";
+import { buildToneTransitionComment } from "@/lib/today-tone-engine";
+
 export function clampScore(value: number) {
   return Math.max(20, Math.min(99, Math.round(value)));
 }
@@ -37,8 +40,121 @@ export function buildYesterdayComparisons(seedKey: string, areas: { key: string;
   return areas.map((area, index) => {
     const raw = ((seed >> (index * 4)) % 25) - 10;
     const delta = raw === 0 ? (index % 2 === 0 ? 5 : -4) : raw;
-    return { ...area, delta, previousScore: clampScore(area.score - delta) };
+    return { ...area, delta, previousScore: clampScore(area.score - delta), isReal: false };
   });
+}
+
+export function buildYesterdayComparisonsFromRecords(
+  areas: { key: string; label: string; score: number }[],
+  previousRecord: SavedTodayRecord | undefined,
+  seedKey: string,
+): YesterdayComparison[] {
+  if (!previousRecord) {
+    return buildYesterdayComparisons(seedKey, areas);
+  }
+
+  return areas.map((area) => {
+    const previousScore = clampScore(previousRecord.areas?.[area.key as keyof NonNullable<SavedTodayRecord["areas"]>] ?? previousRecord.overall);
+    const delta = area.score - previousScore;
+    return {
+      ...area,
+      delta,
+      previousScore,
+      isReal: Boolean(previousRecord.areas),
+    };
+  });
+}
+
+export function buildOverallComparison(
+  previousRecord: SavedTodayRecord | undefined,
+  currentOverall: number,
+) {
+  if (!previousRecord) return null;
+  const delta = currentOverall - previousRecord.overall;
+  return {
+    previousOverall: previousRecord.overall,
+    previousStatus: previousRecord.status || getTodayStatus(previousRecord.overall),
+    previousDateKey: previousRecord.dateKey,
+    delta,
+    isReal: true,
+  };
+}
+
+export function buildComparisonInsight(
+  overallComparison: ReturnType<typeof buildOverallComparison>,
+  comparisons: YesterdayComparison[],
+  currentStatus: string,
+  options?: { previousToneKey?: ToneKey; currentToneKey?: ToneKey },
+) {
+  if (options?.previousToneKey && options?.currentToneKey) {
+    return buildToneTransitionComment(options.previousToneKey, options.currentToneKey);
+  }
+
+  if (!overallComparison) {
+    const best = [...comparisons].sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))[0];
+    const msg = YESTERDAY_MESSAGES[best?.key ?? ""];
+    if (!best || !msg) return "오늘은 어제와 다른 리듬으로 읽힙니다.";
+    return best.delta >= 0 ? msg.up : msg.down;
+  }
+
+  const { delta, previousDateKey } = overallComparison;
+  const dateLabel = formatHistoryDate(previousDateKey);
+  const strongest = [...comparisons].sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta))[0];
+  const areaHint = strongest && Math.abs(strongest.delta) >= 3
+    ? ` 특히 ${strongest.label} 흐름이 ${strongest.delta >= 0 ? "올라갔습니다" : "조율이 필요합니다"}.`
+    : "";
+
+  if (delta >= 8) return `어제(${dateLabel})보다 전반 흐름이 눈에 띄게 좋아졌습니다.${areaHint}`;
+  if (delta >= 3) return `어제(${dateLabel})보다 조금 더 여유 있는 날입니다.${areaHint}`;
+  if (delta <= -8) return `어제(${dateLabel})보다 속도를 늦추고 조율하는 편이 좋습니다.${areaHint}`;
+  if (delta <= -3) return `어제(${dateLabel})보다 판단보다 순서가 중요합니다.${areaHint}`;
+  if (currentStatus === "주의") return `어제(${dateLabel})와 비슷하지만, 오늘은 조율이 먼저입니다.${areaHint}`;
+  return `어제(${dateLabel})와 비슷한 리듬이 이어집니다.${areaHint}`;
+}
+
+export function buildThreeDayTrendFromHistory(
+  records: SavedTodayRecord[],
+  currentDateKey: string,
+  birthKey: string,
+  currentOverall: number,
+  currentStatus: string,
+  seedKey: string,
+): ThreeDayTrendItem[] {
+  const userRecords = records
+    .filter((item) => item.birthKey === birthKey && item.dateKey <= currentDateKey)
+    .sort((a, b) => b.dateKey.localeCompare(a.dateKey));
+
+  const fallback = buildThreeDayTrend(seedKey).map((item) => ({ ...item, isReal: false }));
+  const yesterdayRecord = userRecords.find((item) => item.dateKey < currentDateKey);
+  const dayBeforeRecord = userRecords.find((item) => item.dateKey < (yesterdayRecord?.dateKey ?? currentDateKey));
+
+  return [
+    dayBeforeRecord
+      ? {
+          label: "그제",
+          status: dayBeforeRecord.status || getTodayStatus(dayBeforeRecord.overall),
+          score: dayBeforeRecord.overall,
+          isReal: true,
+          dateKey: dayBeforeRecord.dateKey,
+        }
+      : fallback[0],
+    yesterdayRecord
+      ? {
+          label: "어제",
+          status: yesterdayRecord.status || getTodayStatus(yesterdayRecord.overall),
+          score: yesterdayRecord.overall,
+          isReal: true,
+          dateKey: yesterdayRecord.dateKey,
+        }
+      : fallback[1],
+    {
+      label: "오늘",
+      status: currentStatus,
+      score: currentOverall,
+      isReal: true,
+      dateKey: currentDateKey,
+    },
+  ];
 }
 
 const YESTERDAY_MESSAGES: Record<string, { up: string; down: string }> = {
@@ -71,6 +187,7 @@ export function buildThreeDayTrend(seedKey: string) {
     label,
     status: statuses[(seed + index * 3) % statuses.length],
     score: clampScore(58 + ((seed >> (index * 2)) % 28)),
+    isReal: false,
   }));
 }
 
@@ -93,6 +210,32 @@ export type SavedTodayRecord = {
   birthKey: string;
   status?: string;
   flow?: string;
+  toneKey?: import("@/lib/today-tone-types").ToneKey;
+  toneLabel?: string;
+  saveSentence?: string;
+  areas?: {
+    relation: number;
+    decision: number;
+    emotion: number;
+    balance?: number;
+  };
+};
+
+export type YesterdayComparison = {
+  key: string;
+  label: string;
+  score: number;
+  delta: number;
+  previousScore: number;
+  isReal: boolean;
+};
+
+export type ThreeDayTrendItem = {
+  label: string;
+  status: string;
+  score: number;
+  isReal: boolean;
+  dateKey?: string;
 };
 
 function parseHistory(raw: string | null): SavedTodayRecord[] {

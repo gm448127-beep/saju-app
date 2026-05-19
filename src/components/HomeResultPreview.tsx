@@ -5,24 +5,20 @@ function clampScore(value: number) {
   return Math.max(20, Math.min(99, Math.round(value)));
 }
 
-function hashSeed(value: string) {
-  let hash = 0;
-  for (let i = 0; i < value.length; i += 1) {
-    hash = (hash * 31 + value.charCodeAt(i)) % 2147483647;
-  }
-  return Math.abs(hash);
-}
-
-function getPreviewScores(seedKey: string) {
-  const seed = hashSeed(seedKey);
-  const overall = clampScore(58 + (seed % 30));
+function getPreviewScores(content: DailyFortuneContent) {
+  const overall = clampScore(
+    content.axisScores.relation * 0.3 +
+      content.axisScores.decision * 0.3 +
+      content.axisScores.emotion * 0.2 +
+      content.axisScores.balance * 0.2,
+  );
   return {
     overall,
     areas: [
-      { label: "관계", score: clampScore(overall + ((seed >> 3) % 10) - 3) },
-      { label: "결정", score: clampScore(overall + 2) },
-      { label: "감정", score: clampScore(overall - 6) },
-      { label: "균형", score: clampScore(overall - 4 + (seed % 8)) },
+      { label: "관계", score: clampScore(content.axisScores.relation) },
+      { label: "결정", score: clampScore(content.axisScores.decision) },
+      { label: "감정", score: clampScore(content.axisScores.emotion) },
+      { label: "균형", score: clampScore(content.axisScores.balance) },
     ],
   };
 }
@@ -34,15 +30,16 @@ function getTodayStatus(score: number) {
   return "주의";
 }
 
-function ScoreBlocks({ score }: { score: number }) {
+function ScoreBlocks({ score, size = "md" }: { score: number; size?: "md" | "sm" }) {
   const filled = Math.round((score / 100) * 8);
+  const blockClass = size === "sm" ? "h-1.5 w-1.5" : "h-2 w-2";
 
   return (
     <div className="flex items-center gap-0.5" aria-hidden="true">
       {Array.from({ length: 8 }, (_, index) => (
         <span
           key={index}
-          className={`h-2 w-2 rounded-sm ${index < filled ? "bg-[#8B6F47]" : "bg-[#EDE4DC]"}`}
+          className={`rounded-sm ${blockClass} ${index < filled ? "bg-[#8B6F47]" : "bg-[#EDE4DC]"}`}
         />
       ))}
     </div>
@@ -59,9 +56,8 @@ interface HomeResultPreviewProps {
 }
 
 export default function HomeResultPreview({ content }: HomeResultPreviewProps) {
-  const scores = getPreviewScores(content.seedKey);
-  const statusLabel = getTodayStatus(scores.overall);
-  const areaRows = [{ label: "종합", score: scores.overall }, ...scores.areas];
+  const scores = getPreviewScores(content);
+  const statusLabel = content.toneLabel || getTodayStatus(scores.overall);
 
   return (
     <section className="overflow-hidden rounded-[30px] border border-[#E2D7D0] bg-white p-4 shadow-[0_18px_48px_rgba(61,51,56,0.07)] sm:p-5">
@@ -92,7 +88,7 @@ export default function HomeResultPreview({ content }: HomeResultPreviewProps) {
           <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/40" />
           <div className="relative">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-bold text-[#8B6F47]">
-              <span className="rounded-full border border-[#E2D7D0] bg-white/70 px-2 py-0.5">오늘의 흐름</span>
+              <span className="rounded-full border border-[#E2D7D0] bg-white/70 px-2 py-0.5">오늘의 결 · {content.toneLabel}</span>
               <span className="whitespace-nowrap text-[#6B5E58]">{formatTodayLabel()}</span>
               <span className="text-[#A09488]">·</span>
               <span className="whitespace-nowrap">{statusLabel}</span>
@@ -106,13 +102,25 @@ export default function HomeResultPreview({ content }: HomeResultPreviewProps) {
             </h3>
 
             <div className="relative mt-5 overflow-hidden rounded-2xl border border-[#E2D7D0] bg-white/80 px-4 py-4">
-              <div className="pointer-events-none absolute inset-x-3 bottom-3 top-10 rounded-xl bg-white/25 backdrop-blur-[1px]" />
-              <div className="relative space-y-2.5">
-                {areaRows.map((area) => (
-                  <div key={area.label} className="grid grid-cols-[42px_34px_1fr] items-center gap-3">
-                    <p className={`text-sm font-bold ${area.label === "종합" ? "text-[#8B6F47]" : "text-[#3D3338]"}`}>{area.label}</p>
-                    <p className="text-sm font-bold text-[#8B6F47]">{area.score}</p>
-                    <ScoreBlocks score={area.score} />
+              <div className="pointer-events-none absolute inset-x-3 bottom-3 top-[4.5rem] rounded-xl bg-white/25 backdrop-blur-[1px]" />
+              <div className="relative border-b border-[#E2D7D0]/70 pb-3">
+                <div className="flex items-end justify-between gap-3">
+                  <div>
+                    <p className="text-[11px] font-bold tracking-[0.08em] text-[#8B6F47]">종합</p>
+                    <div className="mt-1 flex items-end gap-2">
+                      <p className="text-3xl font-bold leading-none text-[#2F282B]">{scores.overall}</p>
+                      <p className="pb-0.5 text-sm font-bold text-[#8B6F47]">{statusLabel}</p>
+                    </div>
+                  </div>
+                  <ScoreBlocks score={scores.overall} />
+                </div>
+              </div>
+              <div className="relative mt-3 space-y-2">
+                {scores.areas.map((area) => (
+                  <div key={area.label} className="grid grid-cols-[34px_26px_1fr] items-center gap-2 sm:grid-cols-[42px_34px_1fr] sm:gap-3">
+                    <p className="text-[11px] font-semibold text-[#8A7E78] sm:text-xs">{area.label}</p>
+                    <p className="text-[11px] font-bold text-[#8B6F47] sm:text-xs">{area.score}</p>
+                    <ScoreBlocks score={area.score} size="sm" />
                   </div>
                 ))}
               </div>

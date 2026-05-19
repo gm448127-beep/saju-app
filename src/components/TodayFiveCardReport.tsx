@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import {
   buildAreaScores,
-  buildRealYesterdayHeadline,
-  buildThreeDayTrend,
-  buildYesterdayComparisons,
-  buildYesterdayHeadline,
+  buildComparisonInsight,
+  buildOverallComparison,
+  buildThreeDayTrendFromHistory,
+  buildYesterdayComparisonsFromRecords,
   getPreviousDayRecord,
   getTodayHistory,
   clampScore,
@@ -62,30 +62,40 @@ export default function TodayFiveCardReport({ report, result, birthKey }: TodayF
   const overall = clampScore(scores.overall ?? 70);
   const status = getTodayStatus(overall);
   const interpretation = result.briefing?.scoreTone || getScoreInterpretation(overall, status);
-  const areas = buildAreaScores(scores, overall);
+  const areas = report.axisScores
+    ? [
+        { key: "relation", label: "관계", score: clampScore(report.axisScores.relation) },
+        { key: "decision", label: "결정", score: clampScore(report.axisScores.decision) },
+        { key: "emotion", label: "감정", score: clampScore(report.axisScores.emotion) },
+      ]
+    : buildAreaScores(scores, overall);
+  const savedAreas = {
+    relation: areas.find((area) => area.key === "relation")?.score ?? overall,
+    decision: areas.find((area) => area.key === "decision")?.score ?? overall,
+    emotion: areas.find((area) => area.key === "emotion")?.score ?? overall,
+    balance: report.axisScores ? clampScore(report.axisScores.balance) : overall,
+  };
   const history = getTodayHistory();
   const previousRecord = getPreviousDayRecord(history, dateKey, birthKey);
-  const comparisons = buildYesterdayComparisons(report.seedKey, areas).map((item) => {
-    if (!previousRecord) return item;
-    const currentArea = areas.find((area) => area.key === item.key);
-    if (!currentArea) return item;
-    const delta = currentArea.score - previousRecord.overall;
-    return {
-      ...item,
-      delta,
-      previousScore: clampScore(previousRecord.overall),
-    };
+  const overallComparison = buildOverallComparison(previousRecord, overall);
+  const comparisons = buildYesterdayComparisonsFromRecords(areas, previousRecord, report.seedKey);
+  const yesterdayHeadline = buildComparisonInsight(overallComparison, comparisons, status, {
+    previousToneKey: previousRecord?.toneKey,
+    currentToneKey: report.toneKey,
   });
-  const yesterdayHeadline =
-    buildRealYesterdayHeadline(previousRecord, overall, status) ?? buildYesterdayHeadline(comparisons);
-  const threeDayTrend = buildThreeDayTrend(report.seedKey).map((item, index) => {
-    if (index !== 2 || !previousRecord) return item;
-    return { ...item, score: overall, status };
-  });
+  const threeDayTrend = buildThreeDayTrendFromHistory(
+    history,
+    dateKey,
+    birthKey,
+    overall,
+    status,
+    report.seedKey,
+  );
+  const hasRealYesterday = Boolean(previousRecord);
 
   const [saved, setSaved] = useState(false);
   const [savePulse, setSavePulse] = useState(false);
-  const [compareOpen, setCompareOpen] = useState(false);
+  const [compareOpen, setCompareOpen] = useState(hasRealYesterday);
   const [activeSlot, setActiveSlot] = useState<string | null>(null);
 
   const timeSlots = report.timeSlots.slice(0, 3);
@@ -103,9 +113,13 @@ export default function TodayFiveCardReport({ report, result, birthKey }: TodayF
       birthKey,
       status,
       flow: report.flow,
+      toneKey: report.toneKey,
+      toneLabel: report.toneLabel,
+      saveSentence: report.saveSentence,
+      areas: savedAreas,
     });
     setSaved(true);
-  }, [birthKey, dateKey, overall, report.flow, report.sentence, status]);
+  }, [birthKey, dateKey, overall, report.flow, report.sentence, savedAreas.decision, savedAreas.emotion, savedAreas.relation, status]);
 
   const handleSave = () => {
     const ok = saveTodayRecord({
@@ -116,6 +130,10 @@ export default function TodayFiveCardReport({ report, result, birthKey }: TodayF
       birthKey,
       status,
       flow: report.flow,
+      toneKey: report.toneKey,
+      toneLabel: report.toneLabel,
+      saveSentence: report.saveSentence,
+      areas: savedAreas,
     });
     if (ok) {
       setSaved(true);
@@ -130,7 +148,12 @@ export default function TodayFiveCardReport({ report, result, birthKey }: TodayF
       <div className="rounded-[28px] border border-[#E2D7D0] bg-white px-5 py-5 shadow-[0_14px_38px_rgba(61,51,56,0.06)]">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">오늘의 상태</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">오늘의 상태</p>
+              <span className="rounded-full border border-[#E2D7D0] bg-[#FFF8EE] px-2 py-0.5 text-[10px] font-bold text-[#8B6F47]">
+                오늘의 결 · {report.toneLabel}
+              </span>
+            </div>
             <div className="mt-2 flex items-end gap-3">
               <p className="text-5xl font-bold leading-none text-[#2F282B]">{overall}</p>
               <div>
@@ -150,17 +173,74 @@ export default function TodayFiveCardReport({ report, result, birthKey }: TodayF
           </div>
         </div>
 
-        <div className="mt-4 rounded-2xl border border-[#E8D7C4] bg-[#FFF8EE] px-4 py-3">
-          <p className="text-xs font-bold text-[#8B6F47]">어제보다 오늘</p>
-          <p className="mt-1 text-sm leading-relaxed text-[#4A403B]">{yesterdayHeadline}</p>
+        <div className="mt-4 rounded-2xl border border-[#E8D7C4] bg-[#FFF8EE] px-4 py-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-xs font-bold text-[#8B6F47]">어제보다 오늘</p>
+            <span className="rounded-full border border-[#E2D7D0] bg-white px-2 py-0.5 text-[10px] font-bold text-[#8B6F47]">
+              {hasRealYesterday ? "내 기록 기준" : "예시 흐름"}
+            </span>
+          </div>
+
+          {overallComparison ? (
+            <div className="mt-3 flex flex-wrap items-end gap-3">
+              <div className="flex items-end gap-2">
+                <p className="text-2xl font-bold leading-none text-[#A09488]">{overallComparison.previousOverall}</p>
+                <span className="pb-0.5 text-sm text-[#A09488]">→</span>
+                <p className="text-3xl font-bold leading-none text-[#2F282B]">{overall}</p>
+              </div>
+              <span
+                className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                  overallComparison.delta >= 0
+                    ? "bg-white text-[#8B6F47]"
+                    : "bg-white text-[#7A4A3D]"
+                }`}
+              >
+                {overallComparison.delta >= 0 ? "▲" : "▼"} {Math.abs(overallComparison.delta)}
+              </span>
+            </div>
+          ) : null}
+
+          <p className="mt-3 text-sm leading-relaxed text-[#4A403B]">{yesterdayHeadline}</p>
+
+          <div className="mt-3 flex flex-wrap gap-2">
+            {comparisons.map((item) => {
+              const isUp = item.delta >= 0;
+              return (
+                <span
+                  key={item.key}
+                  className="inline-flex items-center gap-1 rounded-full border border-[#E2D7D0] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#5A4E48]"
+                >
+                  {item.label}
+                  <span className={isUp ? "text-[#8B6F47]" : "text-[#7A4A3D]"}>
+                    {isUp ? "▲" : "▼"}
+                    {Math.abs(item.delta)}
+                  </span>
+                </span>
+              );
+            })}
+          </div>
+
+          {!hasRealYesterday && (
+            <p className="mt-3 text-[11px] leading-relaxed text-[#8A7E78]">
+              내일부터는 어제 기록과 실제 점수 변화를 비교할 수 있습니다.
+            </p>
+          )}
         </div>
 
         <div className="mt-3 flex gap-2">
           {threeDayTrend.map((item) => (
-            <div key={item.label} className="flex-1 rounded-xl border border-[#E2D7D0] bg-[#FFFDF9] px-2 py-2 text-center">
+            <div
+              key={item.label}
+              className={`flex-1 rounded-xl border px-2 py-2 text-center ${
+                item.label === "오늘" ? "border-[#C49A4A]/40 bg-[#FFF8EE]" : "border-[#E2D7D0] bg-[#FFFDF9]"
+              }`}
+            >
               <p className="text-[10px] text-[#8A7E78]">{item.label}</p>
               <p className="text-xs font-bold text-[#8B6F47]">{item.status}</p>
               <p className="text-[10px] text-[#A09488]">{item.score}</p>
+              {!item.isReal && item.label !== "오늘" && (
+                <p className="mt-0.5 text-[9px] text-[#C4B8AE]">예시</p>
+              )}
             </div>
           ))}
         </div>
@@ -192,14 +272,25 @@ export default function TodayFiveCardReport({ report, result, birthKey }: TodayF
 
       {compareOpen && (
         <div className="animate-fade-in space-y-2 rounded-[24px] border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4">
-          <p className="text-xs font-bold text-[#8B6F47]">어제와의 변화</p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-bold text-[#8B6F47]">어제와의 변화</p>
+            <span className="text-[10px] font-semibold text-[#8A7E78]">
+              {hasRealYesterday ? "저장된 기록 기준" : "첫 방문 예시"}
+            </span>
+          </div>
           {comparisons.map((item) => {
             const isUp = item.delta >= 0;
             return (
-              <div key={item.key} className="flex items-center justify-between rounded-xl border border-[#E2D7D0] bg-white px-3 py-2.5">
-                <p className="text-sm text-[#4A403B]">{item.label}</p>
-                <p className={`text-sm font-bold ${isUp ? "text-[#8B6F47]" : "text-[#7A4A3D]"}`}>
-                  {isUp ? "▲" : "▼"} {Math.abs(item.delta)} ({item.previousScore} → {item.score})
+              <div key={item.key} className="rounded-xl border border-[#E2D7D0] bg-white px-3 py-2.5">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-[#4A403B]">{item.label}</p>
+                  <p className={`text-sm font-bold ${isUp ? "text-[#8B6F47]" : "text-[#7A4A3D]"}`}>
+                    {isUp ? "▲" : "▼"} {Math.abs(item.delta)}
+                  </p>
+                </div>
+                <p className="mt-1 text-xs text-[#8A7E78]">
+                  {item.previousScore} → {item.score}
+                  {!item.isReal && " · 예시"}
                 </p>
               </div>
             );
@@ -209,6 +300,9 @@ export default function TodayFiveCardReport({ report, result, birthKey }: TodayF
 
       {/* 카드 1: 오늘의 한 줄 */}
       <CardShell title="CARD 01 · 오늘의 한 줄" className="border-[#E8D7C4] bg-[#FFFDF8]">
+        <p className="mt-3 inline-flex rounded-full bg-[#FFF8EE] px-2.5 py-1 text-[11px] font-bold text-[#8B6F47]">
+          오늘 기억할 말 · {report.saveSentence}
+        </p>
         <h2 className="mt-4 text-3xl leading-tight text-[#2F282B] sm:text-4xl" style={{ fontFamily: "Jua, sans-serif" }}>
           {report.sentence}
         </h2>

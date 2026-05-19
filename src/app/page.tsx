@@ -73,7 +73,6 @@ function buildLiveCards(
     eyebrow: "WEEKLY",
     text: `이번 주의 중심은 ${dailyContent.weekly.keyDay}에\n가장 또렷하게 놓여 있습니다`,
     trend: dailyContent.weekly.trend,
-    keyDay: dailyContent.weekly.keyDay,
     cta: "주간 보기",
     cardClass: "border-[#E2D7D0] bg-white",
     graphClass: "bg-[#C49A4A]",
@@ -239,22 +238,17 @@ export default function HomePage() {
             </h2>
             {card.trend && (
               <div className="mt-3">
-                {card.keyDay && (
-                  <p className="mb-2 inline-flex rounded-full bg-[#FFF8EE] px-2 py-1 text-[11px] font-bold text-[#8B6F47]">
-                    이번 주 중심: {card.keyDay}
-                  </p>
-                )}
-                <div className="flex h-12 items-end gap-1.5">
+                <div className="flex h-8 items-end gap-1.5">
                 {card.trend.map((value, index) => (
-                  <div key={index} className="relative flex flex-1 flex-col items-center gap-1">
+                  <div key={index} className="relative flex flex-1 flex-col items-center gap-0.5">
                     {index === todayIndex && (
-                      <span className="absolute -top-3 h-2 w-2 rounded-full bg-[#2F282B] ring-2 ring-[#F3E8D5]" />
+                      <span className="absolute -top-2.5 h-1.5 w-1.5 rounded-full bg-[#2F282B] ring-2 ring-[#F3E8D5]" />
                     )}
                     <div
                       className={`w-full rounded-t-full ${card.graphClass}`}
-                      style={{ height: `${Math.max(value / 2, 16)}px`, opacity: 0.45 + index * 0.06 }}
+                      style={{ height: `${Math.max(value / 3, 10)}px`, opacity: 0.45 + index * 0.06 }}
                     />
-                    <span className="text-[10px] text-[#A09488]">{"월화수목금토일"[index]}</span>
+                    <span className="text-[9px] text-[#A09488]">{"월화수목금토일"[index]}</span>
                   </div>
                 ))}
                 </div>
@@ -270,7 +264,9 @@ export default function HomePage() {
               </div>
             )}
             {"text" in card && card.text ? (
-              <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-[#4A403B]">{card.text}</p>
+              <p className={`mt-2 whitespace-pre-line leading-relaxed text-[#2F282B] ${card.trend ? "text-sm font-medium" : "text-sm text-[#4A403B]"}`}>
+                {card.text}
+              </p>
             ) : null}
             <p className="mt-3 text-xs font-bold text-[#8B6F47]">{card.cta} ›</p>
           </Link>
@@ -338,6 +334,14 @@ export default function HomePage() {
       <footer className="text-center py-10 text-sm text-[#A09488]">
         <p>운명비서는 재미와 참고용입니다.</p>
         <p className="mt-1">중요한 결정은 전문가와 상담하세요.</p>
+        <p className="mt-3">
+          <a
+            href="mailto:unmyeong.team@gmail.com?subject=운명비서 피드백"
+            className="text-[#8B6F47] underline-offset-2 transition hover:text-[#6F5435] hover:underline"
+          >
+            피드백 보내기 · unmyeong.team@gmail.com
+          </a>
+        </p>
         <p className="mt-3 text-xs">v1.1 · 2026.05 · 운명비서팀</p>
       </footer>
     </div>
