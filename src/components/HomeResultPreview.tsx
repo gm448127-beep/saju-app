@@ -60,14 +60,15 @@ interface HomeResultPreviewProps {
 
 export default function HomeResultPreview({ content }: HomeResultPreviewProps) {
   const scores = getPreviewScores(content.seedKey);
-  const statusLabel = `${getTodayStatus(scores.overall)}의 흐름`;
+  const statusLabel = getTodayStatus(scores.overall);
+  const areaRows = [{ label: "종합", score: scores.overall }, ...scores.areas];
 
   return (
     <section className="overflow-hidden rounded-[30px] border border-[#E2D7D0] bg-white p-4 shadow-[0_18px_48px_rgba(61,51,56,0.07)] sm:p-5">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">TODAY PREVIEW</p>
-          <h2 className="mt-1 text-2xl leading-tight text-[#2F282B] sm:text-3xl" style={{ fontFamily: "Jua, sans-serif" }}>
+          <h2 className="mt-1 text-xl leading-tight text-[#2F282B] sm:text-2xl" style={{ fontFamily: "Jua, sans-serif" }}>
             오늘의 흐름은 이렇게 읽힙니다
           </h2>
           <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-[#8A7E78]">
@@ -90,13 +91,11 @@ export default function HomeResultPreview({ content }: HomeResultPreviewProps) {
         >
           <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/40" />
           <div className="relative">
-            <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-[#8B6F47]">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-bold text-[#8B6F47]">
               <span className="rounded-full border border-[#E2D7D0] bg-white/70 px-2 py-0.5">오늘의 흐름</span>
-              <span>{formatTodayLabel()}</span>
+              <span className="whitespace-nowrap text-[#6B5E58]">{formatTodayLabel()}</span>
               <span className="text-[#A09488]">·</span>
-              <span>{statusLabel}</span>
-              <span className="text-[#A09488]">·</span>
-              <span className="font-normal text-[#8A7E78]">{scores.overall}</span>
+              <span className="whitespace-nowrap">{statusLabel}</span>
             </div>
 
             <div className="my-4 h-px bg-[#D9C8C0]/80" />
@@ -109,9 +108,9 @@ export default function HomeResultPreview({ content }: HomeResultPreviewProps) {
             <div className="relative mt-5 overflow-hidden rounded-2xl border border-[#E2D7D0] bg-white/80 px-4 py-4">
               <div className="pointer-events-none absolute inset-x-3 bottom-3 top-10 rounded-xl bg-white/25 backdrop-blur-[1px]" />
               <div className="relative space-y-2.5">
-                {scores.areas.map((area) => (
+                {areaRows.map((area) => (
                   <div key={area.label} className="grid grid-cols-[42px_34px_1fr] items-center gap-3">
-                    <p className="text-sm font-bold text-[#3D3338]">{area.label}</p>
+                    <p className={`text-sm font-bold ${area.label === "종합" ? "text-[#8B6F47]" : "text-[#3D3338]"}`}>{area.label}</p>
                     <p className="text-sm font-bold text-[#8B6F47]">{area.score}</p>
                     <ScoreBlocks score={area.score} />
                   </div>

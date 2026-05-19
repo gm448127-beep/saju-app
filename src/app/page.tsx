@@ -59,12 +59,6 @@ function buildLiveCards(
   dailyContent: ReturnType<typeof buildDailyFortuneContent>,
   historyStats: { todayCount: number; dayCount: number; sajuCount: number; tarotCount: number },
 ) {
-  const totalSaved = historyStats.todayCount + historyStats.sajuCount + historyStats.tarotCount;
-  const archiveText =
-    totalSaved > 0
-      ? `지금까지 ${historyStats.dayCount}일,\n기록 ${totalSaved}건이 쌓였습니다`
-      : "오늘의 리포트를 읽는 순간\n기록은 조용히 이어집니다";
-
   return [
   {
     title: "오늘의 한 줄",
@@ -88,10 +82,9 @@ function buildLiveCards(
   {
     title: "쌓인 흐름",
     eyebrow: "ARCHIVE",
-    text: archiveText,
     cta: "기록 보기",
     cardClass: "border-[#ECE3DC] bg-[#FFFDF9]",
-    stats: [`사주 리포트 ${historyStats.sajuCount}건`, `오늘의 흐름 ${historyStats.todayCount}건`],
+    stats: [`사주 ${historyStats.sajuCount}건`, `오늘 ${historyStats.todayCount}건`],
     href: "/history",
   },
   {
@@ -164,8 +157,8 @@ export default function HomePage() {
             <div className="absolute right-16 top-16 h-12 w-12 rounded-full" style={{ backgroundColor: `${selectedSlide.accent}22` }} />
           </div>
 
-          <div className="relative flex min-h-[160px] flex-col justify-between sm:min-h-[200px]">
-            <div className="flex items-center justify-between">
+          <div className="relative flex min-h-[160px] w-full min-w-0 flex-col justify-between sm:min-h-[200px]">
+            <div className="flex items-center justify-between sm:px-10">
               <span className="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-[#8B6F47] backdrop-blur">
                 DAILY REPORT {selectedSlide.badge}
               </span>
@@ -174,27 +167,28 @@ export default function HomePage() {
               </span>
             </div>
 
-            <div>
-              <h2 className="text-3xl leading-tight text-[#2F282B] sm:text-4xl" style={{ fontFamily: "Jua, sans-serif" }}>
+            <div className="relative w-full min-w-0 sm:px-10 sm:pr-32">
+              <h2 className="w-full text-[2rem] leading-tight text-[#2F282B] sm:text-5xl" style={{ fontFamily: "Jua, sans-serif" }}>
                 {selectedSlide.headline}
               </h2>
-              <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-[#6B5E58] sm:text-base">
+              <p className="mt-2 w-full whitespace-pre-line text-sm leading-relaxed text-[#6B5E58] sm:text-base">
                 {selectedSlide.subcopy}
               </p>
-              <div
-                className="absolute bottom-2 right-6 hidden h-24 w-24 items-center justify-center rounded-[28px] border border-white/70 bg-white/35 text-5xl text-[#8B6F47] shadow-inner sm:flex"
-                style={{ fontFamily: "'Noto Serif KR', serif" }}
-              >
-                {selectedSlide.motif}
-              </div>
               <Link
                 href={selectedSlide.href}
-                className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#2F282B] px-4 py-2.5 text-sm font-bold text-white shadow-[0_12px_28px_rgba(47,40,43,0.18)] transition hover:-translate-y-0.5"
+                className="relative z-10 mt-4 inline-flex items-center gap-2 rounded-full bg-[#2F282B] px-4 py-2.5 text-sm font-bold text-white shadow-[0_12px_28px_rgba(47,40,43,0.18)] transition hover:-translate-y-0.5"
               >
                 리포트 보기
                 <span className="text-lg leading-none">›</span>
               </Link>
             </div>
+          </div>
+
+          <div
+            className="pointer-events-none absolute -bottom-2 right-6 z-0 hidden h-32 w-32 items-center justify-center rounded-[34px] border border-white/55 bg-white/45 text-6xl font-semibold text-[#6F5435] shadow-[inset_0_2px_16px_rgba(255,255,255,0.45)] sm:flex"
+            style={{ fontFamily: "'Noto Serif KR', serif" }}
+          >
+            {selectedSlide.motif}
           </div>
 
           <button
@@ -275,7 +269,9 @@ export default function HomePage() {
                 ))}
               </div>
             )}
-            <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-[#4A403B]">{card.text}</p>
+            {"text" in card && card.text ? (
+              <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-[#4A403B]">{card.text}</p>
+            ) : null}
             <p className="mt-3 text-xs font-bold text-[#8B6F47]">{card.cta} ›</p>
           </Link>
         ))}
@@ -291,11 +287,11 @@ export default function HomePage() {
 
         <div className="relative px-6 py-8 sm:px-10 sm:py-10">
           <div className="max-w-2xl">
-            <h1 className="text-3xl leading-tight text-[#2F282B] sm:text-5xl" style={{ fontFamily: "Jua, sans-serif" }}>
+            <h2 className="text-2xl leading-tight text-[#2F282B] sm:text-3xl lg:text-4xl" style={{ fontFamily: "Jua, sans-serif" }}>
               오늘의 흐름을
               <br />
               먼저 정리해두었습니다
-            </h1>
+            </h2>
             <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-[#4A403B] sm:mt-4 sm:text-base">
               {"사주와 오늘의 해석, 상담까지\n매일 다시 찾게 되는 흐름을 모았습니다"}
             </p>
