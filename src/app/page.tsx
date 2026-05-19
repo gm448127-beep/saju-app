@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import HomeResultPreview from "@/components/HomeResultPreview";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
 import { getSajuHistory, getTarotFavorites } from "@/lib/archive-storage";
+import { buildHomeWeeklyCard } from "@/lib/today-pattern-helpers";
 import { getUnifiedArchiveStats, getTodayHistory } from "@/lib/today-report-helpers";
 
 const FEATURE_SLIDES = [
@@ -58,6 +59,7 @@ const FEATURE_SLIDES = [
 function buildLiveCards(
   dailyContent: ReturnType<typeof buildDailyFortuneContent>,
   historyStats: { todayCount: number; dayCount: number; sajuCount: number; tarotCount: number },
+  weeklyCard: ReturnType<typeof buildHomeWeeklyCard>,
 ) {
   return [
   {
@@ -71,12 +73,13 @@ function buildLiveCards(
   {
     title: "이번 주의 흐름",
     eyebrow: "WEEKLY",
-    text: `이번 주의 중심은 ${dailyContent.weekly.keyDay}에\n가장 또렷하게 놓여 있습니다`,
-    trend: dailyContent.weekly.trend,
+    text: weeklyCard.text,
+    trend: weeklyCard.trend,
+    highlightIndex: weeklyCard.highlightIndex,
     cta: "주간 보기",
     cardClass: "border-[#E2D7D0] bg-white",
     graphClass: "bg-[#C49A4A]",
-    href: "/today",
+    href: weeklyCard.href,
   },
   {
     title: "나의 패턴",
@@ -106,15 +109,34 @@ const DIFFERENCE_POINTS = [
 export default function HomePage() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [historyRecords, setHistoryRecords] = useState<ReturnType<typeof getTodayHistory>>([]);
   const [historyStats, setHistoryStats] = useState({ todayCount: 0, dayCount: 0, sajuCount: 0, tarotCount: 0, totalCount: 0 });
   const selectedSlide = FEATURE_SLIDES[activeSlide];
-  const todayIndex = (new Date().getDay() + 6) % 7;
   const dailyContent = buildDailyFortuneContent();
-  const liveCards = buildLiveCards(dailyContent, historyStats);
+
+  const weeklyCard = useMemo(
+    () =>
+      buildHomeWeeklyCard(historyRecords, {
+        toneLabel: dailyContent.toneLabel,
+        overall: dailyContent.axisScores
+          ? Math.round(
+              dailyContent.axisScores.relation * 0.3 +
+                dailyContent.axisScores.decision * 0.3 +
+                dailyContent.axisScores.emotion * 0.2 +
+                dailyContent.axisScores.balance * 0.2,
+            )
+          : 75,
+      }),
+    [historyRecords, dailyContent],
+  );
+
+  const liveCards = buildLiveCards(dailyContent, historyStats, weeklyCard);
 
   useEffect(() => {
+    const records = getTodayHistory();
+    setHistoryRecords(records);
     setHistoryStats(
-      getUnifiedArchiveStats(getTodayHistory(), getSajuHistory().length, getTarotFavorites().length),
+      getUnifiedArchiveStats(records, getSajuHistory().length, getTarotFavorites().length),
     );
   }, []);
 
@@ -241,7 +263,7 @@ export default function HomePage() {
                 <div className="flex h-8 items-end gap-1.5">
                 {card.trend.map((value, index) => (
                   <div key={index} className="relative flex flex-1 flex-col items-center gap-0.5">
-                    {index === todayIndex && (
+                    {index === ("highlightIndex" in card ? card.highlightIndex : undefined) && (
                       <span className="absolute -top-2.5 h-1.5 w-1.5 rounded-full bg-[#2F282B] ring-2 ring-[#F3E8D5]" />
                     )}
                     <div

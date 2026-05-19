@@ -1,5 +1,6 @@
 import {
   HISTORY_PAGE_EMPTY_COPY,
+  HOME_WEEKLY_COPY,
   WEEK_INSIGHT_COPY,
   type HistoryFilter,
 } from "@/lib/history-copy";
@@ -253,6 +254,88 @@ export function filterTodayRecords(
   }
 
   return list;
+}
+
+const WEEKDAY_FULL = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"] as const;
+
+/** 월요일=0 기준 오늘 요일 인덱스 */
+export function getMondayBasedDayIndex(date = new Date()) {
+  return (date.getDay() + 6) % 7;
+}
+
+export type HomeWeeklyCard = {
+  trend: number[];
+  highlightIndex: number;
+  text: string;
+  href: string;
+};
+
+/** 홈 WEEKLY 카드 — 기록 우선, 없으면 오늘 요일·결 */
+export function buildHomeWeeklyCard(
+  records: SavedTodayRecord[],
+  today: { toneLabel: string; overall: number },
+  date = new Date(),
+): HomeWeeklyCard {
+  const todayIndex = getMondayBasedDayIndex(date);
+  const todayDay = WEEKDAY_FULL[todayIndex];
+  const last7 = buildLast7DaysFlow(records);
+  const recordCount = dedupeRecordsByDate(records).length;
+
+  const softTrend = last7.map((day, index) => {
+    if (day.hasRecord) return day.overall;
+    const soft = 38 + (index % 4) * 4;
+    return index === todayIndex ? Math.max(soft, today.overall) : soft;
+  });
+
+  if (recordCount === 0) {
+    const trend = softTrend.map((value, index) =>
+      index === todayIndex ? Math.max(value, today.overall, 70) : value,
+    );
+    return {
+      trend,
+      highlightIndex: todayIndex,
+      text: HOME_WEEKLY_COPY.todayFocus(todayDay, today.toneLabel),
+      href: "/today",
+    };
+  }
+
+  if (recordCount < 3) {
+    return {
+      trend: softTrend,
+      highlightIndex: todayIndex,
+      text: HOME_WEEKLY_COPY.warmup(todayDay, today.toneLabel, 3 - recordCount),
+      href: "/today",
+    };
+  }
+
+  let keyIndex = todayIndex;
+  let bestScore = -1;
+  let bestDateKey = "";
+  last7.forEach((day, index) => {
+    if (!day.hasRecord) return;
+    if (day.overall > bestScore || (day.overall === bestScore && day.dateKey > bestDateKey)) {
+      bestScore = day.overall;
+      bestDateKey = day.dateKey;
+      keyIndex = index;
+    }
+  });
+
+  const trend = last7.map((day) => (day.hasRecord ? day.overall : 34));
+
+  let text = buildWeekInsight(records);
+  if (keyIndex === todayIndex) {
+    const toneLabel = last7[todayIndex]?.hasRecord ? last7[todayIndex].toneLabel : today.toneLabel;
+    text = HOME_WEEKLY_COPY.todayIsCenter(todayDay, toneLabel);
+  } else if (text === WEEK_INSIGHT_COPY.warmup || text === WEEK_INSIGHT_COPY.oneDay) {
+    text = HOME_WEEKLY_COPY.keyDayCenter(WEEKDAY_FULL[keyIndex]);
+  }
+
+  return {
+    trend,
+    highlightIndex: keyIndex,
+    text,
+    href: "/history",
+  };
 }
 
 export function getPatternEmptyState(records: SavedTodayRecord[]) {

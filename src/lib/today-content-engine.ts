@@ -46,15 +46,17 @@ export type DailyFortuneContent = {
   };
 };
 
-function buildWeekly(seed: number) {
+function buildWeekly(date: Date, toneLabel: string, overall: number) {
   const dayNames = ["월요일", "화요일", "수요일", "목요일", "금요일", "토요일", "일요일"];
-  const trend = Array.from({ length: 7 }, (_, index) => 46 + ((seed + index * 13) % 39));
-  const keyIndex = trend.reduce((bestIndex, value, index) => (value > trend[bestIndex] ? index : bestIndex), 0);
+  const todayIndex = (date.getDay() + 6) % 7;
+  const trend = Array.from({ length: 7 }, (_, index) =>
+    index === todayIndex ? overall : 40 + ((index * 7) % 18),
+  );
 
   return {
     trend,
-    keyDay: dayNames[keyIndex],
-    summary: `이번 주의 중심은 ${dayNames[keyIndex]}에 가장 또렷하게 놓여 있습니다.`,
+    keyDay: dayNames[todayIndex],
+    summary: `오늘은 ${dayNames[todayIndex]} · ${toneLabel}의 흐름이 가장 또렷합니다.`,
   };
 }
 
@@ -126,7 +128,7 @@ export function buildDailyFortuneContent(
       { label: "저녁", keyword: timeKeywords.evening, description: toneReport.timeFlow.evening },
       { label: "밤", keyword: timeKeywords.night, description: toneReport.timeFlow.night },
     ],
-    weekly: buildWeekly(seed),
+    weekly: buildWeekly(date, toneReport.toneLabel, toneReport.scores.total),
     recommendation: buildRecommendation(date, seed),
   };
 }

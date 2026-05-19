@@ -47,6 +47,22 @@ export const HISTORY_FILTER_OPTIONS: { value: HistoryFilter; label: string }[] =
   { value: "rising", label: "상승한 날만" },
 ];
 
+/** 홈 WEEKLY 카드 */
+export const HOME_WEEKLY_COPY = {
+  todayFocus(todayDay: string, toneLabel: string) {
+    return `오늘은 ${todayDay} · ${toneLabel}의\n흐름이 가장 또렷합니다`;
+  },
+  warmup(todayDay: string, toneLabel: string, daysLeft: number) {
+    return `오늘은 ${todayDay} · ${toneLabel}입니다.\n${daysLeft}일만 더 읽으면 주간 패턴이 보입니다`;
+  },
+  todayIsCenter(todayDay: string, toneLabel: string) {
+    return `오늘 ${todayDay} · ${toneLabel}의 결이\n이번 주의 중심에 놓여 있습니다`;
+  },
+  keyDayCenter(keyDay: string) {
+    return `이번 주의 중심은 ${keyDay}에\n가장 또렷하게 놓여 있습니다`;
+  },
+} as const;
+
 /** §2 PATTERN REPORT */
 export const PATTERN_REPORT_COPY = {
   sectionLabel: "PATTERN REPORT",
