@@ -6,6 +6,7 @@ import { matchCharacter } from "@/data/matchCharacter";
 import { HOURLY_FLOW_INTRO, SCORE_LABEL_DESC, SIJIN_META } from "@/data/sijinDict";
 import { SIPSIN_DICT } from "@/data/wisdomDict";
 import { buildSajuTriggers, triggersToLegacyLines } from "@/lib/saju-triggers";
+import { buildDailyFortuneContent } from "@/lib/today-content-engine";
 
 /* ─── 상수 정의 ─── */
 const CHEONGAN = ["갑","을","병","정","무","기","경","신","임","계"] as const;
@@ -1182,6 +1183,11 @@ export async function POST(request: NextRequest) {
       sajuTriggers,
       gearAnalysis,
     });
+    const dailyReport = buildDailyFortuneContent(today, {
+      sipsin: todaySipsin,
+      element: myDayOh,
+      scores,
+    });
 
     const response = {
       date: dateStr,
@@ -1224,6 +1230,7 @@ export async function POST(request: NextRequest) {
       todayDosDetailed: actionGuides.dos,
       todayDontsDetailed: actionGuides.donts,
       todayQuote: QUOTES[todaySipsin],
+      dailyReport,
       briefing,
       domainScores,
       detailedFortunes,

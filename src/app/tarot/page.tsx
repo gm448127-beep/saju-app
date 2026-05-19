@@ -1,6 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  buildTarotFavoriteId,
+  deleteTarotFavorite,
+  extractTarotExcerpt,
+  hasTarotFavorite,
+  saveTarotFavorite,
+} from '@/lib/archive-storage';
 
 interface TarotCard {
   name: string;
@@ -9,6 +16,7 @@ interface TarotCard {
   position: string;
   meaning: string;
   advice: string;
+  image?: string;
   suit?: string;
   rank?: string;
 }
@@ -40,18 +48,29 @@ const CARD_VISUALS: Record<string, { symbol: string; motif: string; tone: string
 
 const TOPICS = ['일반', '연애', '재물', '직업', '관계', '선택'];
 
+const TIME_HORIZONS = ['지금', '3개월 후', '1년 후', '2년 후'] as const;
+
 const QUESTION_GUIDE = [
   '예/아니오보다 “어떤 태도가 좋을까요?”처럼 물어보면 더 선명합니다.',
   '상대의 마음을 단정하기보다 “이 관계에서 내가 볼 점은?”처럼 물어보세요.',
-  '기간을 넣으면 좋습니다. 예: 이번 달, 지금 단계, 앞으로 3개월.',
+  '기간을 넣으면 좋습니다. 예: 이번 달, 3개월 후, 1년 후, 2년 후의 모습.',
+  '미래 질문은 “수호신이 비추는 가능한 풍경”처럼 열어두고 물어보면 리딩이 깊어집니다.',
 ];
 
 const SAMPLE_QUESTIONS = [
   '지금 이 선택을 해도 괜찮을까요?',
+  '3개월 후 이 일은 어떤 흐름일까요?',
+  '1년 후의 나는 어떤 모습에 가까울까요?',
+  '2년 후 당신의 모습, 카드가 보여주는 방향은?',
   '그 사람과의 관계 흐름이 궁금합니다.',
-  '지금 하는 일을 계속 밀고 가도 될까요?',
-  '돈 문제에서 조심해야 할 점이 있을까요?',
 ];
+
+function getHorizonFromQuestion(text: string): (typeof TIME_HORIZONS)[number] {
+  if (text.includes('2년 후')) return '2년 후';
+  if (text.includes('1년 후')) return '1년 후';
+  if (text.includes('3개월 후')) return '3개월 후';
+  return '지금';
+}
 
 const SUIT_ART = {
   완드: { icon: '✦', line: 'bg-[#B89968]', mark: 'WANDS' },
@@ -112,11 +131,13 @@ function getRankLabel(rank?: string) {
 }
 
 function TarotCardArtwork({ card }: { card: TarotCard }) {
+  const [imageFailed, setImageFailed] = useState(false);
   const visual = getCardVisual(card.name);
   const suitArt = card.suit ? SUIT_ART[card.suit as keyof typeof SUIT_ART] : null;
   const rankLabel = getRankLabel(card.rank);
   const isCourt = ['페이지', '나이트', '퀸', '킹'].includes(card.rank ?? '');
   const numericCount = card.rank && /^\d+$/.test(card.rank) ? Number(card.rank) : card.rank === '에이스' ? 1 : 0;
+  const shouldShowImage = Boolean(card.image && !imageFailed);
 
   return (
     <div className={`relative mt-3 min-h-[310px] overflow-hidden rounded-[24px] border border-[#D9C8C0] bg-gradient-to-br ${visual.tone} px-4 py-5 text-center shadow-[0_16px_34px_rgba(61,51,56,0.10)]`}>
@@ -125,6 +146,23 @@ function TarotCardArtwork({ card }: { card: TarotCard }) {
       <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/35" />
       <div className="absolute -bottom-12 left-1/2 h-36 w-36 -translate-x-1/2 rounded-full border border-white/75" />
 
+      {shouldShowImage ? (
+        <div className="relative min-h-[270px] overflow-hidden rounded-[18px] border border-white/80 bg-white/30">
+          <img
+            src={card.image}
+            alt={`${card.name} 타로 카드 이미지`}
+            className={`${card.isReversed ? 'rotate-180' : ''} h-[270px] w-full object-cover transition-transform`}
+            draggable={false}
+            onError={() => setImageFailed(true)}
+          />
+          <div className="pointer-events-none absolute inset-2 rounded-[14px] border border-white/70" />
+          {card.isReversed && (
+            <p className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-white/80 px-2 py-1 text-[10px] font-bold text-[#8B6F47]">
+              역방향
+            </p>
+          )}
+        </div>
+      ) : (
       <div className="relative flex min-h-[270px] flex-col justify-between">
         <div className="flex items-center justify-between text-[#8B6F47]">
           <div className="text-left">
@@ -183,17 +221,51 @@ function TarotCardArtwork({ card }: { card: TarotCard }) {
           )}
         </div>
       </div>
+      )}
     </div>
   );
 }
 
 export default function TarotPage() {
   const [topic, setTopic] = useState('일반');
+  const [timeHorizon, setTimeHorizon] = useState<(typeof TIME_HORIZONS)[number]>('지금');
   const [question, setQuestion] = useState('');
   const [cards, setCards] = useState<TarotCard[]>([]);
   const [reading, setReading] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  const favoriteId = useMemo(() => {
+    if (!reading || cards.length === 0) return '';
+    return buildTarotFavoriteId(question.trim(), timeHorizon, cards.map((card) => card.name));
+  }, [reading, cards, question, timeHorizon]);
+
+  useEffect(() => {
+    if (!favoriteId) {
+      setIsFavorite(false);
+      return;
+    }
+    setIsFavorite(hasTarotFavorite(favoriteId));
+  }, [favoriteId]);
+
+  const toggleFavorite = () => {
+    if (!favoriteId || !reading) return;
+    if (isFavorite) {
+      deleteTarotFavorite(favoriteId);
+      setIsFavorite(false);
+      return;
+    }
+    saveTarotFavorite({
+      savedAt: new Date().toISOString(),
+      id: favoriteId,
+      question: question.trim(),
+      timeHorizon,
+      cardNames: cards.map((card) => card.name),
+      excerpt: extractTarotExcerpt(reading),
+    });
+    setIsFavorite(true);
+  };
 
   const handleSubmit = async () => {
     const trimmedQuestion = question.trim();
@@ -211,7 +283,7 @@ export default function TarotPage() {
       const response = await fetch('/api/tarot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: trimmedQuestion, topic }),
+        body: JSON.stringify({ question: trimmedQuestion, topic, timeHorizon }),
       });
       const data = await response.json();
 
@@ -245,7 +317,7 @@ export default function TarotPage() {
             세 장의 카드로 정리해드릴게요
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#4A403B]">
-            78장 전체 덱으로 현재 상황과 다음 행동을 정리합니다. 타로를 무서운 예언이 아니라 선택 기준을 세우는 상징 리포트로 풀어드립니다.
+            78장 전체 덱으로 현재와 미래의 흐름을 정리합니다. 3개월·1년·2년 후의 모습도 카드가 비추는 가능한 풍경으로 풀어드립니다.
           </p>
         </div>
       </section>
@@ -272,6 +344,31 @@ export default function TarotPage() {
                 {item}
               </button>
             ))}
+          </div>
+
+          <div className="mb-4">
+            <p className="mb-2 text-xs font-bold text-[#8B6F47]">시간축</p>
+            <div className="flex flex-wrap gap-2">
+              {TIME_HORIZONS.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => setTimeHorizon(item)}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-bold transition ${
+                    timeHorizon === item
+                      ? 'border-[#C49A4A] bg-[#FFF8EE] text-[#8B6F47]'
+                      : 'border-[#D9C8C0] bg-white text-[#5A4E48] hover:bg-[#FAF8F5]'
+                  }`}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+            {timeHorizon !== '지금' && (
+              <p className="mt-2 text-xs leading-relaxed text-[#6B5E58]">
+                {timeHorizon}를 선택하면 카드 위치가 미래 예언 스프레드로 바뀌고, 수호신이 비추는 풍경처럼 서사적으로 풀어드립니다.
+              </p>
+            )}
           </div>
 
           <textarea
@@ -303,7 +400,9 @@ export default function TarotPage() {
               ))}
             </div>
             <p className="mt-3 text-xs leading-relaxed text-[#6B5E58]">
-              버튼을 누르면 전체 78장 중 세 장이 섞여 뽑히고, 현재 상황 · 다가오는 흐름 · 조언으로 펼쳐집니다.
+              {timeHorizon === '지금'
+                ? '버튼을 누르면 전체 78장 중 세 장이 섞여 뽑히고, 현재 상황 · 다가오는 흐름 · 조언으로 펼쳐집니다.'
+                : `버튼을 누르면 ${timeHorizon} 예언 스프레드로 세 장이 펼쳐집니다.`}
             </p>
           </div>
 
@@ -341,7 +440,10 @@ export default function TarotPage() {
               <button
                 key={sample}
                 type="button"
-                onClick={() => setQuestion(sample)}
+                onClick={() => {
+                  setQuestion(sample);
+                  setTimeHorizon(getHorizonFromQuestion(sample));
+                }}
                 className="w-full rounded-2xl border border-[#E2D7D0] bg-white px-3 py-2.5 text-left text-sm text-[#3D3338] transition hover:bg-[#FFFDF9]"
               >
                 {sample}
@@ -356,9 +458,16 @@ export default function TarotPage() {
 
       {cards.length > 0 && (
         <section className="card animate-fade-in">
-          <div className="mb-4">
-            <p className="text-xs tracking-[0.12em] text-[#8B6F47]">THREE CARD SPREAD</p>
-            <h2 className="label mt-1">뽑힌 카드</h2>
+          <div className="mb-4 flex flex-wrap items-center gap-2">
+            <div>
+              <p className="text-xs tracking-[0.12em] text-[#8B6F47]">THREE CARD SPREAD</p>
+              <h2 className="label mt-1">뽑힌 카드</h2>
+            </div>
+            {timeHorizon !== '지금' && (
+              <span className="rounded-full border border-[#C49A4A]/30 bg-[#FFF8EE] px-2.5 py-1 text-[10px] font-bold text-[#8B6F47]">
+                {timeHorizon} 예언
+              </span>
+            )}
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             {cards.map((card) => {
@@ -377,9 +486,22 @@ export default function TarotPage() {
 
       {reading && (
         <section className="card animate-fade-in">
-          <div className="mb-4">
-            <p className="text-xs tracking-[0.12em] text-[#8B6F47]">TAROT INTERPRETATION</p>
-            <h2 className="label mt-1">운명비서 타로 리딩</h2>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-xs tracking-[0.12em] text-[#8B6F47]">TAROT INTERPRETATION</p>
+              <h2 className="label mt-1">운명비서 타로 리딩</h2>
+            </div>
+            <button
+              type="button"
+              onClick={toggleFavorite}
+              className={`rounded-full border px-3 py-1.5 text-xs font-bold transition ${
+                isFavorite
+                  ? 'border-[#C49A4A] bg-[#FFF8EE] text-[#8B6F47]'
+                  : 'border-[#E2D7D0] bg-white text-[#6B5E58] hover:bg-[#FFFDF9]'
+              }`}
+            >
+              {isFavorite ? '즐겨찾기 해제' : '즐겨찾기 저장'}
+            </button>
           </div>
           <div className="rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4">
             {renderContent(reading)}

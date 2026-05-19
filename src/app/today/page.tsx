@@ -6,9 +6,11 @@ import PdfButton from "@/components/PdfButton";
 import BirthDateNumberInputs, { isValidBirthDate } from "@/components/BirthDateNumberInputs";
 import HourlyFlowSection from "@/components/HourlyFlowSection";
 import SajuTriggerSection from "@/components/SajuTriggerSection";
-import TodayStatsSection from "@/components/TodayStatsSection";
+import TodayStatsSection, { type TodayStatItem } from "@/components/TodayStatsSection";
 import TimeAdviceSection from "@/components/TimeAdviceSection";
 import TodayActionGuideSection from "@/components/TodayActionGuideSection";
+import TodayFiveCardReport from "@/components/TodayFiveCardReport";
+import type { DailyFortuneContent } from "@/lib/today-content-engine";
 
 
 const TIME_SLOTS = [
@@ -31,6 +33,12 @@ const TAB_ITEMS = [
   { key: "detail", label: "상세" },
   { key: "myeongsik", label: "명식" },
 ] as const;
+
+const SAMPLE_GAUGES = [
+  { label: "관계", score: 78 },
+  { label: "결정", score: 70 },
+  { label: "감정 안정", score: 65 },
+];
 
 type TodayTab = (typeof TAB_ITEMS)[number]["key"];
 
@@ -296,7 +304,7 @@ export default function TodayPage() {
     }
   };
 
-  const statItems = result
+  const statItems: Omit<TodayStatItem, "score">[] = result
     ? [
         { label: "재물운", key: "wealth", color: "#8B6F47", emoji: "" },
         { label: "애정운", key: "love", color: "#8B6F47", emoji: "" },
@@ -309,14 +317,52 @@ export default function TodayPage() {
   return (
     <div className="space-y-6">
       <div className="rounded-[24px] border border-[#E2D7D0] bg-white px-5 py-5 shadow-[0_10px_30px_rgba(61,51,56,0.05)]">
-        <p className="text-xs tracking-[0.08em] text-[#B8A78D] mb-2">매일 보는 운명 리포트</p>
+        <p className="text-xs tracking-[0.08em] text-[#B8A78D] mb-2">TODAY REPORT</p>
         <h1 style={{ fontFamily: "Jua, sans-serif" }} className="text-2xl text-[#2F282B]">
-          오늘의 운세
+          오늘의 흐름
         </h1>
         <p className="text-[#8A7E78] text-sm mt-1">
-          생년월일시를 입력하면 오늘의 흐름과 실천 포인트를 정리합니다.
+          생년월일을 입력하면 오늘의 해석을 5장의 리포트로 정리합니다.
         </p>
       </div>
+
+      {!result && (
+        <section className="relative overflow-hidden rounded-[28px] border border-[#E2D7D0] bg-white px-5 py-6 shadow-[0_14px_38px_rgba(61,51,56,0.06)]">
+          <div className="absolute -right-12 -top-16 h-40 w-40 rounded-full bg-[#F1E7DE]" />
+          <div className="absolute -bottom-16 left-8 h-36 w-36 rounded-full bg-[#FAF8F5]" />
+          <div className="relative">
+            <p className="mb-2 text-xs font-bold tracking-[0.14em] text-[#8B6F47]">TODAY PREVIEW</p>
+            <h2 className="text-2xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
+              오늘의 흐름은 이렇게 읽힙니다
+            </h2>
+            <div className="relative mt-4 overflow-hidden rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4">
+              <div className="pointer-events-none absolute inset-x-4 bottom-4 top-16 rounded-2xl bg-white/35 backdrop-blur-[1.5px]" />
+              <div className="relative">
+                <p className="text-lg leading-relaxed text-[#3D3338]" style={{ fontFamily: "Jua, sans-serif" }}>
+                  결정은 오후가 유리하고, 말 한마디가 운을 좌우합니다.
+                </p>
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  {SAMPLE_GAUGES.map((item) => (
+                    <div key={item.label} className="rounded-xl border border-[#E2D7D0] bg-white/85 px-3 py-3">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className="text-[11px] font-semibold text-[#6B5E58]">{item.label}</p>
+                        <p className="text-xs font-bold text-[#8B6F47]">{item.score}</p>
+                      </div>
+                      <div className="mt-2 h-2 rounded-full bg-[#EDE4DC]">
+                        <div className="h-full rounded-full bg-[#8B6F47]" style={{ width: `${item.score}%` }} />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-3 text-[11px] text-[#8A7E78]">입력 후 내 사주 기준으로 다시 읽힙니다</p>
+              </div>
+            </div>
+            <p className="mt-4 rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3 text-sm leading-relaxed text-[#5A4E48]">
+              생년월일을 입력하면 내 사주 기준 5카드 리포트가 열립니다.
+            </p>
+          </div>
+        </section>
+      )}
 
       {/* ────────── 입력 폼 (사주보기와 동일 구조) ────────── */}
       <div className="card">
@@ -441,7 +487,7 @@ export default function TodayPage() {
                 </svg>
                 분석 중...
               </span>
-            ) : "오늘의 운세 보기"}
+            ) : "오늘의 흐름 읽기"}
           </button>
         </form>
       </div>
@@ -459,9 +505,9 @@ export default function TodayPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" data-pdf-ignore>
             <div>
               <p className="text-xs tracking-[0.12em] text-[#B8A78D]">TODAY REPORT</p>
-              <p className="text-sm text-[#5A4E48]">전문 비서형 오늘의 운세 리포트</p>
+              <p className="text-sm text-[#5A4E48]">5카드 리포트 · 점수와 흐름을 함께 읽습니다</p>
             </div>
-            <div className="flex w-full flex-nowrap gap-1 sm:w-auto sm:min-w-[340px] sm:gap-2">
+            <div id="today-share-actions" className="flex w-full flex-nowrap gap-1 sm:w-auto sm:min-w-[340px] sm:gap-2">
               <PdfButton targetRef={resultRef} fileName="today-fortune" />
               <ShareButton targetRef={resultRef} fileName="today-fortune" />
             </div>
@@ -486,15 +532,18 @@ export default function TodayPage() {
             </div>
           </div>
 
-          {activeTab === "summary" && (
-            <div className="space-y-6">
-              <TodayBriefingReport result={result} />
-              <DomainScoreSummary domains={result.domainScores} />
-            </div>
+          {activeTab === "summary" && result.dailyReport && (
+            <TodayFiveCardReport
+              report={result.dailyReport as DailyFortuneContent}
+              result={result}
+              birthKey={`${year}-${month}-${day}-${gender}`}
+            />
           )}
 
           {activeTab === "detail" && (
             <div className="space-y-6">
+              <TodayBriefingReport result={result} />
+              <DomainScoreSummary domains={result.domainScores} />
               <TodayStatsSection
                 overall={result.scores.overall}
                 items={statItems.map((item) => ({

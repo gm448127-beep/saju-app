@@ -1,9 +1,10 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ShareButton from "@/components/ShareButton";
 import BirthDateNumberInputs, { isValidBirthDate } from "@/components/BirthDateNumberInputs";
 import OhaengChart from "@/components/OhaengChart";
+import { buildSajuBirthKey, saveSajuRecord } from "@/lib/archive-storage";
 import { matchCharacter, findStrongestSipsin } from "@/data/matchCharacter";
 import { Character } from "@/data/characters";
 import { CHEONGAN_DICT, GYEOK_DICT, STRENGTH_DICT, GONGMANG_DICT, GILSIN_DICT, HYUNGSIN_DICT, OHAENG_DICT } from "@/data/wisdomDict";
@@ -223,6 +224,20 @@ export default function SajuPage() {
       setError(err instanceof Error ? err.message : "오류가 발생했습니다.");
     } finally { setLoading(false); }
   }
+
+  useEffect(() => {
+    if (!result) return;
+    saveSajuRecord({
+      savedAt: new Date().toISOString(),
+      birthKey: buildSajuBirthKey(name, year, month, day, gender),
+      name: name || "이름 없음",
+      birthDate: result.birthDate,
+      dayGan: result.dayGan,
+      gyeok: result.gyeok,
+      mainElement: result.mainElement,
+      summary: result.summary?.slice(0, 160) || result.personality?.slice(0, 160) || "사주 리포트",
+    });
+  }, [result, name, year, month, day, gender]);
 
   function ohaengColor(name: string) {
     const map: Record<string, string> = { "목(木)": "#22c55e", "화(火)": "#ef4444", "토(土)": "#eab308", "금(金)": "#a3a3a3", "수(水)": "#3b82f6" };

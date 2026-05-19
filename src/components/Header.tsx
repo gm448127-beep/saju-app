@@ -16,6 +16,7 @@ const NAV_ITEMS = [
 export default function Header() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const isHistoryActive = pathname === "/history";
 
   return (
     <header className="sticky top-0 z-50" style={{
@@ -24,7 +25,7 @@ export default function Header() {
       WebkitBackdropFilter: 'blur(20px)',
       borderBottom: '1px solid rgba(217, 200, 192, 0.55)'
     }}>
-      <div className="max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
+      <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         <Link href="/" className="group flex items-center gap-2.5">
           <span className="relative flex h-9 w-9 items-center justify-center rounded-2xl bg-[#2F282B] text-lg font-bold text-[#F4E7D6] shadow-[0_8px_18px_rgba(47,40,43,0.18)] transition-all group-hover:-translate-y-0.5 group-hover:bg-[#8B6F47]">
             <span className="absolute inset-1 rounded-[14px] border border-[#F4E7D6]/25" />
@@ -53,7 +54,7 @@ export default function Header() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-3 py-1.5 rounded-full text-sm transition-all ${
+                className={`px-2.5 py-1.5 rounded-full text-xs transition-all lg:px-3 lg:text-sm ${
                   isActive
                     ? "bg-white shadow-sm font-bold"
                     : "text-[#8A7E78] hover:bg-[#F8F3EE]"
@@ -70,21 +71,39 @@ export default function Header() {
           })}
         </nav>
 
-        {/* 모바일 햄버거 */}
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden text-[#8A7E78] hover:text-[#3D3338] p-2"
-        >
-          {menuOpen ? (
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M18 6L6 18M6 6l12 12" />
+        <div className="flex items-center gap-1.5">
+          <Link
+            href="/history"
+            aria-label="내 기록 보관함"
+            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-xs font-bold transition-all ${
+              isHistoryActive
+                ? "border-[#2F282B] bg-[#2F282B] text-[#F4E7D6]"
+                : "border-[#D9C8C0] bg-[#FAF8F5] text-[#3D3338] hover:border-[#8B6F47] hover:text-[#8B6F47]"
+            }`}
+          >
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M5 5.5A2.5 2.5 0 0 1 7.5 3h9A2.5 2.5 0 0 1 19 5.5v15l-7-3-7 3v-15Z" />
+              <path d="M8.5 8h7M8.5 12h5" />
             </svg>
-          ) : (
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M3 12h18M3 6h18M3 18h18" />
-            </svg>
-          )}
-        </button>
+            <span className="hidden lg:inline">내 기록</span>
+          </Link>
+
+          {/* 모바일 햄버거 */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden text-[#8A7E78] hover:text-[#3D3338] p-2"
+          >
+            {menuOpen ? (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M3 12h18M3 6h18M3 18h18" />
+              </svg>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* 모바일 메뉴 */}
