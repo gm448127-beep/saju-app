@@ -158,7 +158,7 @@ export default function HomeResultPreview({ content }: HomeResultPreviewProps) {
           <div className="mt-4 rounded-2xl border border-[#E2D7D0] bg-[#FFFDF9] px-4 py-3">
             <p className="text-xs font-bold text-[#8B6F47]">감정의 중심</p>
             <p className="mt-1 text-base text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-              {content.emotionPoint.title}
+              오늘의 결 · {content.toneLabel}
             </p>
             <p className="mt-1 text-xs leading-relaxed text-[#5A4E48]">{content.emotionPoint.description}</p>
           </div>

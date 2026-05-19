@@ -66,6 +66,17 @@ function buildOverallFromAxis(report: DailyFortuneContent) {
   );
 }
 
+function splitFlowText(flow: string) {
+  const sentences = flow.match(/[^.!?]+[.!?]+/g)?.map((part) => part.trim()) ?? [flow.trim()];
+  if (sentences.length <= 1) {
+    return { headline: flow.trim(), body: "" };
+  }
+  return {
+    headline: sentences[0],
+    body: sentences.slice(1).join(" "),
+  };
+}
+
 export default function TodayFiveCardReport({
   report,
   mode = "personalized",
@@ -118,7 +129,8 @@ export default function TodayFiveCardReport({
   const [compareOpen, setCompareOpen] = useState(hasRealYesterday);
   const [activeSlot, setActiveSlot] = useState<string | null>(null);
 
-  const timeSlots = report.timeSlots.slice(0, 3);
+  const flowParts = splitFlowText(report.flow);
+  const timeSlots = report.timeSlots;
 
   useEffect(() => {
     if (!isPersonalized) return;
@@ -193,13 +205,7 @@ export default function TodayFiveCardReport({
                 </span>
               )}
             </div>
-            <div className="mt-4 flex items-end gap-3">
-              <p className="text-5xl font-bold leading-none text-[#2F282B]">{overall}</p>
-              <div>
-                <p className="text-lg font-bold text-[#8B6F47]">{status}</p>
-                <p className="mt-1 max-w-md text-sm leading-relaxed text-[#5A4E48]">{interpretation}</p>
-              </div>
-            </div>
+            <p className="mt-4 max-w-md text-sm leading-relaxed text-[#5A4E48]">{interpretation}</p>
           </div>
 
           <div className="w-full rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4 lg:max-w-sm">
@@ -359,21 +365,25 @@ export default function TodayFiveCardReport({
 
       {/* 카드 1: 오늘의 한 줄 */}
       <CardShell title="CARD 01 · 오늘의 한 줄" className="border-[#E8D7C4] bg-[#FFFDF8]">
-        <p className="mt-3 inline-flex rounded-full bg-[#FFF8EE] px-2.5 py-1 text-[11px] font-bold text-[#8B6F47]">
-          오늘 기억할 말 · {report.saveSentence}
-        </p>
         <h2 className="mt-4 text-3xl leading-tight text-[#2F282B] sm:text-4xl" style={{ fontFamily: "Jua, sans-serif" }}>
           {report.sentence}
         </h2>
-        <p className="mt-3 text-sm leading-relaxed text-[#6B5E58]">오늘 하루를 기억할 한 문장입니다.</p>
+        <div className="mt-5 rounded-2xl border border-[#E2D7D0] bg-white px-4 py-4">
+          <p className="text-[11px] font-bold text-[#8B6F47]">오늘 기억할 말</p>
+          <p className="mt-2 text-lg leading-relaxed text-[#3D3338]" style={{ fontFamily: "Jua, sans-serif" }}>
+            &ldquo;{report.saveSentence}&rdquo;
+          </p>
+        </div>
       </CardShell>
 
       {/* 카드 2: 오늘의 흐름 */}
       <CardShell title="CARD 02 · 오늘의 흐름" className="border-[#E2D7D0] bg-[#F5EDE3]">
         <p className="mt-4 text-xl leading-snug text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-          {report.flow.split(".")[0]}.
+          {flowParts.headline}
         </p>
-        <p className="mt-3 text-sm leading-relaxed text-[#4A403B]">{report.flow}</p>
+        {flowParts.body && (
+          <p className="mt-3 text-sm leading-relaxed text-[#4A403B]">{flowParts.body}</p>
+        )}
       </CardShell>
 
       {/* 카드 3: 행동 가이드 */}
@@ -416,15 +426,21 @@ export default function TodayFiveCardReport({
 
       {/* 카드 4: 감정 포인트 */}
       <CardShell title="CARD 04 · 감정 포인트" className="border-[#E8D7D0] bg-[#F8F0ED]">
-        <h3 className="mt-4 text-2xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-          {report.emotionPoint.title}
-        </h3>
-        <p className="mt-3 text-sm leading-relaxed text-[#4A403B]">{report.emotionPoint.description}</p>
+        <p className="mt-4 text-xl leading-snug text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
+          {report.emotionPoint.description}
+        </p>
+        <div className="mt-5 space-y-4">
+          {report.emotionPoint.tips.map((tip) => (
+            <div key={tip} className="rounded-2xl border border-[#E2D7D0]/80 bg-white/70 px-4 py-3">
+              <p className="text-sm leading-relaxed text-[#4A403B]">{tip}</p>
+            </div>
+          ))}
+        </div>
       </CardShell>
 
       {/* 카드 5: 시간대 운세 */}
       <CardShell title="CARD 05 · 시간대 운세" className="border-[#E2D7D0] bg-white">
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {timeSlots.map((slot) => (
             <button
               key={slot.label}
@@ -436,21 +452,15 @@ export default function TodayFiveCardReport({
                   : "border-[#E2D7D0] bg-[#FFFDF9]"
               }`}
             >
-              <p className="text-xs text-[#8A7E78]">{slot.label}</p>
-              <p className="mt-1 text-xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-                {slot.keyword}
+              <p className="text-xs text-[#8A7E78]">
+                {slot.label} · {slot.keyword}
               </p>
-              <p className={`mt-2 text-xs leading-relaxed text-[#5A4E48] ${activeSlot === slot.label ? "block" : "line-clamp-2"}`}>
+              <p className={`mt-2 text-xs leading-relaxed text-[#5A4E48] ${activeSlot === slot.label ? "block" : "line-clamp-3"}`}>
                 {slot.description}
               </p>
             </button>
           ))}
         </div>
-        {report.timeSlots[3] && (
-          <p className="mt-3 text-xs leading-relaxed text-[#8A7E78]">
-            밤 · {report.timeSlots[3].keyword} — {report.timeSlots[3].description}
-          </p>
-        )}
       </CardShell>
     </section>
   );

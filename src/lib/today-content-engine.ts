@@ -26,8 +26,8 @@ export type DailyFortuneContent = {
     workMoneyTip: string;
   };
   emotionPoint: {
-    title: string;
     description: string;
+    tips: string[];
   };
   timeSlots: {
     label: "오전" | "오후" | "저녁" | "밤";
@@ -91,7 +91,9 @@ export function buildDailyFortuneContent(
 ): DailyFortuneContent {
   const toneReport = generateTodayToneReport(date, profile, options);
   const seed = toneHashSeed(toneReport.seedKey);
-  const timeKeywords = TONE_DEFINITIONS[toneReport.toneKey].timeKeywords;
+  const toneDef = TONE_DEFINITIONS[toneReport.toneKey];
+  const timeKeywords = toneDef.timeKeywords;
+  const pickTip = (step: number) => toneDef.dontList[(seed + step * 17) % toneDef.dontList.length];
 
   return {
     seedKey: toneReport.seedKey,
@@ -115,8 +117,8 @@ export function buildDailyFortuneContent(
       workMoneyTip: toneReport.guides.money,
     },
     emotionPoint: {
-      title: `오늘의 결 · ${toneReport.toneLabel}`,
       description: toneReport.guides.emotion,
+      tips: [pickTip(4), pickTip(5)],
     },
     timeSlots: [
       { label: "오전", keyword: timeKeywords.morning, description: toneReport.timeFlow.morning },
