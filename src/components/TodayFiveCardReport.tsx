@@ -137,8 +137,8 @@ export default function TodayFiveCardReport({
     setSaved(hasSavedToday(dateKey, birthKey));
   }, [birthKey, dateKey, isPersonalized]);
 
+  // /today 진입 시 해당 날짜·birthKey 기준으로 자동 저장 (같은 날 재진입 시 최신으로 덮어씀)
   useEffect(() => {
-    if (!isPersonalized) return;
     saveTodayRecord({
       savedAt: new Date().toISOString(),
       dateKey,
@@ -152,8 +152,23 @@ export default function TodayFiveCardReport({
       saveSentence: report.saveSentence,
       areas: savedAreas,
     });
-    setSaved(true);
-  }, [birthKey, dateKey, isPersonalized, overall, report.flow, report.sentence, savedAreas.decision, savedAreas.emotion, savedAreas.relation, status]);
+    if (isPersonalized) setSaved(true);
+  }, [
+    birthKey,
+    dateKey,
+    isPersonalized,
+    overall,
+    report.flow,
+    report.sentence,
+    report.toneKey,
+    report.toneLabel,
+    report.saveSentence,
+    savedAreas.balance,
+    savedAreas.decision,
+    savedAreas.emotion,
+    savedAreas.relation,
+    status,
+  ]);
 
   const handleSave = () => {
     if (!isPersonalized) return;

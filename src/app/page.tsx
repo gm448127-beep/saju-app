@@ -79,9 +79,9 @@ function buildLiveCards(
     href: "/today",
   },
   {
-    title: "쌓인 흐름",
-    eyebrow: "ARCHIVE",
-    cta: "기록 보기",
+    title: "나의 패턴",
+    eyebrow: "PATTERN",
+    cta: "패턴 보기",
     cardClass: "border-[#ECE3DC] bg-[#FFFDF9]",
     stats: [`사주 ${historyStats.sajuCount}건`, `오늘 ${historyStats.todayCount}건`],
     href: "/history",

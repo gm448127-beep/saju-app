@@ -74,7 +74,7 @@ export default function Header() {
         <div className="flex items-center gap-1.5">
           <Link
             href="/history"
-            aria-label="내 기록 보관함"
+            aria-label="나의 패턴"
             className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-xs font-bold transition-all ${
               isHistoryActive
                 ? "border-[#2F282B] bg-[#2F282B] text-[#F4E7D6]"
@@ -85,7 +85,7 @@ export default function Header() {
               <path d="M5 5.5A2.5 2.5 0 0 1 7.5 3h9A2.5 2.5 0 0 1 19 5.5v15l-7-3-7 3v-15Z" />
               <path d="M8.5 8h7M8.5 12h5" />
             </svg>
-            <span className="hidden lg:inline">내 기록</span>
+            <span className="hidden lg:inline">나의 패턴</span>
           </Link>
 
           {/* 모바일 햄버거 */}
