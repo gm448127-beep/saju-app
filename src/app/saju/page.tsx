@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { buildDailyFortuneContent } from "@/lib/today-content-engine";
 import ShareButton from "@/components/ShareButton";
 import BirthDateNumberInputs, { isValidBirthDate } from "@/components/BirthDateNumberInputs";
 import OhaengChart from "@/components/OhaengChart";
@@ -198,6 +199,7 @@ export default function SajuPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<SajuResult | null>(null);
+  const todayFortune = useMemo(() => buildDailyFortuneContent(), []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -340,6 +342,18 @@ export default function SajuPage() {
           </div>
 
           <div ref={resultRef} className="space-y-5">
+            <div className="rounded-[26px] border border-[#E8D7C4] bg-[#FFFDF8] px-5 py-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full border border-[#E2D7D0] bg-white px-2.5 py-0.5 text-[10px] font-bold text-[#8B6F47]">
+                  오늘의 결 · {todayFortune.toneLabel}
+                </span>
+                <span className="text-[11px] font-bold tracking-[0.14em] text-[#8B6F47]">SAJU TRIGGER</span>
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-[#5A4E48]">
+                사주 원국과 오늘의 흐름이 맞물릴 때의 신호를 읽습니다.
+              </p>
+            </div>
+
                   {/* 🌟 캐릭터 카드 (운명비서 핵심 - A 시적·감성형) */}
           {(() => {
             const strongestSipsin = findStrongestSipsin(result.sipsinCount);

@@ -47,6 +47,12 @@ export const HISTORY_FILTER_OPTIONS: { value: HistoryFilter; label: string }[] =
   { value: "rising", label: "상승한 날만" },
 ];
 
+/** 행동 가이드 (CARD 03) 라벨 */
+export const ACTION_GUIDE_COPY = {
+  dosLabel: "권하는 움직임",
+  dontsLabel: "늦추는 편이 좋은 것",
+} as const;
+
 /** 홈 WEEKLY 카드 */
 export const HOME_WEEKLY_COPY = {
   todayFocus(todayDay: string, toneLabel: string) {

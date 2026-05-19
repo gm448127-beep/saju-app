@@ -1,5 +1,7 @@
 "use client";
 
+import { ACTION_GUIDE_COPY } from "@/lib/history-copy";
+
 interface ActionGuide {
   text: string;
   reason?: string;
@@ -94,13 +96,13 @@ export default function TodayActionGuideSection({
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <ActionCard
-          title="오늘 하면 좋은 것"
+          title={ACTION_GUIDE_COPY.dosLabel}
           subtitle={sipsinTitle ? `${sipsinTitle} 기운을 잘 쓰는 방법` : "오늘의 기운을 잘 쓰는 방법"}
           guides={doGuides}
           type="do"
         />
         <ActionCard
-          title="오늘 피할 것"
+          title={ACTION_GUIDE_COPY.dontsLabel}
           subtitle="기운이 새거나 꼬이기 쉬운 지점"
           guides={dontGuides}
           type="dont"

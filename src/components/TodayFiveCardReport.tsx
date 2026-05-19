@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
+import { ACTION_GUIDE_COPY } from "@/lib/history-copy";
 import {
   buildComparisonInsight,
   buildOverallComparison,
@@ -378,6 +379,26 @@ export default function TodayFiveCardReport({
       </>
       )}
 
+      {/* 오늘의 결 — CARD 01 직전 */}
+      <div className="rounded-2xl border border-[#E8D7C4] bg-[#FFFDF8] px-4 py-3">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="rounded-full border border-[#E2D7D0] bg-white px-2.5 py-0.5 text-xs font-bold text-[#8B6F47]">
+            오늘의 결 · {report.toneLabel}
+          </span>
+          {dateLabel && <span className="text-xs font-semibold text-[#8A7E78]">{dateLabel}</span>}
+          {!isPersonalized && (
+            <span className="rounded-full border border-[#E2D7D0] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#8A7E78]">
+              공통 흐름
+            </span>
+          )}
+          {isPersonalized && (
+            <span className="rounded-full border border-[#E2D7D0] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#8A7E78]">
+              나의 흐름
+            </span>
+          )}
+        </div>
+      </div>
+
       {/* 카드 1: 오늘의 한 줄 */}
       <CardShell title="CARD 01 · 오늘의 한 줄" className="border-[#E8D7C4] bg-[#FFFDF8]">
         <h2 className="mt-4 text-3xl leading-tight text-[#2F282B] sm:text-4xl" style={{ fontFamily: "Jua, sans-serif" }}>
@@ -405,7 +426,7 @@ export default function TodayFiveCardReport({
       <CardShell title="CARD 03 · 행동 가이드" className="border-[#E2D7D0] bg-white">
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="rounded-2xl border border-[#D9C8C0] bg-[#FAF8F5] px-4 py-4">
-            <p className="text-xs font-bold text-[#3D5838]">하면 좋은 것</p>
+            <p className="text-xs font-bold text-[#3D5838]">{ACTION_GUIDE_COPY.dosLabel}</p>
             <ul className="mt-3 space-y-2">
               {splitGuideLines(report.actionGuide.dos).map((line) => (
                 <li key={line} className="flex gap-2 text-sm leading-relaxed text-[#4A403B]">
@@ -416,7 +437,7 @@ export default function TodayFiveCardReport({
             </ul>
           </div>
           <div className="rounded-2xl border border-[#E2D7D0] bg-[#FFFDF9] px-4 py-4">
-            <p className="text-xs font-bold text-[#7A4A3D]">피하면 좋은 것</p>
+            <p className="text-xs font-bold text-[#7A4A3D]">{ACTION_GUIDE_COPY.dontsLabel}</p>
             <ul className="mt-3 space-y-2">
               {splitGuideLines(report.actionGuide.donts).map((line) => (
                 <li key={line} className="flex gap-2 text-sm leading-relaxed text-[#4A403B]">
