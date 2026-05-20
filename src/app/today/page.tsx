@@ -12,6 +12,7 @@ import TimeAdviceSection from "@/components/TimeAdviceSection";
 import TodayActionGuideSection from "@/components/TodayActionGuideSection";
 import TodayEmptyState from "@/components/TodayEmptyState";
 import TodayFiveCardReport from "@/components/TodayFiveCardReport";
+import TodayStoryShareButton from "@/components/TodayStoryShareButton";
 import TodayPersonalizeForm, { isValidBirthDate } from "@/components/TodayPersonalizeForm";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
@@ -474,9 +475,21 @@ export default function TodayPage() {
             </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" data-pdf-ignore>
             <p className="text-sm text-[#5A4E48]">점수 · 어제 비교 · 상세 리포트</p>
-            <div id="today-share-actions" className="flex w-full flex-nowrap gap-1 sm:w-auto sm:min-w-[340px] sm:gap-2">
-              <PdfButton targetRef={resultRef} fileName="today-fortune" />
-              <ShareButton targetRef={resultRef} fileName="today-fortune" />
+            <div
+              id="today-share-actions"
+              className="flex w-full flex-col gap-2 sm:w-auto sm:min-w-[min(100%,420px)]"
+              data-pdf-ignore
+            >
+              <TodayStoryShareButton
+                report={personalizedReport}
+                dateLabel={todayLabel}
+                displayName={profile ? displayName : undefined}
+                fileName="today-story"
+              />
+              <div className="flex flex-nowrap gap-1 sm:gap-2">
+                <PdfButton targetRef={resultRef} fileName="today-fortune" />
+                <ShareButton targetRef={resultRef} fileName="today-fortune" />
+              </div>
             </div>
           </div>
 

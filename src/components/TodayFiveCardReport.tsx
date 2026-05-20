@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import { ACTION_GUIDE_COPY } from "@/lib/history-copy";
+import MyeongriBasisToggle from "@/components/MyeongriBasisToggle";
+import { buildTodayMyeongriBasis } from "@/lib/today-basis-helpers";
 import {
   buildComparisonInsight,
   buildOverallComparison,
@@ -50,7 +52,7 @@ function CardShell({
 interface TodayFiveCardReportProps {
   report: DailyFortuneContent;
   mode?: "common" | "personalized";
-  result?: {
+  result?: Record<string, unknown> & {
     scores?: Record<string, number>;
     briefing?: { oneLine?: string; scoreTone?: string };
   };
@@ -131,6 +133,7 @@ export default function TodayFiveCardReport({
   const [activeSlot, setActiveSlot] = useState<string | null>(null);
 
   const flowParts = splitFlowText(report.flow);
+  const myeongriBasisSections = isPersonalized ? buildTodayMyeongriBasis(result) : [];
   const timeSlots = report.timeSlots;
 
   useEffect(() => {
@@ -419,6 +422,9 @@ export default function TodayFiveCardReport({
         </p>
         {flowParts.body && (
           <p className="mt-3 text-sm leading-relaxed text-[#4A403B]">{flowParts.body}</p>
+        )}
+        {myeongriBasisSections.length > 0 && (
+          <MyeongriBasisToggle sections={myeongriBasisSections} className="mt-5" />
         )}
       </CardShell>
 
