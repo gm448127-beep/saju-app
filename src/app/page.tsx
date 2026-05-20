@@ -11,7 +11,17 @@ import { getSajuHistory, getTarotFavorites } from "@/lib/archive-storage";
 import { buildHomeWeeklyCard } from "@/lib/today-pattern-helpers";
 import { getUnifiedArchiveStats, getTodayHistory } from "@/lib/today-report-helpers";
 
-const FEATURE_SLIDES = [
+type FeatureSlide = {
+  href: string;
+  headline: string;
+  subcopy: string;
+  badge: string;
+  motif: string;
+  bg: string;
+  accent: string;
+};
+
+const FEATURE_SLIDES: FeatureSlide[] = [
   {
     href: "/saju",
     headline: "타고난 흐름을 깊이 읽습니다",
@@ -58,6 +68,39 @@ const FEATURE_SLIDES = [
     accent: "#7F6A8E",
   },
 ];
+
+/** 저장된 사주가 있을 때 홈 히어로 캐러셀 카피 개인화 */
+function buildFeatureSlides(displayName: string | null, year = new Date().getFullYear()): FeatureSlide[] {
+  if (!displayName || displayName === "나") return FEATURE_SLIDES;
+
+  const personalizedCopy: Record<string, { headline: string; subcopy: string }> = {
+    "/saju": {
+      headline: `${displayName}의 타고난 흐름을 정리해 두었습니다`,
+      subcopy: "입력하신 사주 기준으로\n기질과 방향을 차분한 리포트로 읽습니다",
+    },
+    "/today": {
+      headline: `${displayName}의 오늘의 결을 읽어보세요`,
+      subcopy: "오늘 일진과 맞춘 흐름·점수를\n한 장의 리포트로 정리합니다",
+    },
+    "/tojeong": {
+      headline: `${displayName}의 ${year}년 흐름을 정리해 두었습니다`,
+      subcopy: `${year}년에 담긴 결과와 조심할 시기를\n차분한 리포트로 읽습니다`,
+    },
+    "/compatibility": {
+      headline: `${displayName}의 인연 흐름을 읽어보세요`,
+      subcopy: "두 사람의 온도와 결을\n입력 기준에 맞춰 정리합니다",
+    },
+    "/tarot": {
+      headline: `${displayName}, 마음의 결을 짧게 읽어보세요`,
+      subcopy: "지금 걸리는 마음을\n카드 리포트로 가볍게 정리합니다",
+    },
+  };
+
+  return FEATURE_SLIDES.map((slide) => {
+    const copy = personalizedCopy[slide.href];
+    return copy ? { ...slide, headline: copy.headline, subcopy: copy.subcopy } : slide;
+  });
+}
 
 function buildLiveCards(
   dailyContent: ReturnType<typeof buildDailyFortuneContent>,
@@ -117,7 +160,11 @@ export default function HomePage() {
   const [historyStats, setHistoryStats] = useState({ todayCount: 0, dayCount: 0, sajuCount: 0, tarotCount: 0, totalCount: 0 });
   const [personalizedContent, setPersonalizedContent] = useState<DailyFortuneContent | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
-  const selectedSlide = FEATURE_SLIDES[activeSlide];
+  const featureSlides = useMemo(
+    () => buildFeatureSlides(profile ? displayName : null),
+    [profile, displayName],
+  );
+  const selectedSlide = featureSlides[activeSlide];
   const isPersonalizedHome = Boolean(profile && personalizedContent);
   const dailyContent = isPersonalizedHome
     ? personalizedContent!
@@ -210,14 +257,14 @@ export default function HomePage() {
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setActiveSlide((current) => (current + 1) % FEATURE_SLIDES.length);
+      setActiveSlide((current) => (current + 1) % featureSlides.length);
     }, 6000);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [featureSlides.length]);
 
   const goToSlide = (index: number) => {
-    setActiveSlide((index + FEATURE_SLIDES.length) % FEATURE_SLIDES.length);
+    setActiveSlide((index + featureSlides.length) % featureSlides.length);
   };
 
   const handleTouchEnd = (x: number) => {
@@ -249,10 +296,10 @@ export default function HomePage() {
           <div className="relative flex min-h-[160px] w-full min-w-0 flex-col justify-between sm:min-h-[200px]">
             <div className="flex items-center justify-between sm:px-10">
               <span className="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-[#8B6F47] backdrop-blur">
-                DAILY REPORT {selectedSlide.badge}
+                {profile ? "MY REPORT" : "DAILY REPORT"} {selectedSlide.badge}
               </span>
               <span className="text-xs font-semibold tracking-[0.18em] text-[#8B6F47]">
-                {String(activeSlide + 1).padStart(2, "0")} / {String(FEATURE_SLIDES.length).padStart(2, "0")}
+                {String(activeSlide + 1).padStart(2, "0")} / {String(featureSlides.length).padStart(2, "0")}
               </span>
             </div>
 
@@ -299,11 +346,11 @@ export default function HomePage() {
         </div>
 
         <div className="mt-3 flex items-center justify-center gap-2">
-          {FEATURE_SLIDES.map((slide, index) => (
+          {featureSlides.map((slide, index) => (
             <button
-              key={slide.headline}
+              key={slide.href}
               type="button"
-              aria-label={`${slide.headline} 선택`}
+              aria-label={`${slide.badge}번 리포트 선택`}
               onClick={() => goToSlide(index)}
               className={`h-3 rounded-full transition-all ${
                 activeSlide === index ? "w-9 bg-[#8B6F47]" : "w-3 bg-[#D8D5D4]"
