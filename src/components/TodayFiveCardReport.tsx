@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import { ACTION_GUIDE_COPY } from "@/lib/history-copy";
 import MyeongriBasisToggle from "@/components/MyeongriBasisToggle";
-import { buildTodayMyeongriBasis } from "@/lib/today-basis-helpers";
+import ToneDecisionChip from "@/components/ToneDecisionChip";
+import { buildTodayMyeongriBasis, buildToneChipTooltip } from "@/lib/today-basis-helpers";
 import {
   buildComparisonInsight,
   buildOverallComparison,
@@ -164,6 +165,10 @@ export default function TodayFiveCardReport({
 
   const flowParts = splitFlowText(report.flow);
   const myeongriBasisSections = isPersonalized ? buildTodayMyeongriBasis(result) : [];
+  const toneChipTooltip = isPersonalized
+    ? buildToneChipTooltip(result, report.toneLabel)
+    : null;
+  const toneChipLabel = `${tonePrefix} · ${report.toneLabel}`;
   const timeSlots = report.timeSlots;
 
   useEffect(() => {
@@ -245,9 +250,11 @@ export default function TodayFiveCardReport({
               <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">
                 {isPersonalized ? "MY TODAY" : "TODAY REPORT"}
               </p>
-              <span className="rounded-full border border-[#E2D7D0] bg-[#FFF8EE] px-2.5 py-0.5 text-[10px] font-bold text-[#8B6F47]">
-                {tonePrefix} · {report.toneLabel}
-              </span>
+              <ToneDecisionChip
+                label={toneChipLabel}
+                tooltip={toneChipTooltip}
+                variant="warm"
+              />
               {myTodaySummary?.grade && (
                 <span className="rounded-full border border-[#E2D7D0] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#8A7E78]">
                   등급 {myTodaySummary.grade}
@@ -438,9 +445,12 @@ export default function TodayFiveCardReport({
       {/* 오늘의 결 — CARD 01 직전 */}
       <div className="rounded-2xl border border-[#E8D7C4] bg-[#FFFDF8] px-4 py-3">
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span className="rounded-full border border-[#E2D7D0] bg-white px-2.5 py-0.5 text-xs font-bold text-[#8B6F47]">
-            오늘의 결 · {report.toneLabel}
-          </span>
+          <ToneDecisionChip
+            label={`오늘의 결 · ${report.toneLabel}`}
+            tooltip={toneChipTooltip}
+            size="md"
+            variant="white"
+          />
           {dateLabel && <span className="text-xs font-semibold text-[#8A7E78]">{dateLabel}</span>}
           {!isPersonalized && (
             <span className="rounded-full border border-[#E2D7D0] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#8A7E78]">

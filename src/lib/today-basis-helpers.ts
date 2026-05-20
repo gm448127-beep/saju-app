@@ -34,6 +34,39 @@ function compactLines(lines: Array<string | undefined | null>) {
   return lines.map((line) => line?.trim()).filter((line): line is string => Boolean(line));
 }
 
+/** "갑(甲)" 형식에서 한글 천간·지지 한 글자 추출 */
+function parseGanJiKo(value?: string): string | null {
+  if (!value) return null;
+  const trimmed = value.trim();
+  const paren = trimmed.indexOf("(");
+  if (paren > 0) return trimmed.slice(0, paren);
+  return trimmed.length <= 2 ? trimmed : null;
+}
+
+/** 「오늘의 결 · 결정」 칩 툴팁 한 줄 */
+export function buildToneChipTooltip(
+  result: TodayApiResult | null | undefined,
+  toneLabel: string,
+): string | null {
+  if (!result?.myDayGan || !result.todayGan) return null;
+
+  const stem = parseGanJiKo(result.myDayGan);
+  const element = result.myElement?.trim();
+  const dayMaster =
+    stem && element ? `${stem}${element} 일간` : stem ? `${stem} 일간` : "일간";
+
+  const gan = parseGanJiKo(result.todayGan);
+  const ji = parseGanJiKo(result.todayJi);
+  const iljin = gan && ji ? `${gan}${ji}일` : "오늘 일진";
+
+  const sipsin = result.todaySipsin?.trim();
+  const title = result.sipsinTitle?.trim();
+  const action =
+    sipsin && title ? `${sipsin}(${title}) 작용` : sipsin ? `${sipsin} 작용` : "십성 작용";
+
+  return `${dayMaster} × 오늘 일진(${iljin}) → ${action} → ${toneLabel}의 결`;
+}
+
 /** 개인화 오늘 리포트용 명리 근거 블록 */
 export function buildTodayMyeongriBasis(result: TodayApiResult | null | undefined): TodayBasisSection[] {
   if (!result?.myDayGan || !result.todayGan) return [];
