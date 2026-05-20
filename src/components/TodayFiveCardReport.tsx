@@ -6,6 +6,7 @@ import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import { ACTION_GUIDE_COPY } from "@/lib/history-copy";
 import MyeongriBasisToggle from "@/components/MyeongriBasisToggle";
 import AxisScorePanel from "@/components/AxisScorePanel";
+import TodayScoreHero from "@/components/TodayScoreHero";
 import ToneDecisionChip from "@/components/ToneDecisionChip";
 import { buildTodayMyeongriBasis, buildToneChipTooltip } from "@/lib/today-basis-helpers";
 import {
@@ -152,6 +153,16 @@ export default function TodayFiveCardReport({
   const [savePulse, setSavePulse] = useState(false);
   const [compareOpen, setCompareOpen] = useState(hasRealYesterday);
   const [activeSlot, setActiveSlot] = useState<string | null>(null);
+  /** 모바일: 점수 히어로만 먼저 · lg에서는 항상 전체 펼침 */
+  const [detailExpanded, setDetailExpanded] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const sync = () => setDetailExpanded(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   const flowParts = splitFlowText(report.flow);
   const myeongriBasisSections = isPersonalized ? buildTodayMyeongriBasis(result) : [];
@@ -232,8 +243,77 @@ export default function TodayFiveCardReport({
         </div>
       )}
 
-      {/* 점수 + 어제 대비 */}
-      <div className="rounded-[28px] border border-[#E2D7D0] bg-white px-5 py-5 shadow-[0_14px_38px_rgba(61,51,56,0.06)]">
+      {isPersonalized && (
+        <div className="lg:hidden">
+          <TodayScoreHero
+            overall={overall}
+            status={status}
+            areas={areas}
+            overallComparison={overallComparison}
+            comparisons={comparisons}
+            toneChipLabel={toneChipLabel}
+            toneChipTooltip={toneChipTooltip}
+            grade={myTodaySummary?.grade}
+            sentence={myTodaySummary?.sentence}
+            lead={myTodaySummary?.lead}
+            dateLabel={dateLabel}
+            detailExpanded={detailExpanded}
+            onToggleDetail={() => {
+              setDetailExpanded((open) => {
+                const next = !open;
+                if (next) {
+                  requestAnimationFrame(() => {
+                    document.getElementById("today-detail-start")?.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  });
+                }
+                return next;
+              });
+            }}
+            saved={saved}
+            onSave={handleSave}
+            onToggleCompare={() => setCompareOpen((open) => !open)}
+            compareOpen={compareOpen}
+          />
+        </div>
+      )}
+
+      {isPersonalized && compareOpen && !detailExpanded && (
+        <div className="animate-fade-in space-y-2 rounded-[24px] border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4 lg:hidden">
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs font-bold text-[#8B6F47]">어제와의 변화</p>
+            <span className="text-[10px] font-semibold text-[#8A7E78]">
+              {hasRealYesterday ? "저장된 기록 기준" : "첫 방문 예시"}
+            </span>
+          </div>
+          {comparisons.map((item) => {
+            const isUp = item.delta >= 0;
+            return (
+              <div key={item.key} className="rounded-xl border border-[#E2D7D0] bg-white px-3 py-2.5">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-sm font-semibold text-[#4A403B]">{item.label}</p>
+                  <p className={`text-sm font-bold ${isUp ? "text-[#8B6F47]" : "text-[#7A4A3D]"}`}>
+                    {isUp ? "▲" : "▼"} {Math.abs(item.delta)}
+                  </p>
+                </div>
+                <p className="mt-1 text-xs text-[#8A7E78]">
+                  {item.previousScore} → {item.score}
+                  {!item.isReal && " · 예시"}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* 점수 + 어제 대비 — 데스크톱 전체 / 모바일 펼친 상세 */}
+      <div
+        className={`rounded-[28px] border border-[#E2D7D0] bg-white px-5 py-5 shadow-[0_14px_38px_rgba(61,51,56,0.06)] ${
+          isPersonalized && !detailExpanded ? "max-lg:hidden" : ""
+        } ${isPersonalized ? "hidden lg:block" : ""}`}
+      >
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
@@ -363,10 +443,76 @@ export default function TodayFiveCardReport({
         )}
       </div>
 
+      {isPersonalized && detailExpanded && (
+        <div id="today-detail-start" className="scroll-mt-20 space-y-4 lg:hidden">
+          <div className="rounded-2xl border border-[#E8D7C4] bg-[#FFF8EE] px-4 py-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs font-bold text-[#8B6F47]">어제보다 오늘</p>
+              <span className="rounded-full border border-[#E2D7D0] bg-white px-2 py-0.5 text-[10px] font-bold text-[#8B6F47]">
+                {hasRealYesterday ? "내 기록 기준" : "예시 흐름"}
+              </span>
+            </div>
+            {overallComparison ? (
+              <div className="mt-3 flex flex-wrap items-end gap-3">
+                <div className="flex items-end gap-2">
+                  <p className="text-2xl font-bold leading-none text-[#A09488]">{overallComparison.previousOverall}</p>
+                  <span className="pb-0.5 text-sm text-[#A09488]">→</span>
+                  <p className="text-3xl font-bold leading-none text-[#2F282B]">{overall}</p>
+                </div>
+                <span
+                  className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                    overallComparison.delta >= 0 ? "bg-white text-[#8B6F47]" : "bg-white text-[#7A4A3D]"
+                  }`}
+                >
+                  {overallComparison.delta >= 0 ? "▲" : "▼"} {Math.abs(overallComparison.delta)}
+                </span>
+              </div>
+            ) : null}
+            <p className="mt-3 text-sm leading-relaxed text-[#4A403B]">{yesterdayHeadline}</p>
+          </div>
+          <div className="flex gap-2">
+            {threeDayTrend.map((item) => (
+              <div
+                key={item.label}
+                className={`flex-1 rounded-xl border px-2 py-2 text-center ${
+                  item.label === "오늘" ? "border-[#C49A4A]/40 bg-[#FFF8EE]" : "border-[#E2D7D0] bg-[#FFFDF9]"
+                }`}
+              >
+                <p className="text-[10px] text-[#8A7E78]">{item.label}</p>
+                <p className="text-xs font-bold text-[#8B6F47]">{item.status}</p>
+                <p className="text-[10px] text-[#A09488]">{item.score}</p>
+              </div>
+            ))}
+          </div>
+          {compareOpen && (
+            <div className="animate-fade-in space-y-2 rounded-[24px] border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4">
+              <p className="text-xs font-bold text-[#8B6F47]">어제와의 변화 · 상세</p>
+              {comparisons.map((item) => {
+                const isUp = item.delta >= 0;
+                return (
+                  <div key={item.key} className="rounded-xl border border-[#E2D7D0] bg-white px-3 py-2.5">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-semibold text-[#4A403B]">{item.label}</p>
+                      <p className={`text-sm font-bold ${isUp ? "text-[#8B6F47]" : "text-[#7A4A3D]"}`}>
+                        {isUp ? "▲" : "▼"} {Math.abs(item.delta)}
+                      </p>
+                    </div>
+                    <p className="mt-1 text-xs text-[#8A7E78]">
+                      {item.previousScore} → {item.score}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className={isPersonalized && !detailExpanded ? "max-lg:hidden space-y-4" : "space-y-4"}>
       {isPersonalized && (
       <>
-      {/* 인터랙션 */}
-      <div className="sticky bottom-3 z-20 flex flex-wrap gap-2 rounded-2xl border border-[#E2D7D0] bg-white/95 p-2 shadow-[0_8px_24px_rgba(61,51,56,0.1)] backdrop-blur sm:static sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none">
+      {/* 인터랙션 — 데스크톱 */}
+      <div className="sticky bottom-3 z-20 hidden flex-wrap gap-2 rounded-2xl border border-[#E2D7D0] bg-white/95 p-2 shadow-[0_8px_24px_rgba(61,51,56,0.1)] backdrop-blur lg:flex lg:static lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
         <button
           type="button"
           onClick={handleSave}
@@ -396,7 +542,7 @@ export default function TodayFiveCardReport({
       </div>
 
       {compareOpen && (
-        <div className="animate-fade-in space-y-2 rounded-[24px] border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4">
+        <div className="animate-fade-in hidden space-y-2 rounded-[24px] border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4 lg:block">
           <div className="flex items-center justify-between gap-2">
             <p className="text-xs font-bold text-[#8B6F47]">어제와의 변화</p>
             <span className="text-[10px] font-semibold text-[#8A7E78]">
@@ -550,6 +696,7 @@ export default function TodayFiveCardReport({
           ))}
         </div>
       </CardShell>
+      </div>
     </section>
   );
 }
