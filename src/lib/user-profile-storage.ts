@@ -109,6 +109,11 @@ export function profileToBirthHour(profile: UserBirthProfile): {
   return {};
 }
 
+/** 오늘 기록·히스토리 매칭용 birthKey */
+export function profileToBirthKey(profile: UserBirthProfile) {
+  return `${profile.year}-${profile.month}-${profile.day}-${profile.gender}`;
+}
+
 export function profileToTodayPayload(profile: UserBirthProfile) {
   const { hour, minute } = profileToBirthHour(profile);
   return {

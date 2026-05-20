@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import { ACTION_GUIDE_COPY } from "@/lib/history-copy";
 import MyeongriBasisToggle from "@/components/MyeongriBasisToggle";
+import OverallScoreDelta from "@/components/OverallScoreDelta";
 import ToneDecisionChip from "@/components/ToneDecisionChip";
 import { buildTodayMyeongriBasis, buildToneChipTooltip } from "@/lib/today-basis-helpers";
 import {
@@ -292,7 +293,10 @@ export default function TodayFiveCardReport({
               <div className="flex items-end justify-between gap-3">
                 <div>
                   <p className="text-[11px] font-bold text-[#8B6F47]">종합</p>
-                  <p className="mt-1 text-3xl font-bold leading-none text-[#2F282B]">{overall}</p>
+                  <div className="mt-1 flex items-end gap-2">
+                    <p className="text-3xl font-bold leading-none text-[#2F282B]">{overall}</p>
+                    {isPersonalized && <OverallScoreDelta comparison={overallComparison} size="md" />}
+                  </div>
                 </div>
                 <ScoreBlocks score={overall} />
               </div>

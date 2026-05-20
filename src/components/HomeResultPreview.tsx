@@ -1,8 +1,16 @@
 import Link from "next/link";
+import { useMemo } from "react";
+import OverallScoreDelta from "@/components/OverallScoreDelta";
 import ToneDecisionChip from "@/components/ToneDecisionChip";
 import { TODAY_EMPTY_COPY } from "@/lib/history-copy";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import { buildToneChipTooltip, type TodayToneTooltipSource } from "@/lib/today-basis-helpers";
+import { getTodayDateKey } from "@/lib/today-pattern-helpers";
+import {
+  buildOverallComparison,
+  getPreviousDayRecord,
+  getTodayHistory,
+} from "@/lib/today-report-helpers";
 
 function clampScore(value: number) {
   return Math.max(20, Math.min(99, Math.round(value)));
@@ -62,6 +70,10 @@ interface HomeResultPreviewProps {
   isLoadingPersonalized?: boolean;
   /** 맞춤 API에서 받은 일간·일진·십성 (칩 툴팁용) */
   toneTooltipBasis?: TodayToneTooltipSource | null;
+  /** 맞춤 API 종합 점수 (없으면 축 점수로 계산) */
+  apiOverall?: number | null;
+  /** 어제 대비 비교용 birthKey */
+  birthKey?: string | null;
 }
 
 export default function HomeResultPreview({
@@ -70,9 +82,19 @@ export default function HomeResultPreview({
   isPersonalized = false,
   isLoadingPersonalized = false,
   toneTooltipBasis = null,
+  apiOverall = null,
+  birthKey = null,
 }: HomeResultPreviewProps) {
   const scores = getPreviewScores(content);
-  const statusLabel = content.toneLabel || getTodayStatus(scores.overall);
+  const displayOverall =
+    isPersonalized && apiOverall != null ? clampScore(apiOverall) : scores.overall;
+  const statusLabel = content.toneLabel || getTodayStatus(displayOverall);
+
+  const overallComparison = useMemo(() => {
+    if (!isPersonalized || !birthKey) return null;
+    const previous = getPreviousDayRecord(getTodayHistory(), getTodayDateKey(), birthKey);
+    return buildOverallComparison(previous, displayOverall);
+  }, [isPersonalized, birthKey, displayOverall]);
   const toneChipTooltip = isPersonalized
     ? buildToneChipTooltip(toneTooltipBasis, content.toneLabel)
     : null;
@@ -170,12 +192,13 @@ export default function HomeResultPreview({
                     <p className="text-[11px] font-bold tracking-[0.08em] text-[#8B6F47]">
                       {isPersonalized ? "종합" : "종합 · 예시"}
                     </p>
-                    <div className="mt-1 flex items-end gap-2">
-                      <p className="text-3xl font-bold leading-none text-[#2F282B]">{scores.overall}</p>
+                    <div className="mt-1 flex flex-wrap items-end gap-2">
+                      <p className="text-3xl font-bold leading-none text-[#2F282B]">{displayOverall}</p>
+                      {isPersonalized && <OverallScoreDelta comparison={overallComparison} size="md" />}
                       <p className="pb-0.5 text-sm font-bold text-[#8B6F47]">{statusLabel}</p>
                     </div>
                   </div>
-                  <ScoreBlocks score={scores.overall} />
+                  <ScoreBlocks score={displayOverall} />
                 </div>
               </div>
               <div className="relative mt-3 space-y-2">

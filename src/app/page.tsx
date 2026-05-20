@@ -8,7 +8,11 @@ import { useUserProfile } from "@/components/UserProfileProvider";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import { pickTodayToneTooltipSource, type TodayToneTooltipSource } from "@/lib/today-basis-helpers";
-import { PROFILE_UPDATED_EVENT, profileToTodayPayload } from "@/lib/user-profile-storage";
+import {
+  PROFILE_UPDATED_EVENT,
+  profileToBirthKey,
+  profileToTodayPayload,
+} from "@/lib/user-profile-storage";
 import { getSajuHistory, getTarotFavorites } from "@/lib/archive-storage";
 import { buildHomePatternCard, buildHomeWeeklyCard } from "@/lib/today-pattern-helpers";
 import { getUnifiedArchiveStats, getTodayHistory } from "@/lib/today-report-helpers";
@@ -161,6 +165,7 @@ export default function HomePage() {
   const [historyStats, setHistoryStats] = useState({ todayCount: 0, dayCount: 0, sajuCount: 0, tarotCount: 0, totalCount: 0 });
   const [personalizedContent, setPersonalizedContent] = useState<DailyFortuneContent | null>(null);
   const [personalizedToneBasis, setPersonalizedToneBasis] = useState<TodayToneTooltipSource | null>(null);
+  const [personalizedOverall, setPersonalizedOverall] = useState<number | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const featureSlides = useMemo(
     () => buildFeatureSlides(profile ? displayName : null),
@@ -227,6 +232,7 @@ export default function HomePage() {
     if (!profileReady || !profile) {
       setPersonalizedContent(null);
       setPersonalizedToneBasis(null);
+      setPersonalizedOverall(null);
       setPreviewLoading(false);
       return;
     }
@@ -245,14 +251,19 @@ export default function HomePage() {
         if (!cancelled && res.ok && json.dailyReport) {
           setPersonalizedContent(json.dailyReport as DailyFortuneContent);
           setPersonalizedToneBasis(pickTodayToneTooltipSource(json));
+          setPersonalizedOverall(
+            typeof json.scores?.overall === "number" ? json.scores.overall : null,
+          );
         } else if (!cancelled) {
           setPersonalizedContent(null);
           setPersonalizedToneBasis(null);
+          setPersonalizedOverall(null);
         }
       } catch {
         if (!cancelled) {
           setPersonalizedContent(null);
           setPersonalizedToneBasis(null);
+          setPersonalizedOverall(null);
         }
       } finally {
         if (!cancelled) setPreviewLoading(false);
@@ -278,6 +289,9 @@ export default function HomePage() {
           if (json.dailyReport) {
             setPersonalizedContent(json.dailyReport as DailyFortuneContent);
             setPersonalizedToneBasis(pickTodayToneTooltipSource(json));
+            setPersonalizedOverall(
+              typeof json.scores?.overall === "number" ? json.scores.overall : null,
+            );
           }
         })
         .finally(() => setPreviewLoading(false));
@@ -416,6 +430,8 @@ export default function HomePage() {
           isPersonalized={isPersonalizedHome}
           isLoadingPersonalized={false}
           toneTooltipBasis={personalizedToneBasis}
+          apiOverall={personalizedOverall}
+          birthKey={profile ? profileToBirthKey(profile) : null}
         />
       )}
 
