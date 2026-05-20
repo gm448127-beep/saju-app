@@ -313,16 +313,19 @@ export default function TodayPage() {
   return (
     <div className="space-y-10">
       <div ref={resultRef} className="space-y-6">
-        <section aria-label="공통 오늘의 흐름">
-          <TodayFiveCardReport report={commonReport} mode="common" dateLabel={todayLabel} />
-        </section>
+        {!isPersonalized && (
+          <section aria-label="공통 오늘의 흐름">
+            <TodayFiveCardReport report={commonReport} mode="common" dateLabel={todayLabel} />
+          </section>
+        )}
         {isPersonalized && personalizedReport && (
-          <section aria-label="나의 오늘의 흐름" className="space-y-6 border-t border-[#E2D7D0] pt-8">
+          <section aria-label="나의 오늘의 흐름" className="space-y-6">
             <div className="rounded-[24px] border border-[#E8D7C4] bg-[#FFFDF8] px-5 py-4">
               <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">MY TODAY</p>
               <h2 className="mt-1 text-xl text-[#2F282B] sm:text-2xl" style={{ fontFamily: "Jua, sans-serif" }}>
                 나의 오늘의 흐름
               </h2>
+              <p className="mt-1 text-sm text-[#8A7E78]">{todayLabel}</p>
             </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" data-pdf-ignore>
             <p className="text-sm text-[#5A4E48]">점수 · 어제 비교 · 상세 리포트</p>
@@ -362,6 +365,7 @@ export default function TodayPage() {
             mode="personalized"
             result={result}
             birthKey={birthKey}
+            dateLabel={todayLabel}
           />
         )}
 
