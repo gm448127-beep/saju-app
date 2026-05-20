@@ -15,6 +15,12 @@ import {
   profileToTodayPayload,
 } from "@/lib/user-profile-storage";
 import { getSajuHistory, getTarotFavorites } from "@/lib/archive-storage";
+import {
+  DIFFERENCE_LAYERS,
+  ENGINE_ONE_LINER,
+  ENGINE_SCOPE_NOTE,
+  PRIMARY_TAGLINE,
+} from "@/lib/engine-copy";
 import { buildHomePatternCard, buildHomeWeeklyCard } from "@/lib/today-pattern-helpers";
 import { getUnifiedArchiveStats, getTodayHistory } from "@/lib/today-report-helpers";
 
@@ -151,12 +157,6 @@ function buildLiveCards(
   },
   ];
 }
-
-const DIFFERENCE_POINTS = [
-  ["내 사주를 기준으로", "매일의 흐름을 다르게 읽습니다"],
-  ["어려운 명리의 언어를", "이해되는 문장으로 풀어냅니다"],
-  ["하루의 해석이 쌓일수록", "나의 흐름은 더 선명해집니다"],
-];
 
 export default function HomePage() {
   const { profile, displayName, isReady: profileReady } = useUserProfile();
@@ -329,6 +329,13 @@ export default function HomePage() {
 
   return (
     <div className="space-y-5">
+      <p
+        className="rounded-2xl border border-[#E2D7D0] bg-[#FFF8EE] px-4 py-3 text-center text-base leading-snug text-[#2F282B] sm:text-lg"
+        style={{ fontFamily: "Jua, sans-serif" }}
+      >
+        {PRIMARY_TAGLINE}
+      </p>
+
       <section className="overflow-hidden rounded-[30px] border border-[#E2D7D0] bg-white p-3 shadow-[0_18px_48px_rgba(61,51,56,0.07)] sm:p-4">
         <div
           className="relative min-h-[200px] overflow-hidden rounded-[26px] border border-[#E2D7D0] px-5 py-5 text-[#2F282B] sm:min-h-[260px] sm:px-8 sm:py-6"
@@ -521,8 +528,11 @@ export default function HomePage() {
               <br />
               먼저 정리해두었습니다
             </h2>
-            <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-[#4A403B] sm:mt-4 sm:text-base">
-              {"사주와 오늘의 해석, 상담까지\n매일 다시 찾게 되는 흐름을 모았습니다"}
+            <p className="mt-3 text-base leading-relaxed text-[#4A403B] sm:mt-4 sm:text-lg" style={{ fontFamily: "Jua, sans-serif" }}>
+              {PRIMARY_TAGLINE}
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-[#6B5E58]">
+              사주·오늘의 흐름·토정·궁합·AI 상담까지, 매일 다시 찾게 되는 리포트를 모았습니다.
             </p>
 
             <div className="mt-5 flex flex-col gap-2 sm:mt-6 sm:flex-row">
@@ -549,15 +559,25 @@ export default function HomePage() {
           <h2 className="mt-2 text-2xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
             운명비서가 흐름을 읽는 방식
           </h2>
+          <p className="mt-2 text-lg text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
+            {PRIMARY_TAGLINE}
+          </p>
+          <p className="mt-3 rounded-2xl border border-[#E2D7D0] bg-[#FFF8EE] px-4 py-3 text-sm leading-relaxed text-[#4A403B]">
+            <span className="font-bold text-[#8B6F47]">해석 엔진 · </span>
+            {ENGINE_ONE_LINER}
+          </p>
+          <p className="mt-2 text-xs leading-relaxed text-[#8A7E78]">{ENGINE_SCOPE_NOTE}</p>
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {DIFFERENCE_POINTS.map(([line1, line2], index) => (
-            <div key={line1} className="rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4">
-              <p className="mb-2 text-xs font-bold text-[#8B6F47]">0{index + 1}</p>
+          {DIFFERENCE_LAYERS.map((layer, index) => (
+            <div key={layer.badge} className="rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4">
+              <p className="mb-2 text-xs font-bold text-[#8B6F47]">
+                0{index + 1} · {layer.badge}
+              </p>
               <p className="whitespace-pre-line text-sm leading-relaxed text-[#3D3338]">
-                {line1}
+                {layer.line1}
                 {"\n"}
-                {line2}
+                {layer.line2}
               </p>
             </div>
           ))}

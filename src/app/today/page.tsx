@@ -14,6 +14,7 @@ import TodayEmptyState from "@/components/TodayEmptyState";
 import TodayFiveCardReport from "@/components/TodayFiveCardReport";
 import TodayStoryShareButton from "@/components/TodayStoryShareButton";
 import TodayPersonalizeForm, { isValidBirthDate } from "@/components/TodayPersonalizeForm";
+import { ENGINE_ONE_LINER, PRIMARY_TAGLINE } from "@/lib/engine-copy";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import {
@@ -472,6 +473,10 @@ export default function TodayPage() {
                 {profile ? `${displayName}의 오늘` : "나의 오늘의 흐름"}
               </h2>
               <p className="mt-1 text-sm text-[#8A7E78]">{todayLabel}</p>
+              <p className="mt-2 text-sm text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
+                {PRIMARY_TAGLINE}
+              </p>
+              <p className="mt-1 text-xs leading-relaxed text-[#8A7E78]">{ENGINE_ONE_LINER}</p>
             </div>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" data-pdf-ignore>
             <p className="text-sm text-[#5A4E48]">점수 · 어제 비교 · 상세 리포트</p>
