@@ -73,6 +73,28 @@ export const TODAY_EMPTY_COPY = {
   formSubmit: "내 흐름 보기",
 } as const;
 
+/** 홈 PATTERN 카드 미리보기 */
+export const HOME_PATTERN_COPY = {
+  emptyInsight: "오늘부터 패턴이 쌓이기 시작해요",
+  emptySub: "오늘운세를 읽으면 결의 흐름이 이곳에 남습니다",
+  startedInsight: "오늘부터 패턴이 쌓이기 시작했어요",
+  startedSub(toneLabel: string) {
+    return `첫 기록 · ${toneLabel}의 결`;
+  },
+  warmupInsight(daysLeft: number) {
+    return `${daysLeft}일만 더 읽으면\n주간 패턴이 또렷해집니다`;
+  },
+  dominantInsight(count: number, windowDays: number, toneLabel: string) {
+    return `최근 ${windowDays}일 중 ${count}일이\n'${toneLabel}'의 결이었어요`;
+  },
+  runnerUp(toneLabel: string, count: number) {
+    return `그다음은 ${toneLabel} · ${count}일`;
+  },
+  statsLine(recordDays: number, sajuCount: number, todayCount: number) {
+    return `기록 ${recordDays}일 · 사주 ${sajuCount} · 오늘 ${todayCount}`;
+  },
+} as const;
+
 /** 홈 WEEKLY 카드 */
 export const HOME_WEEKLY_COPY = {
   todayFocus(todayDay: string, toneLabel: string) {

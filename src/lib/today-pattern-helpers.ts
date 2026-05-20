@@ -1,5 +1,6 @@
 import {
   HISTORY_PAGE_EMPTY_COPY,
+  HOME_PATTERN_COPY,
   HOME_WEEKLY_COPY,
   WEEK_INSIGHT_COPY,
   type HistoryFilter,
@@ -269,6 +270,86 @@ export type HomeWeeklyCard = {
   text: string;
   href: string;
 };
+
+export type HomePatternCard = {
+  insight: string;
+  subline?: string;
+  last7: DayFlowItem[];
+  topTones: ToneCluster[];
+  stats: { sajuCount: number; todayCount: number; recordDays: number };
+  phase: "empty" | "started" | "warmup" | "insight";
+  href: string;
+};
+
+/** 홈 PATTERN 카드 — 첫날 안내 / 최근 7일 결 분포 미리보기 */
+export function buildHomePatternCard(
+  records: SavedTodayRecord[],
+  archiveStats: { sajuCount: number; todayCount: number },
+): HomePatternCard {
+  const last7 = buildLast7DaysFlow(records);
+  const recordDays = dedupeRecordsByDate(records).length;
+  const last7WithRecord = last7.filter((day) => day.hasRecord);
+  const clusters = buildToneClusters(records, 7).slice(0, 3);
+  const stats = { ...archiveStats, recordDays };
+
+  if (recordDays === 0) {
+    return {
+      insight: HOME_PATTERN_COPY.emptyInsight,
+      subline: HOME_PATTERN_COPY.emptySub,
+      last7,
+      topTones: [],
+      stats,
+      phase: "empty",
+      href: "/history",
+    };
+  }
+
+  if (recordDays === 1) {
+    const toneLabel = last7WithRecord[0]?.toneLabel || clusters[0]?.label || "흐름";
+    return {
+      insight: HOME_PATTERN_COPY.startedInsight,
+      subline: HOME_PATTERN_COPY.startedSub(toneLabel),
+      last7,
+      topTones: clusters,
+      stats,
+      phase: "started",
+      href: "/history",
+    };
+  }
+
+  if (recordDays < 3 || last7WithRecord.length < 2) {
+    return {
+      insight: HOME_PATTERN_COPY.warmupInsight(Math.max(1, 3 - recordDays)),
+      subline: clusters[0] ? `지금까지 · ${clusters[0].label} ${clusters[0].count}일` : undefined,
+      last7,
+      topTones: clusters,
+      stats,
+      phase: "warmup",
+      href: "/history",
+    };
+  }
+
+  const top = clusters[0];
+  const countIn7 = top
+    ? last7.filter((day) => day.hasRecord && day.toneLabel === top.label).length
+    : 0;
+  const insight = top
+    ? HOME_PATTERN_COPY.dominantInsight(countIn7, 7, top.label)
+    : buildWeekInsight(records);
+
+  const subline =
+    clusters.length >= 2 ? HOME_PATTERN_COPY.runnerUp(clusters[1].label, clusters[1].count) : buildWeekInsight(records);
+
+  return {
+    insight,
+    subline,
+    last7,
+    topTones: clusters,
+    stats,
+    phase: "insight",
+    href: "/history",
+  };
+}
 
 /** 홈 WEEKLY 카드 — 기록 우선, 없으면 오늘 요일·결 */
 export function buildHomeWeeklyCard(

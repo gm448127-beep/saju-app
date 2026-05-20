@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import HomePatternCard from "@/components/HomePatternCard";
 import HomeResultPreview from "@/components/HomeResultPreview";
 import { useUserProfile } from "@/components/UserProfileProvider";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
@@ -9,7 +10,7 @@ import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import { pickTodayToneTooltipSource, type TodayToneTooltipSource } from "@/lib/today-basis-helpers";
 import { PROFILE_UPDATED_EVENT, profileToTodayPayload } from "@/lib/user-profile-storage";
 import { getSajuHistory, getTarotFavorites } from "@/lib/archive-storage";
-import { buildHomeWeeklyCard } from "@/lib/today-pattern-helpers";
+import { buildHomePatternCard, buildHomeWeeklyCard } from "@/lib/today-pattern-helpers";
 import { getUnifiedArchiveStats, getTodayHistory } from "@/lib/today-report-helpers";
 
 type FeatureSlide = {
@@ -107,6 +108,7 @@ function buildLiveCards(
   dailyContent: ReturnType<typeof buildDailyFortuneContent>,
   historyStats: { todayCount: number; dayCount: number; sajuCount: number; tarotCount: number },
   weeklyCard: ReturnType<typeof buildHomeWeeklyCard>,
+  patternCard: ReturnType<typeof buildHomePatternCard>,
 ) {
   return [
   {
@@ -131,9 +133,7 @@ function buildLiveCards(
   {
     title: "나의 패턴",
     eyebrow: "PATTERN",
-    cta: "패턴 보기",
-    cardClass: "border-[#ECE3DC] bg-[#FFFDF9]",
-    stats: [`사주 ${historyStats.sajuCount}건`, `오늘 ${historyStats.todayCount}건`],
+    patternPreview: patternCard,
     href: "/history",
   },
   {
@@ -187,18 +187,40 @@ export default function HomePage() {
     });
   }, [historyRecords, dailyContent]);
 
+  const patternCard = useMemo(
+    () =>
+      buildHomePatternCard(historyRecords, {
+        sajuCount: historyStats.sajuCount,
+        todayCount: historyStats.todayCount,
+      }),
+    [historyRecords, historyStats.sajuCount, historyStats.todayCount],
+  );
+
   const liveCards = buildLiveCards(
     dailyContent ?? buildDailyFortuneContent(),
     historyStats,
     weeklyCard,
+    patternCard,
   );
 
   useEffect(() => {
-    const records = getTodayHistory();
-    setHistoryRecords(records);
-    setHistoryStats(
-      getUnifiedArchiveStats(records, getSajuHistory().length, getTarotFavorites().length),
-    );
+    const syncHistory = () => {
+      const records = getTodayHistory();
+      setHistoryRecords(records);
+      setHistoryStats(
+        getUnifiedArchiveStats(records, getSajuHistory().length, getTarotFavorites().length),
+      );
+    };
+    syncHistory();
+    window.addEventListener("focus", syncHistory);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") syncHistory();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      window.removeEventListener("focus", syncHistory);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, []);
 
   useEffect(() => {
@@ -398,11 +420,14 @@ export default function HomePage() {
       )}
 
       <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {liveCards.map((card) => (
+        {liveCards.map((card) =>
+          "patternPreview" in card && card.patternPreview ? (
+            <HomePatternCard key={card.title} data={card.patternPreview} />
+          ) : (
           <Link
             key={card.title}
             href={card.href}
-            className={`rounded-[24px] border px-4 py-4 shadow-[0_10px_26px_rgba(61,51,56,0.05)] transition hover:-translate-y-0.5 hover:bg-[#FFFDF9] ${card.cardClass}`}
+            className={`rounded-[24px] border px-4 py-4 shadow-[0_10px_26px_rgba(61,51,56,0.05)] transition hover:-translate-y-0.5 hover:bg-[#FFFDF9] ${"cardClass" in card ? card.cardClass : ""}`}
           >
             <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">{card.eyebrow}</p>
             <h2 className="mt-2 text-xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
@@ -440,9 +465,12 @@ export default function HomePage() {
                 {card.text}
               </p>
             ) : null}
-            <p className="mt-3 text-xs font-bold text-[#8B6F47]">{card.cta} ›</p>
+            {"cta" in card && card.cta ? (
+              <p className="mt-3 text-xs font-bold text-[#8B6F47]">{card.cta} ›</p>
+            ) : null}
           </Link>
-        ))}
+          ),
+        )}
       </section>
 
       <section className="relative overflow-hidden rounded-[30px] border border-[#E2D7D0] bg-white shadow-[0_18px_48px_rgba(61,51,56,0.07)]">
