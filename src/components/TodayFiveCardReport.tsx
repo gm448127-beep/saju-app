@@ -80,6 +80,23 @@ function splitFlowText(flow: string) {
   };
 }
 
+/** MY TODAY 본문 — scoreTone(평/길)은 등급 라벨이므로 문장 필드를 쓴다 */
+function buildMyTodayLeadText(
+  result: TodayFiveCardReportProps["result"],
+  report: DailyFortuneContent,
+  overall: number,
+) {
+  const briefing = result?.briefing as
+    | { oneLine?: string; headline?: string; scoreTone?: string }
+    | undefined;
+  if (briefing?.oneLine?.trim()) return briefing.oneLine.trim();
+  if (briefing?.headline?.trim()) return briefing.headline.trim();
+  if (report.sentence?.trim()) return report.sentence.trim();
+  const { headline } = splitFlowText(report.flow);
+  if (headline) return headline;
+  return getScoreInterpretation(overall, getTodayStatus(overall));
+}
+
 export default function TodayFiveCardReport({
   report,
   mode = "personalized",
@@ -94,8 +111,12 @@ export default function TodayFiveCardReport({
   const overall = isPersonalized ? clampScore(scores.overall ?? axisOverall) : axisOverall;
   const status = isPersonalized ? getTodayStatus(overall) : report.toneLabel;
   const interpretation = isPersonalized
-    ? result?.briefing?.scoreTone || getScoreInterpretation(overall, getTodayStatus(overall))
+    ? buildMyTodayLeadText(result, report, overall)
     : report.emotionPoint.description;
+  const scoreGrade =
+    isPersonalized && typeof result?.briefing === "object" && result.briefing !== null
+      ? (result.briefing as { scoreTone?: string }).scoreTone
+      : undefined;
   const tonePrefix = isPersonalized ? "나의 오늘" : "오늘의 결";
   const areas = [
     { key: "relation", label: "관계", score: clampScore(report.axisScores.relation) },
@@ -218,6 +239,11 @@ export default function TodayFiveCardReport({
               <span className="rounded-full border border-[#E2D7D0] bg-[#FFF8EE] px-2.5 py-0.5 text-[10px] font-bold text-[#8B6F47]">
                 {tonePrefix} · {report.toneLabel}
               </span>
+              {scoreGrade && (
+                <span className="rounded-full border border-[#E2D7D0] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#8A7E78]">
+                  등급 {scoreGrade}
+                </span>
+              )}
               {!isPersonalized && (
                 <span className="rounded-full border border-[#E2D7D0] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#8A7E78]">
                   공통 흐름
