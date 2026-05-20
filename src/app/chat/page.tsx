@@ -1,7 +1,14 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import BirthDateNumberInputs, { isValidBirthDate } from '@/components/BirthDateNumberInputs';
+import StoredProfileBar from '@/components/StoredProfileBar';
+import { useUserProfile } from '@/components/UserProfileProvider';
+import {
+  getUserProfile,
+  profileToChatBirthData,
+  type UserBirthProfile,
+} from '@/lib/user-profile-storage';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -48,6 +55,7 @@ const TIME_SLOTS = [
 ];
 
 export default function ChatPage() {
+  const { profile, saveProfile, displayName } = useUserProfile();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -71,19 +79,7 @@ export default function ChatPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const saveBirthData = () => {
-    if (!isValidBirthDate(birthData.year, birthData.month, birthData.day)) {
-      alert('생년월일을 숫자로 정확히 입력해주세요!');
-      return;
-    }
-    setBirthSaved(true);
-    setShowBirthForm(false);
-    // 환영 메시지
-    setMessages([{
-      role: 'assistant',
-      content: `안녕하세요. **운명비서**입니다.\n\n${birthData.year}년 ${birthData.month}월 ${birthData.day}일생 (${birthData.gender === '남' ? '남성' : '여성'}, ${birthData.calendarType === 'solar' ? '양력' : birthData.calendarType === 'lunarLeap' ? '윤달' : '음력'}, ${getBirthTimeLabel(birthData)}) 정보를 확인했습니다.\n\n이제 맞춤형 사주 상담을 받을 수 있습니다.\n\n아래 버튼을 눌러 빠르게 질문하거나, 궁금한 점을 직접 입력해보세요.`,
-    }]);
-  };
+  const chatHydratedRef = useRef<string | null>(null);
 
   function getBirthTimeLabel(data: BirthData) {
     if (data.timeMode === 'slot') {
@@ -94,6 +90,52 @@ export default function ChatPage() {
     }
     return '출생시간 모름';
   }
+
+  const startChatWithBirth = useCallback((data: BirthData, savedProfile?: UserBirthProfile | null) => {
+    setBirthSaved(true);
+    setShowBirthForm(false);
+    const nameLine = savedProfile?.name?.trim()
+      ? `${savedProfile.name.trim()}님, `
+      : '';
+    setMessages([{
+      role: 'assistant',
+      content: `안녕하세요. **운명비서**입니다.\n\n${nameLine}${data.year}년 ${data.month}월 ${data.day}일생 (${data.gender === '남' ? '남성' : '여성'}, ${data.calendarType === 'solar' ? '양력' : data.calendarType === 'lunarLeap' ? '윤달' : '음력'}, ${getBirthTimeLabel(data)}) 기준으로 맞춤 상담을 시작합니다.\n\n아래 버튼을 누르거나 직접 질문해 주세요.`,
+    }]);
+  }, []);
+
+  const persistBirthToProfile = (data: BirthData) => {
+    const stored: Omit<UserBirthProfile, 'savedAt'> = {
+      year: data.year,
+      month: data.month,
+      day: data.day,
+      gender: data.gender as '남' | '여',
+      calendarType: data.calendarType,
+      timeMode: data.timeMode,
+      slotHour: Number(data.slotHour),
+      exactHour: Number(data.exactHour),
+      exactMinute: Number(data.exactMinute),
+    };
+    saveProfile(stored);
+  };
+
+  const saveBirthData = () => {
+    if (!isValidBirthDate(birthData.year, birthData.month, birthData.day)) {
+      alert('생년월일을 숫자로 정확히 입력해주세요!');
+      return;
+    }
+    persistBirthToProfile(birthData);
+    startChatWithBirth(birthData, profile);
+  };
+
+  useEffect(() => {
+    if (birthSaved) return;
+    const stored = profile ?? getUserProfile();
+    if (!stored || chatHydratedRef.current === stored.savedAt) return;
+    chatHydratedRef.current = stored.savedAt;
+    const chatBirth = profileToChatBirthData(stored);
+    setBirthData(chatBirth);
+    startChatWithBirth(chatBirth, stored);
+  }, [profile, birthSaved, startChatWithBirth]);
 
   const skipBirthData = () => {
     setShowBirthForm(false);
@@ -164,8 +206,18 @@ export default function ChatPage() {
     <div className="flex flex-col" style={{ height: 'calc(100vh - 80px)' }}>
       <div className="mx-4 mb-3 rounded-[24px] border border-[#E2D7D0] bg-white px-5 py-4 shadow-[0_10px_30px_rgba(61,51,56,0.05)] shrink-0">
         <p className="text-xs tracking-[0.08em] text-[#B8A78D] mb-1">대화형 운명 상담</p>
-        <h1 style={{ fontFamily: 'Jua, sans-serif' }} className="text-xl text-[#2F282B]">AI 사주 상담</h1>
-        {birthSaved && (
+        <h1 style={{ fontFamily: 'Jua, sans-serif' }} className="text-xl text-[#2F282B]">
+          {profile ? `${displayName}의 AI 상담` : 'AI 사주 상담'}
+        </h1>
+        {birthSaved && profile && (
+          <div className="mt-2">
+            <StoredProfileBar
+              profile={profile}
+              onEdit={() => setShowBirthForm(true)}
+            />
+          </div>
+        )}
+        {birthSaved && !profile && (
           <p className="text-xs text-[#8A7E78] mt-1">
             {birthData.year}년 {birthData.month}월 {birthData.day}일 ({birthData.gender === '남' ? '남' : '여'}, {birthData.calendarType === 'solar' ? '양력' : birthData.calendarType === 'lunarLeap' ? '윤달' : '음력'}, {getBirthTimeLabel(birthData)})
             <button onClick={() => setShowBirthForm(true)} className="ml-2 text-[#8B6F47] underline">수정</button>
@@ -179,7 +231,7 @@ export default function ChatPage() {
       </div>
 
       {/* 생년월일 입력 폼 */}
-      {showBirthForm && (
+      {showBirthForm && !birthSaved && (
         <div className="mx-4 mb-3 card shrink-0">
           <p style={{ fontFamily: 'Jua, sans-serif' }} className="text-base text-[#3D3338] mb-3">생년월일을 입력하면 맞춤 상담이 가능합니다.</p>
           <div className="space-y-3">

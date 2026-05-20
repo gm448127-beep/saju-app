@@ -1,7 +1,12 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+  getProfileDisplayName,
+  getUserProfile,
+  PROFILE_UPDATED_EVENT,
+} from "@/lib/user-profile-storage";
 
 const NAV_ITEMS = [
   { href: "/today", label: "오늘운세", color: "#3D3338" },
@@ -16,7 +21,18 @@ const NAV_ITEMS = [
 export default function Header() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [profileLabel, setProfileLabel] = useState<string | null>(null);
   const isHistoryActive = pathname === "/history";
+
+  useEffect(() => {
+    const sync = () => {
+      const profile = getUserProfile();
+      setProfileLabel(profile ? getProfileDisplayName(profile) : null);
+    };
+    sync();
+    window.addEventListener(PROFILE_UPDATED_EVENT, sync);
+    return () => window.removeEventListener(PROFILE_UPDATED_EVENT, sync);
+  }, []);
 
   return (
     <header className="sticky top-0 z-50" style={{
@@ -72,6 +88,11 @@ export default function Header() {
         </nav>
 
         <div className="flex items-center gap-1.5">
+          {profileLabel && (
+            <span className="hidden rounded-full border border-[#E8D7C4] bg-[#FFF8EE] px-2.5 py-1 text-[10px] font-bold text-[#8B6F47] sm:inline">
+              {profileLabel}
+            </span>
+          )}
           <Link
             href="/history"
             aria-label="나의 패턴"

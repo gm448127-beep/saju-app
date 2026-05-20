@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import StoredProfileBar from "@/components/StoredProfileBar";
+import { useUserProfile } from "@/components/UserProfileProvider";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
 import ShareButton from "@/components/ShareButton";
 import BirthDateNumberInputs, { isValidBirthDate } from "@/components/BirthDateNumberInputs";
 import OhaengChart from "@/components/OhaengChart";
 import { buildSajuBirthKey, saveSajuRecord } from "@/lib/archive-storage";
+import type { UserBirthProfile } from "@/lib/user-profile-storage";
 import { matchCharacter, findStrongestSipsin } from "@/data/matchCharacter";
 import { Character } from "@/data/characters";
 import { CHEONGAN_DICT, GYEOK_DICT, STRENGTH_DICT, GONGMANG_DICT, GILSIN_DICT, HYUNGSIN_DICT, OHAENG_DICT } from "@/data/wisdomDict";
@@ -185,6 +188,7 @@ function formatRelationDetail(key: string, value: string) {
 }
 
 export default function SajuPage() {
+  const { profile, saveProfile, displayName } = useUserProfile();
   const resultRef = useRef<HTMLDivElement | null>(null);
   const [name, setName] = useState("");
   const [year, setYear] = useState("1995");
@@ -200,6 +204,20 @@ export default function SajuPage() {
   const [error, setError] = useState("");
   const [result, setResult] = useState<SajuResult | null>(null);
   const todayFortune = useMemo(() => buildDailyFortuneContent(), []);
+
+  useEffect(() => {
+    if (!profile) return;
+    if (profile.name) setName(profile.name);
+    setYear(profile.year);
+    setMonth(profile.month);
+    setDay(profile.day);
+    setGender(profile.gender);
+    setCalendarType(profile.calendarType);
+    setTimeMode(profile.timeMode);
+    setSlotValue(profile.slotHour);
+    setExactHour(profile.exactHour);
+    setExactMinute(profile.exactMinute);
+  }, [profile]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -222,6 +240,19 @@ export default function SajuPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "분석 실패");
       setResult(data);
+      const stored: Omit<UserBirthProfile, "savedAt"> = {
+        name: name.trim() || undefined,
+        year,
+        month,
+        day,
+        gender,
+        calendarType: calendarType as UserBirthProfile["calendarType"],
+        timeMode,
+        slotHour: slotValue,
+        exactHour,
+        exactMinute,
+      };
+      saveProfile(stored);
     } catch (err) {
       setError(err instanceof Error ? err.message : "오류가 발생했습니다.");
     } finally { setLoading(false); }
@@ -250,9 +281,22 @@ export default function SajuPage() {
     <div className="space-y-6">
       <div className="rounded-[24px] border border-[#E2D7D0] bg-white px-5 py-5 shadow-[0_10px_30px_rgba(61,51,56,0.05)]">
         <p className="text-xs tracking-[0.08em] text-[#B8A78D] mb-2">나를 이해하는 기본 리포트</p>
-        <h1 style={{ fontFamily: "Jua, sans-serif" }} className="text-2xl text-[#2F282B]">사주팔자 분석</h1>
-        <p className="text-[#8A7E78] text-sm mt-1">생년월일시를 입력하면 사주 원국과 주요 흐름을 정리합니다.</p>
+        <h1 style={{ fontFamily: "Jua, sans-serif" }} className="text-2xl text-[#2F282B]">
+          {profile ? `${displayName}의 사주` : "사주팔자 분석"}
+        </h1>
+        <p className="text-[#8A7E78] text-sm mt-1">
+          {profile
+            ? "저장된 생년월일 기준으로 분석합니다. 바꾸려면 아래에서 수정하세요."
+            : "생년월일시를 입력하면 사주 원국과 주요 흐름을 정리합니다."}
+        </p>
       </div>
+
+      {profile && !result && (
+        <StoredProfileBar
+          profile={profile}
+          subtitle="한 번 입력한 정보가 앱 전체에 연결됩니다"
+        />
+      )}
 
       <div className="card">
         <form onSubmit={handleSubmit} className="space-y-4">

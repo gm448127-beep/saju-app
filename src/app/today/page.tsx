@@ -1,6 +1,8 @@
 ﻿"use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import StoredProfileBar from "@/components/StoredProfileBar";
+import { useUserProfile } from "@/components/UserProfileProvider";
 import ShareButton from "@/components/ShareButton";
 import PdfButton from "@/components/PdfButton";
 import HourlyFlowSection from "@/components/HourlyFlowSection";
@@ -13,6 +15,10 @@ import TodayFiveCardReport from "@/components/TodayFiveCardReport";
 import TodayPersonalizeForm, { isValidBirthDate } from "@/components/TodayPersonalizeForm";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
+import {
+  profileToTodayPayload,
+  type UserBirthProfile,
+} from "@/lib/user-profile-storage";
 
 const TAB_ITEMS = [
   { key: "summary", label: "요약" },
@@ -227,7 +233,33 @@ function MyeongsikReport({ report }: { report?: any }) {
   );
 }
 
+function applyProfileToFormState(
+  profile: UserBirthProfile,
+  setters: {
+    setYear: (v: string) => void;
+    setMonth: (v: string) => void;
+    setDay: (v: string) => void;
+    setTimeMode: (v: "none" | "slot" | "exact") => void;
+    setSlotHour: (v: number) => void;
+    setExactHour: (v: number) => void;
+    setExactMinute: (v: number) => void;
+    setCalendarType: (v: string) => void;
+    setGender: (v: string) => void;
+  },
+) {
+  setters.setYear(profile.year);
+  setters.setMonth(profile.month);
+  setters.setDay(profile.day);
+  setters.setTimeMode(profile.timeMode);
+  setters.setSlotHour(profile.slotHour);
+  setters.setExactHour(profile.exactHour);
+  setters.setExactMinute(profile.exactMinute);
+  setters.setCalendarType(profile.calendarType);
+  setters.setGender(profile.gender);
+}
+
 export default function TodayPage() {
+  const { profile, saveProfile, displayName, isReady: profileReady } = useUserProfile();
   const [year, setYear] = useState("1995");
   const [month, setMonth] = useState("1");
   const [day, setDay] = useState("1");
@@ -254,6 +286,87 @@ export default function TodayPage() {
     document.getElementById("personalize")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  const persistProfileFromForm = useCallback(() => {
+    if (!isValidBirthDate(year, month, day)) return;
+    const next: Omit<UserBirthProfile, "savedAt"> = {
+      name: profile?.name,
+      year,
+      month,
+      day,
+      gender: gender as "남" | "여",
+      calendarType: calendarType as UserBirthProfile["calendarType"],
+      timeMode,
+      slotHour,
+      exactHour,
+      exactMinute,
+    };
+    saveProfile(next);
+  }, [
+    year,
+    month,
+    day,
+    gender,
+    calendarType,
+    timeMode,
+    slotHour,
+    exactHour,
+    exactMinute,
+    profile?.name,
+    saveProfile,
+  ]);
+
+  const fetchTodayReport = useCallback(
+    async (payload: ReturnType<typeof profileToTodayPayload>, scrollToResult = true) => {
+      setLoading(true);
+      setError("");
+      try {
+        const res = await fetch("/api/today", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || "분석 실패");
+        setResult(json);
+        setActiveTab("summary");
+        if (scrollToResult) {
+          window.setTimeout(() => {
+            resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }, 80);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "오류가 발생했습니다.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!profileReady || !profile) return;
+    applyProfileToFormState(profile, {
+      setYear,
+      setMonth,
+      setDay,
+      setTimeMode,
+      setSlotHour,
+      setExactHour,
+      setExactMinute,
+      setCalendarType,
+      setGender,
+    });
+  }, [profile, profileReady]);
+
+  const autoLoadedRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!profileReady || !profile) return;
+    if (autoLoadedRef.current === profile.savedAt) return;
+    autoLoadedRef.current = profile.savedAt;
+    fetchTodayReport(profileToTodayPayload(profile), true);
+  }, [profile, profileReady, fetchTodayReport]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -263,45 +376,27 @@ export default function TodayPage() {
       return;
     }
 
-    setLoading(true);
+    persistProfileFromForm();
 
-    try {
-      let hour: number | undefined;
-      let minute: number | undefined;
-
-      if (timeMode === "exact") {
-        hour = exactHour;
-        minute = exactMinute;
-      } else if (timeMode === "slot") {
-        hour = slotHour;
-        minute = 0;
-      }
-
-      const res = await fetch("/api/today", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          year: Number(year),
-          month: Number(month),
-          day: Number(day),
-          hour,
-          minute,
-          isLunar: calendarType !== "solar",
-          gender,
-        }),
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error || "분석 실패");
-      setResult(json);
-      setActiveTab("summary");
-      window.setTimeout(() => {
-        resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 80);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "오류가 발생했습니다.");
-    } finally {
-      setLoading(false);
+    let hour: number | undefined;
+    let minute: number | undefined;
+    if (timeMode === "exact") {
+      hour = exactHour;
+      minute = exactMinute;
+    } else if (timeMode === "slot") {
+      hour = slotHour;
+      minute = 0;
     }
+
+    await fetchTodayReport({
+      year: Number(year),
+      month: Number(month),
+      day: Number(day),
+      hour,
+      minute,
+      isLunar: calendarType !== "solar",
+      gender,
+    });
   };
 
   const statItems: Omit<TodayStatItem, "score">[] = result
@@ -345,12 +440,24 @@ export default function TodayPage() {
     <div className="space-y-10">
       {!isPersonalized && (
         <>
-          <TodayEmptyState
-            dateLabel={todayLabel}
-            toneLabel={commonPreview.toneLabel}
-            sentence={commonPreview.sentence}
-            onScrollToForm={scrollToPersonalizeForm}
-          />
+          {profile && loading ? (
+            <div className="rounded-[24px] border border-[#E8D7C4] bg-[#FFFDF8] px-5 py-8 text-center">
+              <p className="text-sm font-semibold text-[#8B6F47]">{displayName}의 오늘 흐름을 읽는 중…</p>
+            </div>
+          ) : profile ? (
+            <StoredProfileBar
+              profile={profile}
+              subtitle="저장된 사주 기준으로 자동 분석합니다"
+              onEdit={scrollToPersonalizeForm}
+            />
+          ) : (
+            <TodayEmptyState
+              dateLabel={todayLabel}
+              toneLabel={commonPreview.toneLabel}
+              sentence={commonPreview.sentence}
+              onScrollToForm={scrollToPersonalizeForm}
+            />
+          )}
           {personalizeForm}
         </>
       )}
@@ -361,7 +468,7 @@ export default function TodayPage() {
             <div className="rounded-[24px] border border-[#E8D7C4] bg-[#FFFDF8] px-5 py-4">
               <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">MY TODAY</p>
               <h2 className="mt-1 text-xl text-[#2F282B] sm:text-2xl" style={{ fontFamily: "Jua, sans-serif" }}>
-                나의 오늘의 흐름
+                {profile ? `${displayName}의 오늘` : "나의 오늘의 흐름"}
               </h2>
               <p className="mt-1 text-sm text-[#8A7E78]">{todayLabel}</p>
             </div>

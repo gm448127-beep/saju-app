@@ -1,5 +1,6 @@
 ﻿import type { Metadata } from "next";
 import "./globals.css";
+import ClientProviders from "@/components/ClientProviders";
 import Header from "@/components/Header";
 
 export const metadata: Metadata = {
@@ -56,10 +57,10 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen">
-        <Header />
-        <main className="max-w-4xl mx-auto px-4 py-6">
-          {children}
-        </main>
+        <ClientProviders>
+          <Header />
+          <main className="max-w-4xl mx-auto px-4 py-6">{children}</main>
+        </ClientProviders>
       </body>
     </html>
   );

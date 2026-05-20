@@ -54,9 +54,15 @@ function formatTodayLabel(date = new Date()) {
 
 interface HomeResultPreviewProps {
   content: DailyFortuneContent;
+  displayName?: string;
+  isPersonalized?: boolean;
 }
 
-export default function HomeResultPreview({ content }: HomeResultPreviewProps) {
+export default function HomeResultPreview({
+  content,
+  displayName,
+  isPersonalized = false,
+}: HomeResultPreviewProps) {
   const scores = getPreviewScores(content);
   const statusLabel = content.toneLabel || getTodayStatus(scores.overall);
 
@@ -71,17 +77,19 @@ export default function HomeResultPreview({ content }: HomeResultPreviewProps) {
             </span>
           </div>
           <h2 className="mt-1 text-xl leading-tight text-[#2F282B] sm:text-2xl" style={{ fontFamily: "Jua, sans-serif" }}>
-            오늘의 흐름은 이렇게 읽힙니다
+            {isPersonalized && displayName ? `${displayName}의 오늘` : "오늘의 흐름은 이렇게 읽힙니다"}
           </h2>
           <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-[#8A7E78]">
-            {`${TODAY_EMPTY_COPY.ctaLead}\n→ ${TODAY_EMPTY_COPY.ctaAction}`}
+            {isPersonalized
+              ? "사주 기준으로 맞춘 오늘의 흐름입니다."
+              : `${TODAY_EMPTY_COPY.ctaLead}\n→ ${TODAY_EMPTY_COPY.ctaAction}`}
           </p>
         </div>
         <Link
           href="/today"
           className="inline-flex items-center gap-2 rounded-full border border-[#D9C8C0] bg-[#FAF8F5] px-4 py-2 text-xs font-bold text-[#2F282B] transition hover:bg-white"
         >
-          {TODAY_EMPTY_COPY.ctaButton}
+          {isPersonalized ? "오늘 리포트 보기" : TODAY_EMPTY_COPY.ctaButton}
           <span className="text-base leading-none">›</span>
         </Link>
       </div>
@@ -111,13 +119,24 @@ export default function HomeResultPreview({ content }: HomeResultPreviewProps) {
             </h3>
 
             <div className="relative mt-5 overflow-hidden rounded-2xl border border-[#E2D7D0] bg-white/80 px-4 py-4">
-              <p className="text-[11px] font-bold text-[#8B6F47]">{TODAY_EMPTY_COPY.scoreSectionLabel}</p>
-              <p className="mt-1 text-[11px] leading-relaxed text-[#8A7E78]">{TODAY_EMPTY_COPY.scoreDisclaimer}</p>
-              <div className="pointer-events-none absolute inset-x-3 bottom-3 top-[5.5rem] rounded-xl bg-white/30 backdrop-blur-[1px]" />
+              {!isPersonalized && (
+                <>
+                  <p className="text-[11px] font-bold text-[#8B6F47]">{TODAY_EMPTY_COPY.scoreSectionLabel}</p>
+                  <p className="mt-1 text-[11px] leading-relaxed text-[#8A7E78]">{TODAY_EMPTY_COPY.scoreDisclaimer}</p>
+                </>
+              )}
+              {isPersonalized && (
+                <p className="text-[11px] font-bold text-[#8B6F47]">내 사주 기준 · 오늘 점수</p>
+              )}
+              {!isPersonalized && (
+                <div className="pointer-events-none absolute inset-x-3 bottom-3 top-[5.5rem] rounded-xl bg-white/30 backdrop-blur-[1px]" />
+              )}
               <div className="relative mt-3 border-b border-[#E2D7D0]/70 pb-3">
                 <div className="flex items-end justify-between gap-3">
                   <div>
-                    <p className="text-[11px] font-bold tracking-[0.08em] text-[#8B6F47]">종합 · 예시</p>
+                    <p className="text-[11px] font-bold tracking-[0.08em] text-[#8B6F47]">
+                      {isPersonalized ? "종합" : "종합 · 예시"}
+                    </p>
                     <div className="mt-1 flex items-end gap-2">
                       <p className="text-3xl font-bold leading-none text-[#2F282B]">{scores.overall}</p>
                       <p className="pb-0.5 text-sm font-bold text-[#8B6F47]">{statusLabel}</p>
@@ -135,10 +154,12 @@ export default function HomeResultPreview({ content }: HomeResultPreviewProps) {
                   </div>
                 ))}
               </div>
-              <div className="relative mt-3 rounded-xl border border-[#E8D7C4] bg-[#FFF8EE] px-3 py-2.5">
-                <p className="text-xs font-bold text-[#2F282B]">{TODAY_EMPTY_COPY.ctaLead}</p>
-                <p className="mt-0.5 text-[11px] font-semibold text-[#8B6F47]">→ {TODAY_EMPTY_COPY.ctaAction}</p>
-              </div>
+              {!isPersonalized && (
+                <div className="relative mt-3 rounded-xl border border-[#E8D7C4] bg-[#FFF8EE] px-3 py-2.5">
+                  <p className="text-xs font-bold text-[#2F282B]">{TODAY_EMPTY_COPY.ctaLead}</p>
+                  <p className="mt-0.5 text-[11px] font-semibold text-[#8B6F47]">→ {TODAY_EMPTY_COPY.ctaAction}</p>
+                </div>
+              )}
             </div>
 
             <div className="mt-4 rounded-2xl border border-[#E2D7D0] bg-white/70 px-4 py-3">

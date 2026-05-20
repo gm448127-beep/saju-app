@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import HomeResultPreview from "@/components/HomeResultPreview";
+import { useUserProfile } from "@/components/UserProfileProvider";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
+import type { DailyFortuneContent } from "@/lib/today-content-engine";
+import { profileToTodayPayload } from "@/lib/user-profile-storage";
 import { getSajuHistory, getTarotFavorites } from "@/lib/archive-storage";
 import { buildHomeWeeklyCard } from "@/lib/today-pattern-helpers";
 import { getUnifiedArchiveStats, getTodayHistory } from "@/lib/today-report-helpers";
@@ -107,12 +110,15 @@ const DIFFERENCE_POINTS = [
 ];
 
 export default function HomePage() {
+  const { profile, displayName, isReady: profileReady } = useUserProfile();
   const [activeSlide, setActiveSlide] = useState(0);
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [historyRecords, setHistoryRecords] = useState<ReturnType<typeof getTodayHistory>>([]);
   const [historyStats, setHistoryStats] = useState({ todayCount: 0, dayCount: 0, sajuCount: 0, tarotCount: 0, totalCount: 0 });
+  const [personalizedContent, setPersonalizedContent] = useState<DailyFortuneContent | null>(null);
   const selectedSlide = FEATURE_SLIDES[activeSlide];
-  const dailyContent = buildDailyFortuneContent();
+  const dailyContent = personalizedContent ?? buildDailyFortuneContent();
+  const isPersonalizedHome = Boolean(profile && personalizedContent);
 
   const weeklyCard = useMemo(
     () =>
@@ -139,6 +145,34 @@ export default function HomePage() {
       getUnifiedArchiveStats(records, getSajuHistory().length, getTarotFavorites().length),
     );
   }, []);
+
+  useEffect(() => {
+    if (!profileReady || !profile) {
+      setPersonalizedContent(null);
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/today", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(profileToTodayPayload(profile)),
+        });
+        const json = await res.json();
+        if (!cancelled && res.ok && json.dailyReport) {
+          setPersonalizedContent(json.dailyReport as DailyFortuneContent);
+        }
+      } catch {
+        if (!cancelled) setPersonalizedContent(null);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [profile, profileReady]);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -245,7 +279,18 @@ export default function HomePage() {
         </div>
       </section>
 
-      <HomeResultPreview content={dailyContent} />
+      {profile && (
+        <p className="rounded-2xl border border-[#E8D7C4] bg-[#FFF8EE] px-4 py-3 text-center text-sm font-semibold text-[#5A4E48]">
+          <span className="text-[#8B6F47]">{displayName}의 오늘</span>
+          {" · "}홈·오늘운세·사주·상담이 같은 사주 기준으로 연결됩니다
+        </p>
+      )}
+
+      <HomeResultPreview
+        content={dailyContent}
+        displayName={displayName}
+        isPersonalized={isPersonalizedHome}
+      />
 
       <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {liveCards.map((card) => (
