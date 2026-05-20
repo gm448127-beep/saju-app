@@ -5,10 +5,18 @@ export type TodayBasisSection = {
   lines: string[];
 };
 
-type TodayApiResult = {
+/** 오늘의 결 칩 툴팁에 필요한 API 필드 */
+export type TodayToneTooltipSource = {
   myDayGan?: string;
-  myDayBranch?: string;
   myElement?: string;
+  todayGan?: string;
+  todayJi?: string;
+  todaySipsin?: string;
+  sipsinTitle?: string;
+};
+
+type TodayApiResult = TodayToneTooltipSource & {
+  myDayBranch?: string;
   myHourGan?: string | null;
   myHourBranch?: string | null;
   hasHour?: boolean;
@@ -43,9 +51,25 @@ function parseGanJiKo(value?: string): string | null {
   return trimmed.length <= 2 ? trimmed : null;
 }
 
+export function pickTodayToneTooltipSource(
+  json: Record<string, unknown> | null | undefined,
+): TodayToneTooltipSource | null {
+  if (!json || typeof json.myDayGan !== "string" || typeof json.todayGan !== "string") {
+    return null;
+  }
+  return {
+    myDayGan: json.myDayGan,
+    myElement: typeof json.myElement === "string" ? json.myElement : undefined,
+    todayGan: json.todayGan,
+    todayJi: typeof json.todayJi === "string" ? json.todayJi : undefined,
+    todaySipsin: typeof json.todaySipsin === "string" ? json.todaySipsin : undefined,
+    sipsinTitle: typeof json.sipsinTitle === "string" ? json.sipsinTitle : undefined,
+  };
+}
+
 /** 「오늘의 결 · 결정」 칩 툴팁 한 줄 */
 export function buildToneChipTooltip(
-  result: TodayApiResult | null | undefined,
+  result: TodayToneTooltipSource | null | undefined,
   toneLabel: string,
 ): string | null {
   if (!result?.myDayGan || !result.todayGan) return null;

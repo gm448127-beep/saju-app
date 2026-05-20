@@ -61,7 +61,11 @@ export default function ToneDecisionChip({
         aria-expanded={open}
         aria-describedby={open ? tooltipId : undefined}
         aria-label={`${label}, 명리 근거 보기`}
-        onClick={() => setOpen((value) => !value)}
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          setOpen((value) => !value);
+        }}
         className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 font-bold transition ${sizeClass} ${base} ${
           open ? "ring-2 ring-[#C49A4A]/45" : "hover:bg-white"
         }`}

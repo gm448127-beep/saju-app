@@ -1,6 +1,8 @@
 import Link from "next/link";
+import ToneDecisionChip from "@/components/ToneDecisionChip";
 import { TODAY_EMPTY_COPY } from "@/lib/history-copy";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
+import { buildToneChipTooltip, type TodayToneTooltipSource } from "@/lib/today-basis-helpers";
 
 function clampScore(value: number) {
   return Math.max(20, Math.min(99, Math.round(value)));
@@ -58,6 +60,8 @@ interface HomeResultPreviewProps {
   isPersonalized?: boolean;
   /** 프로필은 있으나 맞춤 API 로딩 중 */
   isLoadingPersonalized?: boolean;
+  /** 맞춤 API에서 받은 일간·일진·십성 (칩 툴팁용) */
+  toneTooltipBasis?: TodayToneTooltipSource | null;
 }
 
 export default function HomeResultPreview({
@@ -65,9 +69,13 @@ export default function HomeResultPreview({
   displayName,
   isPersonalized = false,
   isLoadingPersonalized = false,
+  toneTooltipBasis = null,
 }: HomeResultPreviewProps) {
   const scores = getPreviewScores(content);
   const statusLabel = content.toneLabel || getTodayStatus(scores.overall);
+  const toneChipTooltip = isPersonalized
+    ? buildToneChipTooltip(toneTooltipBasis, content.toneLabel)
+    : null;
 
   return (
     <section className="overflow-hidden rounded-[30px] border border-[#E2D7D0] bg-white p-4 shadow-[0_18px_48px_rgba(61,51,56,0.07)] sm:p-5">
@@ -117,9 +125,13 @@ export default function HomeResultPreview({
           <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/40" />
           <div className="relative">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-bold text-[#8B6F47]">
-              <span className="rounded-full border border-[#E2D7D0] bg-white/70 px-2 py-0.5">
-                오늘의 결 · {content.toneLabel}
-              </span>
+              <ToneDecisionChip
+                label={`오늘의 결 · ${content.toneLabel}`}
+                tooltip={toneChipTooltip}
+                size="md"
+                variant="white"
+                className="relative z-10 bg-white/70"
+              />
               {isPersonalized ? (
                 <span className="rounded-full border border-[#8B6F47]/30 bg-white/80 px-2 py-0.5 text-[10px] font-bold text-[#8B6F47]">
                   {TODAY_EMPTY_COPY.badgeMyToday}
@@ -211,11 +223,16 @@ export default function HomeResultPreview({
             ))}
           </div>
 
-          <div className="mt-4 rounded-2xl border border-[#E2D7D0] bg-[#FFFDF9] px-4 py-3">
+          <div className="relative z-10 mt-4 rounded-2xl border border-[#E2D7D0] bg-[#FFFDF9] px-4 py-3">
             <p className="text-xs font-bold text-[#8B6F47]">감정의 중심</p>
-            <p className="mt-1 text-base text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-              오늘의 결 · {content.toneLabel}
-            </p>
+            <div className="mt-1">
+              <ToneDecisionChip
+                label={`오늘의 결 · ${content.toneLabel}`}
+                tooltip={toneChipTooltip}
+                size="md"
+                variant="white"
+              />
+            </div>
             <p className="mt-1 text-xs leading-relaxed text-[#5A4E48]">{content.emotionPoint.description}</p>
           </div>
 

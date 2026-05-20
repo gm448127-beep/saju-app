@@ -6,6 +6,7 @@ import HomeResultPreview from "@/components/HomeResultPreview";
 import { useUserProfile } from "@/components/UserProfileProvider";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
+import { pickTodayToneTooltipSource, type TodayToneTooltipSource } from "@/lib/today-basis-helpers";
 import { PROFILE_UPDATED_EVENT, profileToTodayPayload } from "@/lib/user-profile-storage";
 import { getSajuHistory, getTarotFavorites } from "@/lib/archive-storage";
 import { buildHomeWeeklyCard } from "@/lib/today-pattern-helpers";
@@ -159,6 +160,7 @@ export default function HomePage() {
   const [historyRecords, setHistoryRecords] = useState<ReturnType<typeof getTodayHistory>>([]);
   const [historyStats, setHistoryStats] = useState({ todayCount: 0, dayCount: 0, sajuCount: 0, tarotCount: 0, totalCount: 0 });
   const [personalizedContent, setPersonalizedContent] = useState<DailyFortuneContent | null>(null);
+  const [personalizedToneBasis, setPersonalizedToneBasis] = useState<TodayToneTooltipSource | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const featureSlides = useMemo(
     () => buildFeatureSlides(profile ? displayName : null),
@@ -202,6 +204,7 @@ export default function HomePage() {
   useEffect(() => {
     if (!profileReady || !profile) {
       setPersonalizedContent(null);
+      setPersonalizedToneBasis(null);
       setPreviewLoading(false);
       return;
     }
@@ -219,11 +222,16 @@ export default function HomePage() {
         const json = await res.json();
         if (!cancelled && res.ok && json.dailyReport) {
           setPersonalizedContent(json.dailyReport as DailyFortuneContent);
+          setPersonalizedToneBasis(pickTodayToneTooltipSource(json));
         } else if (!cancelled) {
           setPersonalizedContent(null);
+          setPersonalizedToneBasis(null);
         }
       } catch {
-        if (!cancelled) setPersonalizedContent(null);
+        if (!cancelled) {
+          setPersonalizedContent(null);
+          setPersonalizedToneBasis(null);
+        }
       } finally {
         if (!cancelled) setPreviewLoading(false);
       }
@@ -247,6 +255,7 @@ export default function HomePage() {
         .then((json) => {
           if (json.dailyReport) {
             setPersonalizedContent(json.dailyReport as DailyFortuneContent);
+            setPersonalizedToneBasis(pickTodayToneTooltipSource(json));
           }
         })
         .finally(() => setPreviewLoading(false));
@@ -384,6 +393,7 @@ export default function HomePage() {
           displayName={displayName}
           isPersonalized={isPersonalizedHome}
           isLoadingPersonalized={false}
+          toneTooltipBasis={personalizedToneBasis}
         />
       )}
 
