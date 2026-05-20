@@ -80,21 +80,33 @@ function splitFlowText(flow: string) {
   };
 }
 
-/** MY TODAY 본문 — scoreTone(평/길)은 등급 라벨이므로 문장 필드를 쓴다 */
-function buildMyTodayLeadText(
+type TodayBriefingSlice = {
+  oneLine?: string;
+  headline?: string;
+  scoreTone?: string;
+};
+
+/** MY TODAY 요약 블록 — scoreTone(평/길)은 등급만, 본문은 여러 소스를 합친다 */
+function buildMyTodaySummary(
   result: TodayFiveCardReportProps["result"],
   report: DailyFortuneContent,
   overall: number,
 ) {
-  const briefing = result?.briefing as
-    | { oneLine?: string; headline?: string; scoreTone?: string }
-    | undefined;
-  if (briefing?.oneLine?.trim()) return briefing.oneLine.trim();
-  if (briefing?.headline?.trim()) return briefing.headline.trim();
-  if (report.sentence?.trim()) return report.sentence.trim();
-  const { headline } = splitFlowText(report.flow);
-  if (headline) return headline;
-  return getScoreInterpretation(overall, getTodayStatus(overall));
+  const briefing = result?.briefing as TodayBriefingSlice | undefined;
+  const summaryText = typeof result?.summary === "string" ? result.summary.trim() : "";
+  const sentence = report.sentence?.trim() || "";
+  const lead =
+    briefing?.oneLine?.trim() ||
+    briefing?.headline?.trim() ||
+    summaryText ||
+    splitFlowText(report.flow).headline ||
+    getScoreInterpretation(overall, getTodayStatus(overall));
+
+  return {
+    sentence,
+    lead,
+    grade: briefing?.scoreTone?.trim(),
+  };
 }
 
 export default function TodayFiveCardReport({
@@ -110,13 +122,10 @@ export default function TodayFiveCardReport({
   const axisOverall = buildOverallFromAxis(report);
   const overall = isPersonalized ? clampScore(scores.overall ?? axisOverall) : axisOverall;
   const status = isPersonalized ? getTodayStatus(overall) : report.toneLabel;
+  const myTodaySummary = isPersonalized ? buildMyTodaySummary(result, report, overall) : null;
   const interpretation = isPersonalized
-    ? buildMyTodayLeadText(result, report, overall)
+    ? myTodaySummary?.lead || report.emotionPoint.description
     : report.emotionPoint.description;
-  const scoreGrade =
-    isPersonalized && typeof result?.briefing === "object" && result.briefing !== null
-      ? (result.briefing as { scoreTone?: string }).scoreTone
-      : undefined;
   const tonePrefix = isPersonalized ? "나의 오늘" : "오늘의 결";
   const areas = [
     { key: "relation", label: "관계", score: clampScore(report.axisScores.relation) },
@@ -231,7 +240,7 @@ export default function TodayFiveCardReport({
       {/* 점수 + 어제 대비 */}
       <div className="rounded-[28px] border border-[#E2D7D0] bg-white px-5 py-5 shadow-[0_14px_38px_rgba(61,51,56,0.06)]">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-          <div className="flex-1">
+          <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">
                 {isPersonalized ? "MY TODAY" : "TODAY REPORT"}
@@ -239,9 +248,9 @@ export default function TodayFiveCardReport({
               <span className="rounded-full border border-[#E2D7D0] bg-[#FFF8EE] px-2.5 py-0.5 text-[10px] font-bold text-[#8B6F47]">
                 {tonePrefix} · {report.toneLabel}
               </span>
-              {scoreGrade && (
+              {myTodaySummary?.grade && (
                 <span className="rounded-full border border-[#E2D7D0] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#8A7E78]">
-                  등급 {scoreGrade}
+                  등급 {myTodaySummary.grade}
                 </span>
               )}
               {!isPersonalized && (
@@ -250,7 +259,25 @@ export default function TodayFiveCardReport({
                 </span>
               )}
             </div>
-            <p className="mt-4 max-w-md text-sm leading-relaxed text-[#5A4E48]">{interpretation}</p>
+
+            {isPersonalized && myTodaySummary ? (
+              <div className="mt-4 w-full max-w-xl space-y-3">
+                {myTodaySummary.sentence && (
+                  <p
+                    className="text-lg leading-snug text-[#2F282B] sm:text-xl"
+                    style={{ fontFamily: "Jua, sans-serif" }}
+                  >
+                    {myTodaySummary.sentence}
+                  </p>
+                )}
+                <div className="rounded-2xl border border-[#E8D7C4] bg-[#FFF8EE] px-4 py-3">
+                  <p className="text-[11px] font-bold text-[#8B6F47]">오늘 흐름 요약</p>
+                  <p className="mt-2 text-sm leading-relaxed text-[#4A403B]">{myTodaySummary.lead}</p>
+                </div>
+              </div>
+            ) : (
+              <p className="mt-4 w-full max-w-xl text-sm leading-relaxed text-[#5A4E48]">{interpretation}</p>
+            )}
           </div>
 
           <div className="w-full rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4 lg:max-w-sm">
