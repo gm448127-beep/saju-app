@@ -4,7 +4,8 @@
  */
 
 /** 대표 슬로건 (포지셔닝) */
-export const PRIMARY_TAGLINE = "한마디만 말고, 왜 그런지까지";
+export const PRIMARY_TAGLINE =
+  "매일 아침, 내 사주 기준으로 오늘의 흐름을 1분 안에 읽어드립니다";
 
 /** 기술 한 줄 — 신뢰·보조 설명 */
 export const ENGINE_ONE_LINER =
