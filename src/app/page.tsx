@@ -194,11 +194,15 @@ export default function HomePage() {
 
   const patternCard = useMemo(
     () =>
-      buildHomePatternCard(historyRecords, {
-        sajuCount: historyStats.sajuCount,
-        todayCount: historyStats.todayCount,
-      }),
-    [historyRecords, historyStats.sajuCount, historyStats.todayCount],
+      buildHomePatternCard(
+        historyRecords,
+        {
+          sajuCount: historyStats.sajuCount,
+          todayCount: historyStats.todayCount,
+        },
+        { hasProfile: Boolean(profile) },
+      ),
+    [historyRecords, historyStats.sajuCount, historyStats.todayCount, profile],
   );
 
   const liveCards = buildLiveCards(

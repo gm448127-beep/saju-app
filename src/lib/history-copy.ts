@@ -76,7 +76,11 @@ export const TODAY_EMPTY_COPY = {
 /** 홈 PATTERN 카드 미리보기 */
 export const HOME_PATTERN_COPY = {
   emptyInsight: "오늘부터 패턴이 쌓이기 시작해요",
-  emptySub: "오늘운세를 읽으면 결의 흐름이 이곳에 남습니다",
+  emptySub: "매일의 결이 쌓이면 여기에 주간 패턴이 보입니다",
+  emptyNudgeWithProfile: "오늘 한 번만 읽어도 첫 점이 찍힙니다",
+  emptyNudgeNoProfile: "생년월일만 넣고 오늘운세를 읽으면 첫 점이 찍힙니다",
+  emptyCta: "오늘운세 읽고 시작하기",
+  emptyStatsMuted: "아직 기록이 없어요 · 오늘부터 채워집니다",
   startedInsight: "오늘부터 패턴이 쌓이기 시작했어요",
   startedSub(toneLabel: string) {
     return `첫 기록 · ${toneLabel}의 결`;

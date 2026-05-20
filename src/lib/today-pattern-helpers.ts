@@ -279,12 +279,16 @@ export type HomePatternCard = {
   stats: { sajuCount: number; todayCount: number; recordDays: number };
   phase: "empty" | "started" | "warmup" | "insight";
   href: string;
+  /** 빈 상태 행동 유도 */
+  emptyNudge?: string;
+  emptyCta?: string;
 };
 
 /** 홈 PATTERN 카드 — 첫날 안내 / 최근 7일 결 분포 미리보기 */
 export function buildHomePatternCard(
   records: SavedTodayRecord[],
   archiveStats: { sajuCount: number; todayCount: number },
+  options?: { hasProfile?: boolean },
 ): HomePatternCard {
   const last7 = buildLast7DaysFlow(records);
   const recordDays = dedupeRecordsByDate(records).length;
@@ -300,7 +304,11 @@ export function buildHomePatternCard(
       topTones: [],
       stats,
       phase: "empty",
-      href: "/history",
+      href: "/today",
+      emptyNudge: options?.hasProfile
+        ? HOME_PATTERN_COPY.emptyNudgeWithProfile
+        : HOME_PATTERN_COPY.emptyNudgeNoProfile,
+      emptyCta: HOME_PATTERN_COPY.emptyCta,
     };
   }
 
