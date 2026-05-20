@@ -504,7 +504,7 @@ export default function TodayPage() {
                   key={tab.key}
                   type="button"
                   onClick={() => setActiveTab(tab.key)}
-                  className={`rounded-lg px-2 py-1.5 text-xs font-semibold transition sm:rounded-xl sm:px-3 sm:py-2.5 sm:text-sm ${
+                  className={`min-h-11 rounded-lg px-2 py-2.5 text-xs font-semibold transition sm:rounded-xl sm:px-3 sm:text-sm ${
                     activeTab === tab.key
                       ? "bg-[#2F282B] text-white"
                       : "text-[#8A7E78] hover:bg-[#FAF8F5] hover:text-[#3D3338]"

@@ -9,8 +9,16 @@ body {
   line-height: 1.75;
   letter-spacing: -0.015em;
   min-height: 100vh;
+  min-height: 100dvh;
   word-break: keep-all;
   overflow-wrap: break-word;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 모바일 터치 타깃 최소 44px (WCAG 2.5.5) */
+.touch-target {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
 }
 
 /* ===== 폰트 전역 적용 ===== */

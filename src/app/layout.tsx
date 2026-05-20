@@ -1,9 +1,16 @@
-﻿import "./globals.css";
+﻿import type { Viewport } from "next";
+import "./globals.css";
 import ClientProviders from "@/components/ClientProviders";
 import Header from "@/components/Header";
 import { rootMetadata } from "@/lib/site-metadata";
 
 export const metadata = rootMetadata();
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export default function RootLayout({
   children,

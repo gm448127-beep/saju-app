@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import HomePatternCard from "@/components/HomePatternCard";
 import HomeResultPreview from "@/components/HomeResultPreview";
+import MobileSnapRow, { MobileSnapCard } from "@/components/MobileSnapRow";
 import { useUserProfile } from "@/components/UserProfileProvider";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
@@ -361,7 +362,7 @@ export default function HomePage() {
               </p>
               <Link
                 href={selectedSlide.href}
-                className="relative z-10 mt-4 inline-flex items-center gap-2 rounded-full bg-[#2F282B] px-4 py-2.5 text-sm font-bold text-white shadow-[0_12px_28px_rgba(47,40,43,0.18)] transition hover:-translate-y-0.5"
+                className="relative z-10 mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#2F282B] px-5 py-3 text-sm font-bold text-white shadow-[0_12px_28px_rgba(47,40,43,0.18)] transition hover:-translate-y-0.5"
               >
                 리포트 보기
                 <span className="text-lg leading-none">›</span>
@@ -394,17 +395,22 @@ export default function HomePage() {
           </button>
         </div>
 
-        <div className="mt-3 flex items-center justify-center gap-2">
+        <div className="mt-3 flex items-center justify-center gap-1">
           {featureSlides.map((slide, index) => (
             <button
               key={slide.href}
               type="button"
               aria-label={`${slide.badge}번 리포트 선택`}
+              aria-current={activeSlide === index ? "true" : undefined}
               onClick={() => goToSlide(index)}
-              className={`h-3 rounded-full transition-all ${
-                activeSlide === index ? "w-9 bg-[#8B6F47]" : "w-3 bg-[#D8D5D4]"
-              }`}
-            />
+              className="touch-target flex items-center justify-center rounded-full transition"
+            >
+              <span
+                className={`block h-2.5 rounded-full transition-all ${
+                  activeSlide === index ? "w-9 bg-[#8B6F47]" : "w-2.5 bg-[#D8D5D4]"
+                }`}
+              />
+            </button>
           ))}
         </div>
       </section>
@@ -439,15 +445,21 @@ export default function HomePage() {
         />
       )}
 
-      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <MobileSnapRow
+        desktopClassName="lg:grid lg:grid-cols-4 lg:gap-3"
+        className="gap-3"
+        aria-label="바로가기 카드"
+      >
         {liveCards.map((card) =>
           "patternPreview" in card && card.patternPreview ? (
-            <HomePatternCard key={card.title} data={card.patternPreview} />
+            <MobileSnapCard key={card.title} className="h-full lg:w-auto">
+              <HomePatternCard data={card.patternPreview} />
+            </MobileSnapCard>
           ) : (
+          <MobileSnapCard key={card.title} className="h-full lg:w-auto">
           <Link
-            key={card.title}
             href={card.href}
-            className={`rounded-[24px] border px-4 py-4 shadow-[0_10px_26px_rgba(61,51,56,0.05)] transition hover:-translate-y-0.5 hover:bg-[#FFFDF9] ${"cardClass" in card ? card.cardClass : ""}`}
+            className={`flex h-full min-h-[11rem] flex-col rounded-[24px] border px-4 py-4 shadow-[0_10px_26px_rgba(61,51,56,0.05)] transition hover:-translate-y-0.5 hover:bg-[#FFFDF9] ${"cardClass" in card ? card.cardClass : ""}`}
           >
             <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">{card.eyebrow}</p>
             <h2 className="mt-2 text-xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
@@ -486,12 +498,13 @@ export default function HomePage() {
               </p>
             ) : null}
             {"cta" in card && card.cta ? (
-              <p className="mt-3 text-xs font-bold text-[#8B6F47]">{card.cta} ›</p>
+              <p className="mt-auto pt-3 text-xs font-bold text-[#8B6F47]">{card.cta} ›</p>
             ) : null}
           </Link>
+          </MobileSnapCard>
           ),
         )}
-      </section>
+      </MobileSnapRow>
 
       <section className="relative overflow-hidden rounded-[30px] border border-[#E2D7D0] bg-white shadow-[0_18px_48px_rgba(61,51,56,0.07)]">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">

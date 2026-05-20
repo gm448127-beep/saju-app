@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useMemo } from "react";
-import OverallScoreDelta from "@/components/OverallScoreDelta";
+import AxisScorePanel from "@/components/AxisScorePanel";
 import ToneDecisionChip from "@/components/ToneDecisionChip";
 import { TODAY_EMPTY_COPY } from "@/lib/history-copy";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
@@ -39,22 +39,6 @@ function getTodayStatus(score: number) {
   if (score >= 70) return "안정";
   if (score >= 55) return "보통";
   return "주의";
-}
-
-function ScoreBlocks({ score, size = "md" }: { score: number; size?: "md" | "sm" }) {
-  const filled = Math.round((score / 100) * 8);
-  const blockClass = size === "sm" ? "h-1.5 w-1.5" : "h-2 w-2";
-
-  return (
-    <div className="flex items-center gap-0.5" aria-hidden="true">
-      {Array.from({ length: 8 }, (_, index) => (
-        <span
-          key={index}
-          className={`rounded-sm ${blockClass} ${index < filled ? "bg-[#8B6F47]" : "bg-[#EDE4DC]"}`}
-        />
-      ))}
-    </div>
-  );
 }
 
 function formatTodayLabel(date = new Date()) {
@@ -173,45 +157,36 @@ export default function HomeResultPreview({
               {content.sentence}
             </h3>
 
-            <div className="relative mt-5 overflow-hidden rounded-2xl border border-[#E2D7D0] bg-white/80 px-4 py-4">
+            <div className="relative mt-5">
               {!isPersonalized && (
-                <>
+                <div className="mb-2">
                   <p className="text-[11px] font-bold text-[#8B6F47]">{TODAY_EMPTY_COPY.scoreSectionLabel}</p>
                   <p className="mt-1 text-[11px] leading-relaxed text-[#8A7E78]">{TODAY_EMPTY_COPY.scoreDisclaimer}</p>
-                </>
+                </div>
               )}
               {isPersonalized && (
-                <p className="text-[11px] font-bold text-[#8B6F47]">내 사주 기준 · 오늘 점수</p>
+                <p className="mb-2 text-[11px] font-bold text-[#8B6F47]">내 사주 기준 · 오늘 점수</p>
               )}
-              {!isPersonalized && (
-                <div className="pointer-events-none absolute inset-x-3 bottom-3 top-[5.5rem] rounded-xl bg-white/30 backdrop-blur-[1px]" />
-              )}
-              <div className="relative mt-3 border-b border-[#E2D7D0]/70 pb-3">
-                <div className="flex items-end justify-between gap-3">
-                  <div>
-                    <p className="text-[11px] font-bold tracking-[0.08em] text-[#8B6F47]">
-                      {isPersonalized ? "종합" : "종합 · 예시"}
-                    </p>
-                    <div className="mt-1 flex flex-wrap items-end gap-2">
-                      <p className="text-3xl font-bold leading-none text-[#2F282B]">{displayOverall}</p>
-                      {isPersonalized && <OverallScoreDelta comparison={overallComparison} size="md" />}
-                      <p className="pb-0.5 text-sm font-bold text-[#8B6F47]">{statusLabel}</p>
-                    </div>
-                  </div>
-                  <ScoreBlocks score={displayOverall} />
-                </div>
-              </div>
-              <div className="relative mt-3 space-y-2">
-                {scores.areas.map((area) => (
-                  <div key={area.label} className="grid grid-cols-[34px_26px_1fr] items-center gap-2 sm:grid-cols-[42px_34px_1fr] sm:gap-3">
-                    <p className="text-[11px] font-semibold text-[#8A7E78] sm:text-xs">{area.label}</p>
-                    <p className="text-[11px] font-bold text-[#8B6F47] sm:text-xs">{area.score}</p>
-                    <ScoreBlocks score={area.score} size="sm" />
-                  </div>
-                ))}
+              <div className="relative">
+                {!isPersonalized && (
+                  <div className="pointer-events-none absolute inset-0 z-10 rounded-2xl bg-white/35 backdrop-blur-[1px]" />
+                )}
+                <AxisScorePanel
+                  overall={displayOverall}
+                  areas={scores.areas.map((area) => ({
+                    key: area.label,
+                    label: area.label,
+                    score: area.score,
+                  }))}
+                  overallLabel={isPersonalized ? "종합" : "종합 · 예시"}
+                  overallComparison={overallComparison}
+                  showDelta={isPersonalized}
+                  className="relative bg-white/80"
+                />
+                <p className="relative z-10 mt-2 text-sm font-bold text-[#8B6F47]">{statusLabel}</p>
               </div>
               {!isPersonalized && (
-                <div className="relative mt-3 rounded-xl border border-[#E8D7C4] bg-[#FFF8EE] px-3 py-2.5">
+                <div className="relative z-10 mt-3 rounded-xl border border-[#E8D7C4] bg-[#FFF8EE] px-3 py-2.5">
                   <p className="text-xs font-bold text-[#2F282B]">{TODAY_EMPTY_COPY.ctaLead}</p>
                   <p className="mt-0.5 text-[11px] font-semibold text-[#8B6F47]">→ {TODAY_EMPTY_COPY.ctaAction}</p>
                 </div>
@@ -259,9 +234,12 @@ export default function HomeResultPreview({
             <p className="mt-1 text-xs leading-relaxed text-[#5A4E48]">{content.emotionPoint.description}</p>
           </div>
 
-          <div className="mt-4 grid grid-cols-4 gap-2">
+          <div className="-mx-1 mt-4 flex gap-2 overflow-x-auto overscroll-x-contain pb-1 snap-x snap-mandatory [-webkit-overflow-scrolling:touch] [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-4 sm:gap-2 sm:overflow-visible sm:pb-0 sm:snap-none [&::-webkit-scrollbar]:hidden">
             {content.timeSlots.map((slot) => (
-              <div key={slot.label} className="rounded-xl border border-[#E2D7D0] bg-[#FAF8F5] px-2 py-2 text-center">
+              <div
+                key={slot.label}
+                className="min-w-[4.75rem] shrink-0 snap-start rounded-xl border border-[#E2D7D0] bg-[#FAF8F5] px-2.5 py-2.5 text-center sm:min-w-0 sm:shrink"
+              >
                 <p className="text-[10px] text-[#8A7E78]">{slot.label}</p>
                 <p className="mt-0.5 text-sm text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
                   {slot.keyword}
