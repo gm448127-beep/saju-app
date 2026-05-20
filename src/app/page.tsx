@@ -6,7 +6,7 @@ import HomeResultPreview from "@/components/HomeResultPreview";
 import { useUserProfile } from "@/components/UserProfileProvider";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
-import { profileToTodayPayload } from "@/lib/user-profile-storage";
+import { PROFILE_UPDATED_EVENT, profileToTodayPayload } from "@/lib/user-profile-storage";
 import { getSajuHistory, getTarotFavorites } from "@/lib/archive-storage";
 import { buildHomeWeeklyCard } from "@/lib/today-pattern-helpers";
 import { getUnifiedArchiveStats, getTodayHistory } from "@/lib/today-report-helpers";
@@ -116,27 +116,33 @@ export default function HomePage() {
   const [historyRecords, setHistoryRecords] = useState<ReturnType<typeof getTodayHistory>>([]);
   const [historyStats, setHistoryStats] = useState({ todayCount: 0, dayCount: 0, sajuCount: 0, tarotCount: 0, totalCount: 0 });
   const [personalizedContent, setPersonalizedContent] = useState<DailyFortuneContent | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
   const selectedSlide = FEATURE_SLIDES[activeSlide];
-  const dailyContent = personalizedContent ?? buildDailyFortuneContent();
   const isPersonalizedHome = Boolean(profile && personalizedContent);
+  const dailyContent = isPersonalizedHome
+    ? personalizedContent!
+    : profile
+      ? null
+      : buildDailyFortuneContent();
 
-  const weeklyCard = useMemo(
-    () =>
-      buildHomeWeeklyCard(historyRecords, {
-        toneLabel: dailyContent.toneLabel,
-        overall: dailyContent.axisScores
-          ? Math.round(
-              dailyContent.axisScores.relation * 0.3 +
-                dailyContent.axisScores.decision * 0.3 +
-                dailyContent.axisScores.emotion * 0.2 +
-                dailyContent.axisScores.balance * 0.2,
-            )
-          : 75,
-      }),
-    [historyRecords, dailyContent],
+  const weeklyCard = useMemo(() => {
+    const content = dailyContent ?? buildDailyFortuneContent();
+    return buildHomeWeeklyCard(historyRecords, {
+      toneLabel: content.toneLabel,
+      overall: Math.round(
+        content.axisScores.relation * 0.3 +
+          content.axisScores.decision * 0.3 +
+          content.axisScores.emotion * 0.2 +
+          content.axisScores.balance * 0.2,
+      ),
+    });
+  }, [historyRecords, dailyContent]);
+
+  const liveCards = buildLiveCards(
+    dailyContent ?? buildDailyFortuneContent(),
+    historyStats,
+    weeklyCard,
   );
-
-  const liveCards = buildLiveCards(dailyContent, historyStats, weeklyCard);
 
   useEffect(() => {
     const records = getTodayHistory();
@@ -149,10 +155,13 @@ export default function HomePage() {
   useEffect(() => {
     if (!profileReady || !profile) {
       setPersonalizedContent(null);
+      setPreviewLoading(false);
       return;
     }
 
     let cancelled = false;
+    setPreviewLoading(true);
+
     (async () => {
       try {
         const res = await fetch("/api/today", {
@@ -163,9 +172,13 @@ export default function HomePage() {
         const json = await res.json();
         if (!cancelled && res.ok && json.dailyReport) {
           setPersonalizedContent(json.dailyReport as DailyFortuneContent);
+        } else if (!cancelled) {
+          setPersonalizedContent(null);
         }
       } catch {
         if (!cancelled) setPersonalizedContent(null);
+      } finally {
+        if (!cancelled) setPreviewLoading(false);
       }
     })();
 
@@ -173,6 +186,27 @@ export default function HomePage() {
       cancelled = true;
     };
   }, [profile, profileReady]);
+
+  useEffect(() => {
+    const refetch = () => {
+      if (!profile) return;
+      setPreviewLoading(true);
+      fetch("/api/today", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(profileToTodayPayload(profile)),
+      })
+        .then((res) => res.json())
+        .then((json) => {
+          if (json.dailyReport) {
+            setPersonalizedContent(json.dailyReport as DailyFortuneContent);
+          }
+        })
+        .finally(() => setPreviewLoading(false));
+    };
+    window.addEventListener(PROFILE_UPDATED_EVENT, refetch);
+    return () => window.removeEventListener(PROFILE_UPDATED_EVENT, refetch);
+  }, [profile]);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -286,11 +320,25 @@ export default function HomePage() {
         </p>
       )}
 
-      <HomeResultPreview
-        content={dailyContent}
-        displayName={displayName}
-        isPersonalized={isPersonalizedHome}
-      />
+      {profile && (previewLoading || !dailyContent) ? (
+        <section
+          aria-label="맞춤 오늘 흐름 로딩"
+          className="overflow-hidden rounded-[30px] border border-[#E8D7C4] bg-[#FFFDF8] p-8 text-center shadow-[0_18px_48px_rgba(61,51,56,0.07)]"
+        >
+          <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">MY TODAY</p>
+          <p className="mt-2 text-lg font-semibold text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
+            {displayName}의 오늘을 맞추는 중…
+          </p>
+          <p className="mt-2 text-sm text-[#8A7E78]">입력하신 사주 기준으로 점수와 한 줄을 계산하고 있습니다.</p>
+        </section>
+      ) : (
+        <HomeResultPreview
+          content={dailyContent ?? buildDailyFortuneContent()}
+          displayName={displayName}
+          isPersonalized={isPersonalizedHome}
+          isLoadingPersonalized={false}
+        />
+      )}
 
       <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {liveCards.map((card) => (

@@ -56,6 +56,7 @@ export const ACTION_GUIDE_COPY = {
 /** `/today` 입력 전(empty) · 홈 TODAY PREVIEW */
 export const TODAY_EMPTY_COPY = {
   badgeCommon: "공통 흐름",
+  badgeMyToday: "내 사주 기준",
   badgeTodayAll: "오늘 전체",
   badgeSample: "예시",
   title: "오늘의 흐름",

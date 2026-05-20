@@ -56,12 +56,15 @@ interface HomeResultPreviewProps {
   content: DailyFortuneContent;
   displayName?: string;
   isPersonalized?: boolean;
+  /** 프로필은 있으나 맞춤 API 로딩 중 */
+  isLoadingPersonalized?: boolean;
 }
 
 export default function HomeResultPreview({
   content,
   displayName,
   isPersonalized = false,
+  isLoadingPersonalized = false,
 }: HomeResultPreviewProps) {
   const scores = getPreviewScores(content);
   const statusLabel = content.toneLabel || getTodayStatus(scores.overall);
@@ -72,17 +75,29 @@ export default function HomeResultPreview({
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">TODAY PREVIEW</p>
-            <span className="rounded-full border border-[#D9C8C0] bg-[#FFF8EE] px-2 py-0.5 text-[10px] font-bold text-[#6B5E58]">
-              {TODAY_EMPTY_COPY.badgeCommon}
-            </span>
+            {isPersonalized ? (
+              <span className="rounded-full border border-[#8B6F47]/40 bg-[#FFF8EE] px-2 py-0.5 text-[10px] font-bold text-[#8B6F47]">
+                {TODAY_EMPTY_COPY.badgeMyToday}
+              </span>
+            ) : (
+              <span className="rounded-full border border-[#D9C8C0] bg-[#FFF8EE] px-2 py-0.5 text-[10px] font-bold text-[#6B5E58]">
+                {TODAY_EMPTY_COPY.badgeCommon}
+              </span>
+            )}
           </div>
           <h2 className="mt-1 text-xl leading-tight text-[#2F282B] sm:text-2xl" style={{ fontFamily: "Jua, sans-serif" }}>
-            {isPersonalized && displayName ? `${displayName}의 오늘` : "오늘의 흐름은 이렇게 읽힙니다"}
+            {isPersonalized && displayName
+              ? `${displayName}의 오늘`
+              : isLoadingPersonalized && displayName
+                ? `${displayName}의 오늘`
+                : "오늘의 흐름은 이렇게 읽힙니다"}
           </h2>
           <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-[#8A7E78]">
-            {isPersonalized
-              ? "사주 기준으로 맞춘 오늘의 흐름입니다."
-              : `${TODAY_EMPTY_COPY.ctaLead}\n→ ${TODAY_EMPTY_COPY.ctaAction}`}
+            {isLoadingPersonalized
+              ? "입력하신 사주 기준으로 오늘 흐름을 맞추는 중입니다."
+              : isPersonalized
+                ? "아래 점수·한 줄·행동은 모두 입력하신 사주 기준입니다."
+                : `${TODAY_EMPTY_COPY.ctaLead}\n→ ${TODAY_EMPTY_COPY.ctaAction}`}
           </p>
         </div>
         <Link
@@ -105,9 +120,15 @@ export default function HomeResultPreview({
               <span className="rounded-full border border-[#E2D7D0] bg-white/70 px-2 py-0.5">
                 오늘의 결 · {content.toneLabel}
               </span>
-              <span className="rounded-full border border-[#D9C8C0] bg-white/60 px-2 py-0.5 text-[10px] text-[#6B5E58]">
-                {TODAY_EMPTY_COPY.badgeTodayAll}
-              </span>
+              {isPersonalized ? (
+                <span className="rounded-full border border-[#8B6F47]/30 bg-white/80 px-2 py-0.5 text-[10px] font-bold text-[#8B6F47]">
+                  {TODAY_EMPTY_COPY.badgeMyToday}
+                </span>
+              ) : (
+                <span className="rounded-full border border-[#D9C8C0] bg-white/60 px-2 py-0.5 text-[10px] text-[#6B5E58]">
+                  {TODAY_EMPTY_COPY.badgeTodayAll}
+                </span>
+              )}
               <span className="whitespace-nowrap text-[#8A7E78]">{formatTodayLabel()}</span>
             </div>
 
