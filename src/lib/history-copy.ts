@@ -53,6 +53,25 @@ export const ACTION_GUIDE_COPY = {
   dontsLabel: "늦추는 편이 좋은 것",
 } as const;
 
+/** `/today` 입력 전(empty) · 홈 TODAY PREVIEW */
+export const TODAY_EMPTY_COPY = {
+  badgeCommon: "공통 흐름",
+  badgeTodayAll: "오늘 전체",
+  badgeSample: "예시",
+  title: "오늘의 흐름",
+  ctaLead: "지금은 일반 흐름이에요",
+  ctaAction: "내 결로 보려면 생년월일만 입력",
+  ctaButton: "1초 입력하고 내 흐름 보기",
+  scoreDisclaimer: "아래 숫자는 내 점수가 아니라, 오늘 하루 전체의 예시 흐름입니다.",
+  scoreSectionLabel: "오늘 전체 · 예시 점수",
+  previewOneLine: "오늘의 한 줄 (미리보기)",
+  afterInputNote: "점수·어제 비교·행동 가이드는 입력 후 내 사주 기준으로 계산됩니다.",
+  formTitle: "내 결로 읽기",
+  formSubtitle:
+    "지금 보신 흐름은 오늘 전체 기준입니다. 생년월일을 넣으면 내 점수와 행동 가이드로 바뀝니다.",
+  formSubmit: "내 흐름 보기",
+} as const;
+
 /** 홈 WEEKLY 카드 */
 export const HOME_WEEKLY_COPY = {
   todayFocus(todayDay: string, toneLabel: string) {

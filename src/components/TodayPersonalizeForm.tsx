@@ -1,6 +1,7 @@
 "use client";
 
 import BirthDateNumberInputs, { isValidBirthDate } from "@/components/BirthDateNumberInputs";
+import { TODAY_EMPTY_COPY } from "@/lib/history-copy";
 
 const TIME_SLOTS = [
   { value: 23, label: "자시 (23:00~01:00)" },
@@ -62,12 +63,12 @@ export default function TodayPersonalizeForm(props: TodayPersonalizeFormProps) {
         <div className="relative border-b border-[#E2D7D0]/80 px-5 py-6 sm:px-7">
           <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">PERSONAL FLOW</p>
           <h2 className="mt-2 text-2xl text-[#2F282B] sm:text-3xl" style={{ fontFamily: "Jua, sans-serif" }}>
-            {isPersonalized ? "다른 사주로 다시 정렬" : "내 사주 기준으로 다시 읽기"}
+            {isPersonalized ? "다른 사주로 다시 정렬" : TODAY_EMPTY_COPY.formTitle}
           </h2>
           <p className="mt-2 max-w-xl text-sm leading-relaxed text-[#6B5E58]">
             {isPersonalized
               ? "생년월일을 바꾸면 같은 날의 흐름이 다른 결·점수로 다시 그려집니다."
-              : "생년월일을 더하면 같은 흐름이 내 결로 다시 정렬됩니다."}
+              : TODAY_EMPTY_COPY.formSubtitle}
           </p>
         </div>
 
@@ -204,7 +205,7 @@ export default function TodayPersonalizeForm(props: TodayPersonalizeFormProps) {
             className="w-full rounded-[20px] bg-[#2F282B] px-5 py-4 text-lg font-bold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
             style={{ fontFamily: "Jua, sans-serif" }}
           >
-            {loading ? "내 흐름 정렬 중..." : isPersonalized ? "다시 정렬하기" : "내 사주 기준으로 다시 읽기"}
+            {loading ? "내 흐름 정렬 중..." : isPersonalized ? "다시 정렬하기" : TODAY_EMPTY_COPY.formSubmit}
           </button>
         </form>
       </div>

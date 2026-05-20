@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import ShareButton from "@/components/ShareButton";
 import PdfButton from "@/components/PdfButton";
 import HourlyFlowSection from "@/components/HourlyFlowSection";
@@ -8,8 +8,10 @@ import SajuTriggerSection from "@/components/SajuTriggerSection";
 import TodayStatsSection, { type TodayStatItem } from "@/components/TodayStatsSection";
 import TimeAdviceSection from "@/components/TimeAdviceSection";
 import TodayActionGuideSection from "@/components/TodayActionGuideSection";
+import TodayEmptyState from "@/components/TodayEmptyState";
 import TodayFiveCardReport from "@/components/TodayFiveCardReport";
 import TodayPersonalizeForm, { isValidBirthDate } from "@/components/TodayPersonalizeForm";
+import { buildDailyFortuneContent } from "@/lib/today-content-engine";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
 
 const TAB_ITEMS = [
@@ -246,6 +248,11 @@ export default function TodayPage() {
   const personalizedReport = isPersonalized ? (result.dailyReport as DailyFortuneContent) : null;
   const birthKey = `${year}-${month}-${day}-${gender}`;
   const todayLabel = formatTodayLabel();
+  const commonPreview = useMemo(() => buildDailyFortuneContent(), []);
+
+  const scrollToPersonalizeForm = () => {
+    document.getElementById("personalize")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -338,19 +345,12 @@ export default function TodayPage() {
     <div className="space-y-10">
       {!isPersonalized && (
         <>
-          <section
-            aria-label="오늘의 운세 안내"
-            className="rounded-[24px] border border-[#E8D7C4] bg-[#FFFDF8] px-5 py-6 sm:px-6"
-          >
-            <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">TODAY</p>
-            <h1 className="mt-1 text-2xl text-[#2F282B] sm:text-3xl" style={{ fontFamily: "Jua, sans-serif" }}>
-              오늘의 흐름
-            </h1>
-            <p className="mt-1 text-sm text-[#8A7E78]">{todayLabel}</p>
-            <p className="mt-4 text-sm leading-relaxed text-[#5A4E48]">
-              생년월일을 입력하면 나만의 흐름·점수·행동 가이드를 볼 수 있습니다.
-            </p>
-          </section>
+          <TodayEmptyState
+            dateLabel={todayLabel}
+            toneLabel={commonPreview.toneLabel}
+            sentence={commonPreview.sentence}
+            onScrollToForm={scrollToPersonalizeForm}
+          />
           {personalizeForm}
         </>
       )}
