@@ -64,12 +64,12 @@ function FullImageSlide({
         )}
       </div>
 
-      {/* 하단 30%: 베이지 블러 그라데이션 */}
+      {/* 하단 40%: 이미지 → 배경색 자연스러운 페이드 (블러 없음) */}
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[30%] backdrop-blur-md"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[40%]"
         style={{
           background:
-            "linear-gradient(to top, #F5F1EB 0%, rgba(245, 241, 235, 0.94) 38%, rgba(245, 241, 235, 0.55) 68%, transparent 100%)",
+            "linear-gradient(to top, #F5F1EB 0%, #F5F1EB 12%, rgba(245, 241, 235, 0.88) 42%, rgba(245, 241, 235, 0.45) 72%, transparent 100%)",
         }}
         aria-hidden
       />
