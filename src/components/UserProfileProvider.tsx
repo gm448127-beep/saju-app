@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import {
   createContext,
   useCallback,
@@ -9,7 +10,9 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import IntroOnboarding from "@/components/IntroOnboarding";
 import OnboardingModal from "@/components/OnboardingModal";
+import { isIntroOnboarded, setIntroOnboarded } from "@/lib/onboarding-storage";
 import {
   getProfileDisplayName,
   getUserProfile,
@@ -44,8 +47,10 @@ export function useUserProfileOptional() {
 }
 
 export default function UserProfileProvider({ children }: { children: ReactNode }) {
+  const router = useRouter();
   const [profile, setProfile] = useState<UserBirthProfile | null>(null);
   const [isReady, setIsReady] = useState(false);
+  const [showIntro, setShowIntro] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [onboardingDismissed, setOnboardingDismissed] = useState(false);
 
@@ -64,12 +69,23 @@ export default function UserProfileProvider({ children }: { children: ReactNode 
 
   useEffect(() => {
     if (!isReady) return;
+    if (!isIntroOnboarded()) {
+      setShowIntro(true);
+      setShowOnboarding(false);
+      return;
+    }
+    setShowIntro(false);
     if (!profile && !onboardingDismissed) {
       setShowOnboarding(true);
     } else {
       setShowOnboarding(false);
     }
   }, [isReady, profile, onboardingDismissed]);
+
+  const finishIntro = useCallback(() => {
+    setIntroOnboarded();
+    setShowIntro(false);
+  }, []);
 
   const saveProfile = useCallback((next: Omit<UserBirthProfile, "savedAt">) => {
     saveUserProfile(next);
@@ -98,8 +114,17 @@ export default function UserProfileProvider({ children }: { children: ReactNode 
   return (
     <UserProfileContext.Provider value={value}>
       {children}
+      {showIntro && (
+        <IntroOnboarding
+          onSkip={() => finishIntro()}
+          onStart={() => {
+            finishIntro();
+            router.push("/today#personalize");
+          }}
+        />
+      )}
       <OnboardingModal
-        open={showOnboarding}
+        open={showOnboarding && !showIntro}
         onComplete={saveProfile}
         onClose={() => {
           setOnboardingDismissed(true);
