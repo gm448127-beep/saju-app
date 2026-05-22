@@ -6,6 +6,7 @@ import { INTRO_SLIDE2_IMAGE } from "@/lib/intro-onboarding-assets";
 
 const SLIDE_COUNT = 3;
 const SWIPE_THRESHOLD_PX = 48;
+const BG = "#F5F1EB";
 
 interface IntroOnboardingProps {
   onSkip: () => void;
@@ -15,96 +16,121 @@ interface IntroOnboardingProps {
 function SlideCaptionBlock({
   caption,
   subcaption,
-  className = "",
+  withWhitePanel = false,
 }: {
   caption: string;
   subcaption: string;
-  className?: string;
+  withWhitePanel?: boolean;
 }) {
-  return (
-    <div className={`space-y-2 text-center ${className}`}>
+  const content = (
+    <div className="space-y-2 text-center">
       <p className="text-xl font-bold leading-snug text-[#2F282B] sm:text-2xl">{caption}</p>
       <p className="text-sm leading-relaxed text-[#2F282B]/75 sm:text-base">{subcaption}</p>
     </div>
   );
-}
 
-/** 1장: 이미지 풀블리드 + 반투명 흰 텍스트 패널 */
-function Slide1Hero({
-  src,
-  alt,
-  caption,
-  subcaption,
-}: {
-  src: string;
-  alt: string;
-  caption: string;
-  subcaption: string;
-}) {
+  if (!withWhitePanel) return content;
+
   return (
-    <section className="relative h-full w-full shrink-0 overflow-hidden bg-[#F5F1EB]">
-      <div className="absolute inset-0">
-        <Image
-          src={src}
-          alt={alt}
-          fill
-          priority
-          className="object-cover object-top"
-          sizes="100vw"
-        />
-      </div>
-
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#F5F1EB]/80 to-transparent pb-36 pt-16 sm:pb-40"
-        aria-hidden
-      />
-
-      <div className="absolute inset-x-0 bottom-36 z-10 px-5 sm:bottom-40 sm:px-8">
-        <div className="mx-auto max-w-md rounded-2xl bg-white/72 px-5 py-4 shadow-[0_8px_28px_rgba(47,40,43,0.08)] backdrop-blur-[2px] sm:px-6 sm:py-5">
-          <SlideCaptionBlock caption={caption} subcaption={subcaption} />
-        </div>
-      </div>
-    </section>
+    <div className="mx-auto w-full max-w-md rounded-2xl bg-white/72 px-5 py-4 shadow-[0_8px_28px_rgba(47,40,43,0.08)] backdrop-blur-[2px] sm:px-6 sm:py-5">
+      {content}
+    </div>
   );
 }
 
-/** 2장: 상단 70% 이미지 · 하단 30% 베이지 텍스트 */
-function Slide2Split({
+/** 1·2장: 상단 이미지 + 하단 텍스트 영역 (버튼은 공통 푸터) */
+function SplitImageSlide({
+  imageHeightPercent,
+  textHeightPercent,
   src,
   alt,
   caption,
   subcaption,
+  withWhitePanel = false,
   onError,
   hasError,
 }: {
+  imageHeightPercent: number;
+  textHeightPercent: number;
   src: string;
   alt: string;
   caption: string;
   subcaption: string;
+  withWhitePanel?: boolean;
   onError?: () => void;
   hasError?: boolean;
 }) {
   return (
-    <section className="flex h-full w-full shrink-0 flex-col overflow-hidden bg-[#F5F1EB]">
-      <div className="relative h-[70%] min-h-0 w-full shrink-0">
+    <section
+      className="flex h-full w-full shrink-0 flex-col overflow-hidden"
+      style={{ backgroundColor: BG }}
+    >
+      <div
+        className="relative w-full shrink-0 overflow-hidden"
+        style={{ height: `${imageHeightPercent}%` }}
+      >
         {!hasError ? (
           <Image
             src={src}
             alt={alt}
             fill
+            priority={src.includes("miim")}
             className="object-cover object-top"
             sizes="100vw"
             onError={onError}
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-sm text-[#2F282B]/50">
+          <div
+            className="flex h-full items-center justify-center text-sm text-[#2F282B]/50"
+            style={{ backgroundColor: BG }}
+          >
             이미지를 불러오지 못했습니다
           </div>
         )}
       </div>
 
-      <div className="flex h-[30%] min-h-0 shrink-0 flex-col justify-center bg-[#F5F1EB] px-6 pb-2 pt-1">
-        <SlideCaptionBlock caption={caption} subcaption={subcaption} />
+      <div
+        className="flex min-h-0 w-full shrink-0 flex-col justify-center px-5 sm:px-8"
+        style={{ height: `${textHeightPercent}%`, backgroundColor: BG }}
+      >
+        <SlideCaptionBlock
+          caption={caption}
+          subcaption={subcaption}
+          withWhitePanel={withWhitePanel}
+        />
+      </div>
+    </section>
+  );
+}
+
+function Slide3Center() {
+  return (
+    <section
+      className="relative flex h-full w-full shrink-0 flex-col items-center justify-center overflow-hidden px-6 text-center sm:px-10"
+      style={{ backgroundColor: BG }}
+    >
+      <div
+        className="pointer-events-none absolute inset-0 select-none overflow-hidden"
+        style={{ fontFamily: "serif" }}
+        aria-hidden
+      >
+        <div className="absolute -left-[8%] top-[14%] h-40 w-40 rounded-full bg-[#2F282B]/[0.03] sm:h-56 sm:w-56" />
+        <div className="absolute -right-[6%] bottom-[22%] h-48 w-48 rounded-full bg-[#2F282B]/[0.04] sm:h-64 sm:w-64" />
+        <span className="absolute left-[6%] top-[18%] text-[min(36vw,168px)] font-bold leading-none text-[#2F282B] opacity-[0.08] sm:left-[10%]">
+          運
+        </span>
+        <span className="absolute right-[4%] top-[26%] text-[min(52vw,260px)] font-bold leading-none text-[#2F282B] opacity-[0.11] sm:right-[8%]">
+          命
+        </span>
+      </div>
+
+      <div className="relative z-10 w-full max-w-sm space-y-4">
+        <p className="text-2xl font-bold leading-snug text-[#2F282B] sm:text-3xl">
+          생년월일만 알려주시면 돼요
+        </p>
+        <p className="text-base leading-relaxed text-[#2F282B]/75 sm:text-lg">
+          한 번만 입력하면 매일 자동으로
+        </p>
       </div>
     </section>
   );
@@ -132,12 +158,14 @@ export default function IntroOnboarding({ onSkip, onStart }: IntroOnboardingProp
     touchStartX.current = null;
   };
 
+  const isLastSlide = activeIndex === SLIDE_COUNT - 1;
+
   return (
     <div
-      className="fixed inset-0 z-[100] flex flex-col bg-[#F5F1EB] text-[#2F282B]"
+      className="fixed inset-0 z-[100] flex h-[100dvh] max-h-[100dvh] flex-col overflow-hidden text-[#2F282B]"
       style={{
         fontFamily: "Noto Sans KR, sans-serif",
-        paddingBottom: "env(safe-area-inset-bottom)",
+        backgroundColor: BG,
       }}
       role="dialog"
       aria-modal="true"
@@ -148,24 +176,31 @@ export default function IntroOnboarding({ onSkip, onStart }: IntroOnboardingProp
       <button
         type="button"
         onClick={onSkip}
-        className="absolute right-4 top-[max(0.75rem,env(safe-area-inset-top))] z-20 min-h-11 rounded-full bg-[#F5F1EB]/75 px-4 py-2 text-sm font-semibold text-[#2F282B]/80 backdrop-blur-sm transition hover:bg-[#F5F1EB] hover:text-[#2F282B] sm:right-6"
+        className="absolute right-4 top-[max(0.75rem,env(safe-area-inset-top))] z-30 min-h-11 rounded-full px-4 py-2 text-sm font-semibold text-[#2F282B]/80 transition hover:text-[#2F282B] sm:right-6"
+        style={{ backgroundColor: `${BG}bf` }}
       >
         건너뛰기
       </button>
 
+      {/* 슬라이드 영역: 100dvh − 고정 푸터 */}
       <div className="relative min-h-0 flex-1 overflow-hidden">
         <div
           className="flex h-full transition-transform duration-300 ease-out"
           style={{ transform: `translateX(-${activeIndex * 100}%)` }}
         >
-          <Slide1Hero
+          <SplitImageSlide
+            imageHeightPercent={60}
+            textHeightPercent={40}
             src="/miim.png"
             alt="운명비서 안내"
             caption="매일 아침, 오늘의 나를 읽어드립니다"
             subcaption="결정·관계·감정·균형 — 사주로 정리하는 차분한 리포트"
+            withWhitePanel
           />
 
-          <Slide2Split
+          <SplitImageSlide
+            imageHeightPercent={55}
+            textHeightPercent={45}
             src={INTRO_SLIDE2_IMAGE}
             alt="매일 받아보는 리포트"
             caption="이런 리포트를 매일 받아보세요"
@@ -174,60 +209,43 @@ export default function IntroOnboarding({ onSkip, onStart }: IntroOnboardingProp
             onError={() => setSlide2Error(true)}
           />
 
-          {/* 3장 */}
-          <section className="relative flex h-full w-full shrink-0 flex-col items-center justify-center overflow-hidden bg-[#F5F1EB] px-6 pb-8 text-center sm:px-10">
-            <div
-              className="pointer-events-none absolute inset-0 select-none overflow-hidden"
-              style={{ fontFamily: "serif" }}
-              aria-hidden
-            >
-              <div className="absolute -left-[8%] top-[18%] h-48 w-48 rounded-full bg-[#2F282B]/[0.03] sm:h-64 sm:w-64" />
-              <div className="absolute -right-[6%] bottom-[28%] h-56 w-56 rounded-full bg-[#2F282B]/[0.04] sm:h-72 sm:w-72" />
-              <span className="absolute left-[6%] top-[22%] text-[min(36vw,168px)] font-bold leading-none text-[#2F282B] opacity-[0.08] sm:left-[10%]">
-                運
-              </span>
-              <span className="absolute right-[4%] top-[32%] text-[min(52vw,260px)] font-bold leading-none text-[#2F282B] opacity-[0.11] sm:right-[8%]">
-                命
-              </span>
-            </div>
-
-            <div className="relative z-10 w-full max-w-sm space-y-4">
-              <p className="text-2xl font-bold leading-snug text-[#2F282B] sm:text-3xl">
-                생년월일만 알려주시면 돼요
-              </p>
-              <p className="text-base leading-relaxed text-[#2F282B]/75 sm:text-lg">
-                한 번만 입력하면 매일 자동으로
-              </p>
-
-              <div className="pt-6">
-                <p className="mb-3 text-xs font-medium tracking-wide text-[#2F282B]/60 sm:text-sm">
-                  오늘의 결 · 5축 점수 · 명리 근거까지
-                </p>
-                <button
-                  type="button"
-                  onClick={onStart}
-                  className="min-h-12 w-full rounded-2xl bg-[#2F282B] px-6 py-4 text-lg font-bold text-[#F5F1EB] shadow-[0_14px_32px_rgba(47,40,43,0.22)] transition active:scale-[0.98]"
-                >
-                  내 결로 시작하기
-                </button>
-              </div>
-            </div>
-          </section>
+          <Slide3Center />
         </div>
       </div>
 
-      <footer className="relative z-10 shrink-0 space-y-4 bg-[#F5F1EB] px-6 pb-6 pt-2 sm:pb-8">
-        {activeIndex < SLIDE_COUNT - 1 && (
+      {/* 고정 하단: 버튼 → 인디케이터 */}
+      <footer
+        className="z-20 shrink-0 px-6 pt-3"
+        style={{
+          backgroundColor: BG,
+          paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
+        }}
+      >
+        {isLastSlide && (
+          <p className="mb-2 text-center text-xs font-medium tracking-wide text-[#2F282B]/60 sm:text-sm">
+            오늘의 결 · 5축 점수 · 명리 근거까지
+          </p>
+        )}
+
+        {isLastSlide ? (
+          <button
+            type="button"
+            onClick={onStart}
+            className="min-h-12 w-full rounded-2xl bg-[#2F282B] px-6 py-3.5 text-lg font-bold text-[#F5F1EB] shadow-[0_14px_32px_rgba(47,40,43,0.22)] transition active:scale-[0.98]"
+          >
+            내 결로 시작하기
+          </button>
+        ) : (
           <button
             type="button"
             onClick={() => goTo(activeIndex + 1)}
-            className="min-h-11 w-full rounded-2xl border-2 border-[#2F282B]/15 bg-white/60 py-3 text-sm font-bold text-[#2F282B] backdrop-blur-sm transition hover:border-[#2F282B]/25"
+            className="min-h-12 w-full rounded-2xl border-2 border-[#2F282B]/15 bg-white/70 py-3.5 text-sm font-bold text-[#2F282B] transition hover:border-[#2F282B]/25"
           >
             다음
           </button>
         )}
 
-        <div className="flex items-center justify-center gap-2" aria-hidden>
+        <div className="mt-3 flex items-center justify-center gap-2">
           {Array.from({ length: SLIDE_COUNT }, (_, i) => (
             <button
               key={i}
