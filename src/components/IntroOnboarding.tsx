@@ -13,69 +13,44 @@ interface IntroOnboardingProps {
   onStart: () => void;
 }
 
-function SlideCaptionBlock({
-  caption,
-  subcaption,
-  withWhitePanel = false,
-}: {
-  caption: string;
-  subcaption: string;
-  withWhitePanel?: boolean;
-}) {
-  const content = (
-    <div className="space-y-2 text-center">
-      <p className="text-xl font-bold leading-snug text-[#2F282B] sm:text-2xl">{caption}</p>
-      <p className="text-sm leading-relaxed text-[#2F282B]/75 sm:text-base">{subcaption}</p>
-    </div>
-  );
-
-  if (!withWhitePanel) return content;
-
+function SlideCaptionBlock({ caption, subcaption }: { caption: string; subcaption: string }) {
   return (
-    <div className="mx-auto w-full max-w-md rounded-2xl bg-white/72 px-5 py-4 shadow-[0_8px_28px_rgba(47,40,43,0.08)] backdrop-blur-[2px] sm:px-6 sm:py-5">
-      {content}
+    <div className="mx-auto w-full max-w-md space-y-2 text-center">
+      <p className="text-xl font-bold leading-snug text-[#2F282B] sm:text-2xl">{caption}</p>
+      <p className="text-sm leading-relaxed text-[#2F282B]/80 sm:text-base">{subcaption}</p>
     </div>
   );
 }
 
-/** 1·2장: 상단 이미지 + 하단 텍스트 영역 (버튼은 공통 푸터) */
-function SplitImageSlide({
-  imageHeightPercent,
-  textHeightPercent,
+/** 1·2장: 이미지 전체 노출 + 하단 30% 베이지 블러 그라데이션 + 텍스트 오버레이 */
+function FullImageSlide({
   src,
   alt,
   caption,
   subcaption,
-  withWhitePanel = false,
   onError,
   hasError,
 }: {
-  imageHeightPercent: number;
-  textHeightPercent: number;
   src: string;
   alt: string;
   caption: string;
   subcaption: string;
-  withWhitePanel?: boolean;
   onError?: () => void;
   hasError?: boolean;
 }) {
   return (
     <section
-      className="flex h-full w-full shrink-0 flex-col overflow-hidden"
+      className="relative h-full w-full shrink-0 overflow-hidden"
       style={{ backgroundColor: BG }}
     >
-      <div
-        className="relative w-full shrink-0 overflow-hidden"
-        style={{ height: `${imageHeightPercent}%` }}
-      >
+      <div className="absolute inset-0">
         {!hasError ? (
           <Image
             src={src}
             alt={alt}
             fill
             priority={src.includes("miim")}
-            className="object-cover object-top"
+            className="object-contain object-top"
             sizes="100vw"
             onError={onError}
           />
@@ -89,15 +64,19 @@ function SplitImageSlide({
         )}
       </div>
 
+      {/* 하단 30%: 베이지 블러 그라데이션 */}
       <div
-        className="flex min-h-0 w-full shrink-0 flex-col justify-center px-5 sm:px-8"
-        style={{ height: `${textHeightPercent}%`, backgroundColor: BG }}
-      >
-        <SlideCaptionBlock
-          caption={caption}
-          subcaption={subcaption}
-          withWhitePanel={withWhitePanel}
-        />
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[30%] backdrop-blur-md"
+        style={{
+          background:
+            "linear-gradient(to top, #F5F1EB 0%, rgba(245, 241, 235, 0.94) 38%, rgba(245, 241, 235, 0.55) 68%, transparent 100%)",
+        }}
+        aria-hidden
+      />
+
+      {/* 그라데이션 위 텍스트 (한 단계 아래) */}
+      <div className="absolute inset-x-0 bottom-1 z-10 px-5 sm:bottom-2 sm:px-8">
+        <SlideCaptionBlock caption={caption} subcaption={subcaption} />
       </div>
     </section>
   );
@@ -188,19 +167,14 @@ export default function IntroOnboarding({ onSkip, onStart }: IntroOnboardingProp
           className="flex h-full transition-transform duration-300 ease-out"
           style={{ transform: `translateX(-${activeIndex * 100}%)` }}
         >
-          <SplitImageSlide
-            imageHeightPercent={60}
-            textHeightPercent={40}
+          <FullImageSlide
             src="/miim.png"
             alt="운명비서 안내"
             caption="매일 아침, 오늘의 나를 읽어드립니다"
             subcaption="결정·관계·감정·균형 — 사주로 정리하는 차분한 리포트"
-            withWhitePanel
           />
 
-          <SplitImageSlide
-            imageHeightPercent={55}
-            textHeightPercent={45}
+          <FullImageSlide
             src={INTRO_SLIDE2_IMAGE}
             alt="매일 받아보는 리포트"
             caption="이런 리포트를 매일 받아보세요"
