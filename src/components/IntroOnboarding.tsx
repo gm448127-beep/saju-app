@@ -12,6 +12,55 @@ interface IntroOnboardingProps {
   onStart: () => void;
 }
 
+/** 1·2장: 상단부터 화면 가득 이미지 + 하단 캡션·서브텍스트 */
+function ImageHeroSlide({
+  src,
+  alt,
+  caption,
+  subcaption,
+  onError,
+  hasError,
+}: {
+  src: string;
+  alt: string;
+  caption: string;
+  subcaption: string;
+  onError?: () => void;
+  hasError?: boolean;
+}) {
+  return (
+    <section className="relative h-full w-full shrink-0 overflow-hidden bg-[#F5F1EB]">
+      <div className="absolute inset-0">
+        {!hasError ? (
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            priority={src.includes("miim")}
+            className="object-cover object-top"
+            sizes="100vw"
+            onError={onError}
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center bg-[#F5F1EB] text-sm text-[#2F282B]/50">
+            이미지를 불러오지 못했습니다
+          </div>
+        )}
+      </div>
+
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#F5F1EB] via-[#F5F1EB]/92 to-transparent pt-32 pb-40 sm:pt-36 sm:pb-44"
+        aria-hidden
+      />
+
+      <div className="absolute inset-x-0 bottom-40 z-10 space-y-2 px-6 text-center sm:bottom-44">
+        <p className="text-xl font-bold leading-snug text-[#2F282B] sm:text-2xl">{caption}</p>
+        <p className="text-sm leading-relaxed text-[#2F282B]/70 sm:text-base">{subcaption}</p>
+      </div>
+    </section>
+  );
+}
+
 export default function IntroOnboarding({ onSkip, onStart }: IntroOnboardingProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [slide2Error, setSlide2Error] = useState(false);
@@ -37,96 +86,93 @@ export default function IntroOnboarding({ onSkip, onStart }: IntroOnboardingProp
   return (
     <div
       className="fixed inset-0 z-[100] flex flex-col bg-[#F5F1EB] text-[#2F282B]"
-      style={{ fontFamily: "Noto Sans KR, sans-serif", paddingTop: "env(safe-area-inset-top)", paddingBottom: "env(safe-area-inset-bottom)" }}
+      style={{
+        fontFamily: "Noto Sans KR, sans-serif",
+        paddingBottom: "env(safe-area-inset-bottom)",
+      }}
       role="dialog"
       aria-modal="true"
       aria-label="운명비서 소개"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <header className="flex shrink-0 items-center justify-end px-4 pt-3 sm:px-6">
-        <button
-          type="button"
-          onClick={onSkip}
-          className="min-h-11 rounded-full px-4 py-2 text-sm font-semibold text-[#2F282B]/70 transition hover:bg-[#2F282B]/5 hover:text-[#2F282B]"
-        >
-          건너뛰기
-        </button>
-      </header>
+      <button
+        type="button"
+        onClick={onSkip}
+        className="absolute right-4 top-[max(0.75rem,env(safe-area-inset-top))] z-20 min-h-11 rounded-full bg-[#F5F1EB]/75 px-4 py-2 text-sm font-semibold text-[#2F282B]/80 backdrop-blur-sm transition hover:bg-[#F5F1EB] hover:text-[#2F282B] sm:right-6"
+      >
+        건너뛰기
+      </button>
 
       <div className="relative min-h-0 flex-1 overflow-hidden">
         <div
           className="flex h-full transition-transform duration-300 ease-out"
           style={{ transform: `translateX(-${activeIndex * 100}%)` }}
         >
-          {/* 1장 */}
-          <section className="flex h-full w-full shrink-0 flex-col px-5 pb-4 sm:px-8">
-            <div className="relative mx-auto mt-2 h-[min(52vh,420px)] w-full max-w-sm flex-1">
-              <Image
-                src="/miim.png"
-                alt="운명비서 안내"
-                fill
-                priority
-                className="object-contain object-top"
-                sizes="(max-width: 640px) 100vw, 400px"
-              />
-            </div>
-            <p className="shrink-0 pb-6 text-center text-xl font-bold leading-snug text-[#2F282B] sm:text-2xl">
-              매일 아침, 오늘의 나를 읽어드립니다
-            </p>
-          </section>
+          <ImageHeroSlide
+            src="/miim.png"
+            alt="운명비서 안내"
+            caption="매일 아침, 오늘의 나를 읽어드립니다"
+            subcaption="결정·관계·감정·균형 — 사주로 정리하는 차분한 리포트"
+          />
 
-          {/* 2장 */}
-          <section className="flex h-full w-full shrink-0 flex-col px-5 pb-4 sm:px-8">
-            <div className="relative mx-auto mt-2 h-[min(52vh,420px)] w-full max-w-sm flex-1 overflow-hidden rounded-2xl border border-[#2F282B]/10 bg-white/60 shadow-[0_12px_40px_rgba(47,40,43,0.08)]">
-              {!slide2Error ? (
-                <Image
-                  src={INTRO_SLIDE2_IMAGE}
-                  alt="매일 받아보는 리포트"
-                  fill
-                  className="object-contain object-center p-3"
-                  sizes="(max-width: 640px) 100vw, 400px"
-                  onError={() => setSlide2Error(true)}
-                />
-              ) : (
-                <div className="flex h-full flex-col items-center justify-center gap-2 p-6 text-center text-sm text-[#2F282B]/55">
-                  <p className="font-semibold text-[#2F282B]/70">이미지를 불러오지 못했습니다</p>
-                  <p className="text-xs leading-relaxed">잠시 후 다시 시도해 주세요.</p>
-                </div>
-              )}
-            </div>
-            <p className="shrink-0 pb-6 text-center text-xl font-bold leading-snug text-[#2F282B] sm:text-2xl">
-              이런 리포트를 매일 받아보세요
-            </p>
-          </section>
+          <ImageHeroSlide
+            src={INTRO_SLIDE2_IMAGE}
+            alt="매일 받아보는 리포트"
+            caption="이런 리포트를 매일 받아보세요"
+            subcaption="매거진 톤으로 정리해드립니다"
+            hasError={slide2Error}
+            onError={() => setSlide2Error(true)}
+          />
 
           {/* 3장 */}
-          <section className="flex h-full w-full shrink-0 flex-col items-center justify-center px-6 pb-8 text-center sm:px-10">
-            <div className="w-full max-w-sm space-y-4">
+          <section className="relative flex h-full w-full shrink-0 flex-col items-center justify-center overflow-hidden bg-[#F5F1EB] px-6 pb-8 text-center sm:px-10">
+            <div
+              className="pointer-events-none absolute inset-0 select-none overflow-hidden"
+              style={{ fontFamily: "serif" }}
+              aria-hidden
+            >
+              <div className="absolute -left-[8%] top-[18%] h-48 w-48 rounded-full bg-[#2F282B]/[0.03] sm:h-64 sm:w-64" />
+              <div className="absolute -right-[6%] bottom-[28%] h-56 w-56 rounded-full bg-[#2F282B]/[0.04] sm:h-72 sm:w-72" />
+              <span className="absolute left-[6%] top-[22%] text-[min(36vw,168px)] font-bold leading-none text-[#2F282B] opacity-[0.08] sm:left-[10%]">
+                運
+              </span>
+              <span className="absolute right-[4%] top-[32%] text-[min(52vw,260px)] font-bold leading-none text-[#2F282B] opacity-[0.11] sm:right-[8%]">
+                命
+              </span>
+            </div>
+
+            <div className="relative z-10 w-full max-w-sm space-y-4">
               <p className="text-2xl font-bold leading-snug text-[#2F282B] sm:text-3xl">
                 생년월일만 알려주시면 돼요
               </p>
               <p className="text-base leading-relaxed text-[#2F282B]/75 sm:text-lg">
                 한 번만 입력하면 매일 자동으로
               </p>
-              <button
-                type="button"
-                onClick={onStart}
-                className="mt-6 min-h-12 w-full rounded-2xl bg-[#2F282B] px-6 py-4 text-lg font-bold text-[#F5F1EB] shadow-[0_14px_32px_rgba(47,40,43,0.22)] transition active:scale-[0.98]"
-              >
-                시작하기
-              </button>
+
+              <div className="pt-6">
+                <p className="mb-3 text-xs font-medium tracking-wide text-[#2F282B]/60 sm:text-sm">
+                  오늘의 결 · 5축 점수 · 명리 근거까지
+                </p>
+                <button
+                  type="button"
+                  onClick={onStart}
+                  className="min-h-12 w-full rounded-2xl bg-[#2F282B] px-6 py-4 text-lg font-bold text-[#F5F1EB] shadow-[0_14px_32px_rgba(47,40,43,0.22)] transition active:scale-[0.98]"
+                >
+                  내 결로 시작하기
+                </button>
+              </div>
             </div>
           </section>
         </div>
       </div>
 
-      <footer className="shrink-0 space-y-4 px-6 pb-6 pt-2 sm:pb-8">
+      <footer className="relative z-10 shrink-0 space-y-4 bg-[#F5F1EB] px-6 pb-6 pt-2 sm:pb-8">
         {activeIndex < SLIDE_COUNT - 1 && (
           <button
             type="button"
             onClick={() => goTo(activeIndex + 1)}
-            className="min-h-11 w-full rounded-2xl border-2 border-[#2F282B]/15 bg-white/50 py-3 text-sm font-bold text-[#2F282B] transition hover:border-[#2F282B]/25"
+            className="min-h-11 w-full rounded-2xl border-2 border-[#2F282B]/15 bg-white/60 py-3 text-sm font-bold text-[#2F282B] backdrop-blur-sm transition hover:border-[#2F282B]/25"
           >
             다음
           </button>
