@@ -12,8 +12,64 @@ interface IntroOnboardingProps {
   onStart: () => void;
 }
 
-/** 1·2장: 상단부터 화면 가득 이미지 + 하단 캡션·서브텍스트 */
-function ImageHeroSlide({
+function SlideCaptionBlock({
+  caption,
+  subcaption,
+  className = "",
+}: {
+  caption: string;
+  subcaption: string;
+  className?: string;
+}) {
+  return (
+    <div className={`space-y-2 text-center ${className}`}>
+      <p className="text-xl font-bold leading-snug text-[#2F282B] sm:text-2xl">{caption}</p>
+      <p className="text-sm leading-relaxed text-[#2F282B]/75 sm:text-base">{subcaption}</p>
+    </div>
+  );
+}
+
+/** 1장: 이미지 풀블리드 + 반투명 흰 텍스트 패널 */
+function Slide1Hero({
+  src,
+  alt,
+  caption,
+  subcaption,
+}: {
+  src: string;
+  alt: string;
+  caption: string;
+  subcaption: string;
+}) {
+  return (
+    <section className="relative h-full w-full shrink-0 overflow-hidden bg-[#F5F1EB]">
+      <div className="absolute inset-0">
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          priority
+          className="object-cover object-top"
+          sizes="100vw"
+        />
+      </div>
+
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#F5F1EB]/80 to-transparent pb-36 pt-16 sm:pb-40"
+        aria-hidden
+      />
+
+      <div className="absolute inset-x-0 bottom-36 z-10 px-5 sm:bottom-40 sm:px-8">
+        <div className="mx-auto max-w-md rounded-2xl bg-white/72 px-5 py-4 shadow-[0_8px_28px_rgba(47,40,43,0.08)] backdrop-blur-[2px] sm:px-6 sm:py-5">
+          <SlideCaptionBlock caption={caption} subcaption={subcaption} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** 2장: 상단 70% 이미지 · 하단 30% 베이지 텍스트 */
+function Slide2Split({
   src,
   alt,
   caption,
@@ -29,33 +85,26 @@ function ImageHeroSlide({
   hasError?: boolean;
 }) {
   return (
-    <section className="relative h-full w-full shrink-0 overflow-hidden bg-[#F5F1EB]">
-      <div className="absolute inset-0">
+    <section className="flex h-full w-full shrink-0 flex-col overflow-hidden bg-[#F5F1EB]">
+      <div className="relative h-[70%] min-h-0 w-full shrink-0">
         {!hasError ? (
           <Image
             src={src}
             alt={alt}
             fill
-            priority={src.includes("miim")}
             className="object-cover object-top"
             sizes="100vw"
             onError={onError}
           />
         ) : (
-          <div className="flex h-full items-center justify-center bg-[#F5F1EB] text-sm text-[#2F282B]/50">
+          <div className="flex h-full items-center justify-center text-sm text-[#2F282B]/50">
             이미지를 불러오지 못했습니다
           </div>
         )}
       </div>
 
-      <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#F5F1EB] via-[#F5F1EB]/92 to-transparent pt-32 pb-40 sm:pt-36 sm:pb-44"
-        aria-hidden
-      />
-
-      <div className="absolute inset-x-0 bottom-40 z-10 space-y-2 px-6 text-center sm:bottom-44">
-        <p className="text-xl font-bold leading-snug text-[#2F282B] sm:text-2xl">{caption}</p>
-        <p className="text-sm leading-relaxed text-[#2F282B]/70 sm:text-base">{subcaption}</p>
+      <div className="flex h-[30%] min-h-0 shrink-0 flex-col justify-center bg-[#F5F1EB] px-6 pb-2 pt-1">
+        <SlideCaptionBlock caption={caption} subcaption={subcaption} />
       </div>
     </section>
   );
@@ -109,14 +158,14 @@ export default function IntroOnboarding({ onSkip, onStart }: IntroOnboardingProp
           className="flex h-full transition-transform duration-300 ease-out"
           style={{ transform: `translateX(-${activeIndex * 100}%)` }}
         >
-          <ImageHeroSlide
+          <Slide1Hero
             src="/miim.png"
             alt="운명비서 안내"
             caption="매일 아침, 오늘의 나를 읽어드립니다"
             subcaption="결정·관계·감정·균형 — 사주로 정리하는 차분한 리포트"
           />
 
-          <ImageHeroSlide
+          <Slide2Split
             src={INTRO_SLIDE2_IMAGE}
             alt="매일 받아보는 리포트"
             caption="이런 리포트를 매일 받아보세요"
