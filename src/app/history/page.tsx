@@ -81,8 +81,18 @@ function HistoryPageContent() {
 
   useEffect(() => {
     const skeletonTimer = window.setTimeout(() => setShowSkeleton(true), 200);
-    loadRecords();
-    return () => window.clearTimeout(skeletonTimer);
+    const refresh = () => loadRecords();
+    refresh();
+    window.addEventListener("focus", refresh);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") refresh();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      window.clearTimeout(skeletonTimer);
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, []);
 
   const stats = getUnifiedArchiveStats(records, getSajuHistory().length, getTarotFavorites().length);
@@ -286,7 +296,11 @@ function HistoryPageContent() {
               {LAST_7_DAYS_COPY.headline}
             </h2>
             {last7RecordCount < 2 && (
-              <p className="mt-3 text-sm text-[#8A7E78]">{HISTORY_SECTION_EMPTY_COPY.last7Days}</p>
+              <p className="mt-3 text-sm leading-relaxed text-[#8A7E78]">
+                {last7RecordCount === 1
+                  ? LAST_7_DAYS_COPY.dailyAccumulate
+                  : HISTORY_SECTION_EMPTY_COPY.last7Days}
+              </p>
             )}
             <div className="mt-4 space-y-2.5">
               {last7.map((day) => (

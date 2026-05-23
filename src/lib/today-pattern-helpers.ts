@@ -5,7 +5,7 @@ import {
   WEEK_INSIGHT_COPY,
   type HistoryFilter,
 } from "@/lib/history-copy";
-import { getTodayDateKeyKst } from "@/lib/kst-date";
+import { getKstWeekdayShort, getTodayDateKeyKst, shiftKstDateKey } from "@/lib/kst-date";
 import type { ToneKey } from "@/lib/today-tone-types";
 import { buildToneTransitionComment } from "@/lib/today-tone-engine";
 import {
@@ -62,12 +62,7 @@ export function formatShortDate(dateKey: string) {
 }
 
 export function getWeekdayShort(dateKey: string) {
-  if (dateKey.length !== 8) return "";
-  const y = Number(dateKey.slice(0, 4));
-  const m = Number(dateKey.slice(4, 6)) - 1;
-  const d = Number(dateKey.slice(6, 8));
-  const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
-  return weekdays[new Date(y, m, d).getDay()];
+  return getKstWeekdayShort(dateKey);
 }
 
 /** 날짜별 최신 기록만 유지 */
@@ -86,25 +81,8 @@ export function filterRecordsInDays(records: SavedTodayRecord[], days: number) {
   const deduped = dedupeRecordsByDate(records);
   if (days <= 0) return deduped;
   const today = getTodayDateKey();
-  const todayDate = parseDateKey(today);
-  const cutoff = new Date(todayDate);
-  cutoff.setDate(cutoff.getDate() - (days - 1));
-  const cutoffKey = formatDateKey(cutoff);
+  const cutoffKey = shiftKstDateKey(today, -(days - 1));
   return deduped.filter((r) => r.dateKey >= cutoffKey);
-}
-
-function parseDateKey(dateKey: string) {
-  const y = Number(dateKey.slice(0, 4));
-  const m = Number(dateKey.slice(4, 6)) - 1;
-  const d = Number(dateKey.slice(6, 8));
-  return new Date(y, m, d);
-}
-
-function formatDateKey(date: Date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}${m}${d}`;
 }
 
 /** 종합 점수 → 5단계 도트 (1~5) */
@@ -175,16 +153,14 @@ export function buildWeekInsight(records: SavedTodayRecord[]) {
   return WEEK_INSIGHT_COPY.mixed;
 }
 
-/** 최근 7일(캘린더) 흐름 행 */
+/** 최근 7일(캘린더, KST) 흐름 행 */
 export function buildLast7DaysFlow(records: SavedTodayRecord[]): DayFlowItem[] {
   const dedupedMap = new Map(dedupeRecordsByDate(records).map((r) => [r.dateKey, r]));
-  const today = parseDateKey(getTodayDateKey());
+  const todayKey = getTodayDateKey();
   const items: DayFlowItem[] = [];
 
-  for (let i = 6; i >= 0; i -= 1) {
-    const d = new Date(today);
-    d.setDate(d.getDate() - i);
-    const dateKey = formatDateKey(d);
+  for (let offset = -6; offset <= 0; offset += 1) {
+    const dateKey = shiftKstDateKey(todayKey, offset);
     const record = dedupedMap.get(dateKey);
     const overall = record?.overall ?? 0;
     items.push({

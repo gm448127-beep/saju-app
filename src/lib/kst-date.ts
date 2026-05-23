@@ -37,3 +37,24 @@ export function formatKstDateLabel(instant = new Date()): string {
   const { year, month, day, dayOfWeek } = getKstDateParts(instant);
   return `${year}년 ${month}월 ${day}일 (${WEEKDAY_KO[dayOfWeek]}요일)`;
 }
+
+/** YYYYMMDD(KST)에서 N일 이동 */
+export function shiftKstDateKey(dateKey: string, deltaDays: number): string {
+  const y = Number(dateKey.slice(0, 4));
+  const m = Number(dateKey.slice(4, 6));
+  const d = Number(dateKey.slice(6, 8));
+  if (!y || !m || !d) return dateKey;
+  const anchor = new Date(Date.UTC(y, m - 1, d, 12, 0, 0, 0));
+  anchor.setUTCDate(anchor.getUTCDate() + deltaDays);
+  return `${anchor.getUTCFullYear()}${String(anchor.getUTCMonth() + 1).padStart(2, "0")}${String(anchor.getUTCDate()).padStart(2, "0")}`;
+}
+
+/** YYYYMMDD(KST) 요일 약칭 */
+export function getKstWeekdayShort(dateKey: string): string {
+  const y = Number(dateKey.slice(0, 4));
+  const m = Number(dateKey.slice(4, 6));
+  const d = Number(dateKey.slice(6, 8));
+  if (!y || !m || !d) return "";
+  const dayOfWeek = new Date(Date.UTC(y, m - 1, d, 12, 0, 0, 0)).getUTCDay();
+  return WEEKDAY_KO[dayOfWeek];
+}

@@ -11,6 +11,7 @@ import AxisScorePanel from "@/components/AxisScorePanel";
 import ToneDecisionChip from "@/components/ToneDecisionChip";
 import { TODAY_CARD_META, TODAY_CARD_SURFACE } from "@/lib/today-page-copy";
 import { buildTodayMyeongriBasis, buildToneChipTooltip } from "@/lib/today-basis-helpers";
+import { getTodayDateKey } from "@/lib/today-pattern-helpers";
 import {
   buildComparisonInsight,
   buildOverallComparison,
@@ -140,7 +141,7 @@ export default function TodayFiveCardReport({
   onOpenDetail,
 }: TodayFiveCardReportProps) {
   const isPersonalized = mode === "personalized" && Boolean(result);
-  const dateKey = report.seedKey.split("-")[0] ?? "";
+  const dateKey = getTodayDateKey();
   const scores = result?.scores ?? {};
   const apiScores: TodayApiScores | null =
     isPersonalized && typeof scores.overall === "number"
@@ -213,6 +214,7 @@ export default function TodayFiveCardReport({
   }, [birthKey, dateKey, isPersonalized]);
 
   useEffect(() => {
+    if (!isPersonalized) return;
     saveTodayRecord({
       savedAt: new Date().toISOString(),
       dateKey,
@@ -226,7 +228,7 @@ export default function TodayFiveCardReport({
       saveSentence: report.saveSentence,
       areas: savedAreas,
     });
-    if (isPersonalized) setSaved(true);
+    setSaved(true);
   }, [
     birthKey,
     dateKey,
