@@ -1069,7 +1069,13 @@ export async function POST(request: NextRequest) {
       siJijiRels = findJijiRelations([siBranch], tdBranch);
       siCheonganRels = findCheonganRelations([siStem], tdStem);
       const siRelBonus = getRelationBonus(siJijiRels, siCheonganRels);
-      siBonus = Math.round(siRelBonus.bonus * 0.5);
+      siBonus = Math.round(siRelBonus.bonus * 0.8);
+
+      // 시주 천간이 일간에게 주는 십성 → 소폭 가중 (중심 60, 최대 ±5)
+      const siVsMeSameYY = (siGanIdx % 2) === (myGanIdx % 2);
+      const siVsMeSipsin = getSipsin(myDayOh, siStemOh, siVsMeSameYY);
+      const siSelfScore = SIPSIN_SCORE[siVsMeSipsin]?.base ?? 60;
+      siBonus += Math.round((siSelfScore - 60) / 8);
     }
 
     const totalBonus = relBonus.bonus + seyunEffect.bonus + siBonus;
