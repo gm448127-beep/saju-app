@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState } from "react";
@@ -7,6 +8,7 @@ import HistoryEmptyPreviews from "@/components/pattern/HistoryEmptyPreviews";
 import HistoryOtherRecords from "@/components/pattern/HistoryOtherRecords";
 import HistoryPageSkeleton from "@/components/pattern/HistoryPageSkeleton";
 import PatternDots from "@/components/pattern/PatternDots";
+import PatternEmptyDayLine from "@/components/pattern/PatternEmptyDayLine";
 import {
   getSajuHistory,
   getTarotFavorites,
@@ -22,6 +24,7 @@ import {
   LAST_7_DAYS_COPY,
   PATTERN_REPORT_COPY,
   RECENT_RECORDS_COPY,
+  RECENT_RECORDS_SAVED_SUBCOPY,
   RECURRING_TONES_COPY,
   SAVED_SENTENCES_COPY,
 } from "@/lib/history-copy";
@@ -47,6 +50,9 @@ import {
   getUnifiedArchiveStats,
   type SavedTodayRecord,
 } from "@/lib/today-report-helpers";
+
+const PATTERN_CARD_SURFACE =
+  "rounded-[26px] border border-[#E8D7C4] bg-[#FAF5ED] px-5 py-6 shadow-[0_4px_18px_rgba(139,111,71,0.06)]";
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
@@ -99,6 +105,10 @@ function HistoryPageContent() {
   const visibleRecords = showAllRecords ? filteredRecords : filteredRecords.slice(0, 5);
 
   const last7RecordCount = last7.filter((d) => d.hasRecord).length;
+  const last7EmptyCount = last7.length - last7RecordCount;
+  const showLast7WarmupHint = last7EmptyCount >= 4;
+  const patternHeadline =
+    emptyState?.headline ?? PATTERN_REPORT_COPY.headline;
 
   const toggleToneFilter = (label: string) => {
     setToneFilter((current) => (current === label ? null : label));
@@ -126,12 +136,12 @@ function HistoryPageContent() {
   }
 
   return (
-    <div className="space-y-5 pb-8">
+    <div className="space-y-8 pb-10">
       {/* 헤더 */}
-      <section className="relative overflow-hidden rounded-[28px] border border-[#E2D7D0] bg-white px-5 py-6 shadow-[0_14px_38px_rgba(61,51,56,0.06)] sm:px-7">
-        <div className="absolute -right-16 -top-20 h-48 w-48 rounded-full bg-[#F1E7DE]/80" />
-        <div className="relative flex items-start justify-between gap-3">
-          <div>
+      <section className={`relative overflow-hidden ${PATTERN_CARD_SURFACE} sm:px-7`}>
+        <div className="absolute -right-16 -top-20 h-48 w-48 rounded-full bg-[#F1E7DE]/60" />
+        <div className="relative flex items-start justify-between gap-4">
+          <div className="min-w-0 flex-1">
             <Link href="/" className="text-xs font-semibold text-[#8A7E78] hover:text-[#8B6F47]">
               {HISTORY_HEADER_COPY.backBrand}
             </Link>
@@ -140,33 +150,42 @@ function HistoryPageContent() {
             </h1>
             <p className="mt-2 text-xs leading-relaxed text-[#8A7E78]">{HISTORY_HEADER_COPY.subtitle}</p>
           </div>
-          {filterEnabled ? (
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => setFilterOpen((o) => !o)}
-                className="rounded-full border border-[#D9C8C0] bg-[#FAF8F5] px-3 py-1.5 text-xs font-bold text-[#2F282B]"
-              >
-                {HISTORY_HEADER_COPY.filterTrigger}
-              </button>
-              {filterOpen && (
-                <div className="absolute right-0 top-full z-20 mt-2 min-w-[160px] rounded-2xl border border-[#E2D7D0] bg-white py-2 shadow-lg">
-                  {HISTORY_FILTER_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => applyFilter(opt.value)}
-                      className={`block w-full px-4 py-2 text-left text-xs font-semibold ${
-                        filter === opt.value ? "bg-[#FFF8EE] text-[#8B6F47]" : "text-[#5A4E48]"
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : null}
+          <div className="flex shrink-0 flex-col items-end gap-2">
+            <Image
+              src="/miin.png"
+              alt="미인"
+              width={48}
+              height={48}
+              className="h-12 w-12 rounded-full border border-[#E8D7C4] bg-[#FFF8EE] object-cover object-center shadow-[0_4px_12px_rgba(139,111,71,0.12)]"
+            />
+            {filterEnabled ? (
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setFilterOpen((o) => !o)}
+                  className="rounded-full border border-[#D9C8C0] bg-white px-3 py-1.5 text-xs font-bold text-[#2F282B]"
+                >
+                  {HISTORY_HEADER_COPY.filterTrigger}
+                </button>
+                {filterOpen && (
+                  <div className="absolute right-0 top-full z-20 mt-2 min-w-[160px] rounded-2xl border border-[#E2D7D0] bg-white py-2 shadow-lg">
+                    {HISTORY_FILTER_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => applyFilter(opt.value)}
+                        className={`block w-full px-4 py-2 text-left text-xs font-semibold ${
+                          filter === opt.value ? "bg-[#FFF8EE] text-[#8B6F47]" : "text-[#5A4E48]"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : null}
+          </div>
         </div>
       </section>
 
@@ -194,21 +213,15 @@ function HistoryPageContent() {
         </>
       ) : (
         <>
-          {emptyState && !emptyState.showCta && (
-            <section className="rounded-[26px] border border-[#E8D7C4] bg-[#FFFDF8] px-5 py-4">
-              <h2 className="text-base text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-                {emptyState.headline}
-              </h2>
-              <p className="mt-2 text-sm leading-relaxed text-[#6B5E58]">{emptyState.body}</p>
-            </section>
-          )}
-
-          {/* PATTERN REPORT */}
-          <section className="rounded-[26px] border border-[#E8D7C4] bg-[#FFFDF8] px-5 py-5">
+          {/* 패턴 리포트 + 반복되는 결 (통합) */}
+          <section className={PATTERN_CARD_SURFACE}>
             <SectionLabel>{PATTERN_REPORT_COPY.sectionLabel}</SectionLabel>
             <h2 className="mt-2 text-xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-              {PATTERN_REPORT_COPY.headline}
+              {patternHeadline}
             </h2>
+            {emptyState?.body && (
+              <p className="mt-2 text-sm leading-relaxed text-[#6B5E58]">{emptyState.body}</p>
+            )}
             {topTones.length > 0 && (
               <p className="mt-3 text-sm leading-relaxed text-[#4A403B]">
                 {PATTERN_REPORT_COPY.topTonesPrefix}{" "}
@@ -218,57 +231,56 @@ function HistoryPageContent() {
             )}
             <p className="mt-2 text-sm leading-relaxed text-[#6B5E58]">{weekInsight}</p>
             {transitionLine && (
-              <p className="mt-3 rounded-2xl border border-[#E2D7D0]/80 bg-white/80 px-4 py-3 text-sm text-[#4A403B]">
+              <p className="mt-3 rounded-2xl border border-[#E8D7C4] bg-white/80 px-4 py-3 text-sm text-[#4A403B]">
                 {transitionLine}
               </p>
             )}
-          </section>
 
-          {/* RECURRING TONES */}
-          <section className="rounded-[26px] border border-[#E2D7D0] bg-white px-5 py-5 shadow-[0_8px_22px_rgba(61,51,56,0.04)]">
-            <SectionLabel>{RECURRING_TONES_COPY.sectionLabel}</SectionLabel>
-            <h2 className="mt-1 text-lg text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-              {RECURRING_TONES_COPY.headline}
-            </h2>
-            <p className="mt-1 text-xs text-[#8A7E78]">{RECURRING_TONES_COPY.sub}</p>
-            {clusters.length === 0 ? (
-              <p className="mt-4 text-sm text-[#8A7E78]">{HISTORY_SECTION_EMPTY_COPY.recurringTones}</p>
-            ) : (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {clusters.map((cluster) => (
-                  <button
-                    key={cluster.label}
-                    type="button"
-                    onClick={() => toggleToneFilter(cluster.label)}
-                    aria-pressed={toneFilter === cluster.label}
-                    className={`rounded-full border px-3 py-1.5 text-sm font-semibold transition ${
-                      toneFilter === cluster.label
-                        ? "border-[#8B6F47] bg-[#FFF8EE] text-[#2F282B]"
-                        : "border-[#E2D7D0] bg-[#FAF8F5] text-[#5A4E48]"
-                    }`}
-                  >
-                    {cluster.label}
-                    {toneFilter === cluster.label && (
-                      <span className="sr-only"> {RECURRING_TONES_COPY.chipSelectedSuffix}</span>
-                    )}
-                    <span className="ml-1 text-xs text-[#8B6F47]">×{cluster.count}</span>
-                  </button>
-                ))}
-                {toneFilter && (
-                  <button
-                    type="button"
-                    onClick={() => setToneFilter(null)}
-                    className="rounded-full border border-dashed border-[#C4B8AE] px-3 py-1.5 text-xs font-semibold text-[#8A7E78]"
-                  >
-                    {RECURRING_TONES_COPY.filterClear}
-                  </button>
-                )}
-              </div>
-            )}
+            <div className="mt-6 border-t border-[#E8D7C4] pt-5">
+              <SectionLabel>{RECURRING_TONES_COPY.sectionLabel}</SectionLabel>
+              <h3 className="mt-1 text-base text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
+                {RECURRING_TONES_COPY.headline}
+              </h3>
+              <p className="mt-1 text-xs text-[#8A7E78]">{RECURRING_TONES_COPY.sub}</p>
+              {clusters.length === 0 ? (
+                <p className="mt-4 text-sm text-[#8A7E78]">{HISTORY_SECTION_EMPTY_COPY.recurringTones}</p>
+              ) : (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {clusters.map((cluster) => (
+                    <button
+                      key={cluster.label}
+                      type="button"
+                      onClick={() => toggleToneFilter(cluster.label)}
+                      aria-pressed={toneFilter === cluster.label}
+                      className={`rounded-full border px-3 py-1.5 text-sm font-semibold transition ${
+                        toneFilter === cluster.label
+                          ? "border-[#8B6F47] bg-white text-[#2F282B]"
+                          : "border-[#E8D7C4] bg-white/70 text-[#5A4E48]"
+                      }`}
+                    >
+                      {cluster.label}
+                      {toneFilter === cluster.label && (
+                        <span className="sr-only"> {RECURRING_TONES_COPY.chipSelectedSuffix}</span>
+                      )}
+                      <span className="ml-1 text-xs text-[#8B6F47]">×{cluster.count}</span>
+                    </button>
+                  ))}
+                  {toneFilter && (
+                    <button
+                      type="button"
+                      onClick={() => setToneFilter(null)}
+                      className="rounded-full border border-dashed border-[#C4B8AE] px-3 py-1.5 text-xs font-semibold text-[#8A7E78]"
+                    >
+                      {RECURRING_TONES_COPY.filterClear}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
           </section>
 
           {/* LAST 7 DAYS */}
-          <section className="rounded-[26px] border border-[#E2D7D0] bg-white px-5 py-5 shadow-[0_8px_22px_rgba(61,51,56,0.04)]">
+          <section className={PATTERN_CARD_SURFACE}>
             <SectionLabel>{LAST_7_DAYS_COPY.sectionLabel}</SectionLabel>
             <h2 className="mt-1 text-lg text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
               {LAST_7_DAYS_COPY.headline}
@@ -276,101 +288,98 @@ function HistoryPageContent() {
             {last7RecordCount < 2 && (
               <p className="mt-3 text-sm text-[#8A7E78]">{HISTORY_SECTION_EMPTY_COPY.last7Days}</p>
             )}
-            <div className="mt-4 space-y-2">
+            <div className="mt-4 space-y-2.5">
               {last7.map((day) => (
                 <button
                   key={day.dateKey}
                   type="button"
                   disabled={!day.hasRecord}
                   onClick={() => day.hasRecord && router.push(`/history/${dateKeyToSlug(day.dateKey)}`)}
-                  className={`flex w-full items-center justify-between gap-3 rounded-xl border px-3 py-2.5 text-left transition ${
+                  className={`flex w-full items-center justify-between gap-3 rounded-xl border px-3 py-3 text-left transition ${
                     day.hasRecord
-                      ? "border-[#E2D7D0] bg-[#FFFDF9] hover:border-[#8B6F47]/40"
-                      : "border-[#F0EBE6] bg-[#FAFAF8] opacity-60"
+                      ? "border-[#E8D7C4] bg-white/80 hover:border-[#8B6F47]/40"
+                      : "border-transparent bg-transparent cursor-default"
                   }`}
                 >
                   <span className="text-xs font-semibold text-[#6B5E58]">
                     {day.shortDate}
                     <span className="ml-1 text-[#A09488]">({day.weekday})</span>
                   </span>
-                  <div className="flex items-center gap-3">
+                  <div className="flex min-h-[1.25rem] items-center gap-3">
                     {day.hasRecord ? (
                       <>
                         <PatternDots filled={day.dotsFilled} />
                         <span className="text-xs font-bold text-[#8B6F47]">{day.toneLabel}</span>
                       </>
                     ) : (
-                      <span className="text-[10px] text-[#C4B8AE]">{LAST_7_DAYS_COPY.rowNoRecord}</span>
+                      <PatternEmptyDayLine />
                     )}
                   </div>
                 </button>
               ))}
             </div>
-            <p className="mt-4 text-sm leading-relaxed text-[#6B5E58]">{weekInsight}</p>
-          </section>
-
-          {/* SAVED SENTENCES */}
-          <section className="rounded-[26px] border border-[#E2D7D0] bg-white px-5 py-5 shadow-[0_8px_22px_rgba(61,51,56,0.04)]">
-            <SectionLabel>{SAVED_SENTENCES_COPY.sectionLabel}</SectionLabel>
-            <h2 className="mt-1 text-lg text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-              {SAVED_SENTENCES_COPY.headline}
-            </h2>
-            {savedSentences.length === 0 ? (
-              <p className="mt-4 text-sm leading-relaxed text-[#6B5E58]">{HISTORY_SECTION_EMPTY_COPY.savedSentences}</p>
-            ) : (
-              <>
-                <div className="mt-4 space-y-3">
-                  {savedSentences.slice(0, 3).map((item) => (
-                    <Link
-                      key={`${item.dateKey}-${item.text}`}
-                      href={`/history/${dateKeyToSlug(item.dateKey)}`}
-                      className="block rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4 transition hover:border-[#8B6F47]/40"
-                    >
-                      <p className="text-base leading-relaxed text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-                        &ldquo;{item.text}&rdquo;
-                      </p>
-                      <p className="mt-2 text-xs text-[#8B6F47]">
-                        {SAVED_SENTENCES_COPY.formatMeta(item.shortDate, item.toneLabel)}
-                      </p>
-                    </Link>
-                  ))}
-                </div>
-                {savedSentences.length > 3 && (
-                  <Link href="/history/saved" className="mt-3 inline-flex text-xs font-bold text-[#8B6F47]">
-                    {SAVED_SENTENCES_COPY.viewAll}
-                  </Link>
-                )}
-              </>
+            {showLast7WarmupHint && (
+              <p className="mt-5 text-center text-sm leading-relaxed text-[#8B6F47]">
+                {LAST_7_DAYS_COPY.warmupHint}
+              </p>
             )}
           </section>
 
-          {/* RECENT RECORDS */}
-          <section className="space-y-3">
-            <div className="flex items-end justify-between">
+          {/* 최근 기록 (+ 저장한 문장) */}
+          <section className={`${PATTERN_CARD_SURFACE} space-y-5`}>
+            <div className="flex items-end justify-between gap-3">
               <div>
                 <SectionLabel>{RECENT_RECORDS_COPY.sectionLabel}</SectionLabel>
                 <h2 className="mt-1 text-lg text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
                   {RECENT_RECORDS_COPY.headline}
                 </h2>
               </div>
-              <Link href="/today" className="text-xs font-bold text-[#8B6F47]">
+              <Link href="/today" className="shrink-0 text-xs font-bold text-[#8B6F47]">
                 {RECENT_RECORDS_COPY.readToday}
               </Link>
             </div>
 
+            {savedSentences.length > 0 && (
+              <div className="space-y-3 border-b border-[#E8D7C4] pb-5">
+                <p className="text-xs font-bold text-[#8B6F47]">{RECENT_RECORDS_SAVED_SUBCOPY.subhead}</p>
+                {savedSentences.slice(0, 3).map((item) => (
+                  <Link
+                    key={`${item.dateKey}-${item.text}`}
+                    href={`/history/${dateKeyToSlug(item.dateKey)}`}
+                    className="block rounded-2xl border border-[#E8D7C4] bg-white/80 px-4 py-3 transition hover:border-[#8B6F47]/40"
+                  >
+                    <p className="text-sm leading-relaxed text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
+                      &ldquo;{item.text}&rdquo;
+                    </p>
+                    <p className="mt-1.5 text-[11px] text-[#8B6F47]">
+                      {SAVED_SENTENCES_COPY.formatMeta(item.shortDate, item.toneLabel)}
+                    </p>
+                  </Link>
+                ))}
+                {savedSentences.length > 3 && (
+                  <Link href="/history/saved" className="inline-flex text-xs font-bold text-[#8B6F47]">
+                    {RECENT_RECORDS_SAVED_SUBCOPY.viewAll}
+                  </Link>
+                )}
+              </div>
+            )}
+
             {filteredRecords.length === 0 ? (
-              <p className="rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-5 text-sm text-[#6B5E58]">
-                {RECENT_RECORDS_COPY.filterNoMatch}
+              <p className="text-sm leading-relaxed text-[#6B5E58]">
+                {toneFilter || filter !== "all"
+                  ? RECENT_RECORDS_COPY.filterNoMatch
+                  : HISTORY_SECTION_EMPTY_COPY.recentRecords}
               </p>
             ) : (
-              visibleRecords.map((item) => {
+              <div className="space-y-3">
+              {visibleRecords.map((item) => {
                 const status = item.status || getTodayStatus(item.overall);
                 const relation = item.areas?.relation ?? item.overall;
                 const decision = item.areas?.decision ?? item.overall;
                 return (
                   <article
                     key={`${item.dateKey}-${item.birthKey}`}
-                    className="rounded-[24px] border border-[#E2D7D0] bg-white px-5 py-4 shadow-[0_8px_22px_rgba(61,51,56,0.04)]"
+                    className="rounded-2xl border border-[#E8D7C4] bg-white/80 px-4 py-4"
                   >
                     <div className="flex flex-wrap items-start justify-between gap-2">
                       <p className="text-xs font-bold text-[#8B6F47]">
@@ -402,14 +411,15 @@ function HistoryPageContent() {
                     </Link>
                   </article>
                 );
-              })
+              })}
+              </div>
             )}
 
             {filteredRecords.length > 5 && !showAllRecords && (
               <button
                 type="button"
                 onClick={() => setShowAllRecords(true)}
-                className="w-full rounded-2xl border border-[#E2D7D0] bg-white py-3 text-sm font-bold text-[#2F282B]"
+                className="w-full rounded-2xl border border-[#E8D7C4] bg-white/80 py-3 text-sm font-bold text-[#2F282B]"
               >
                 {RECENT_RECORDS_COPY.loadMore}
               </button>

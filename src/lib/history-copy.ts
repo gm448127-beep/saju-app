@@ -154,8 +154,15 @@ export const RECURRING_TONES_COPY = {
 export const LAST_7_DAYS_COPY = {
   sectionLabel: "LAST 7 DAYS",
   headline: "최근 7일의 흐름",
-  rowNoRecord: "기록 없음",
   empty: "최근 7일 기록이 아직 충분하지 않습니다. 오늘의 흐름을 읽으면 흐름이 쌓이기 시작합니다",
+  /** 기록 없는 날이 많을 때 (4일 이상) */
+  warmupHint: "매일 오늘운세를 읽으면 패턴이 쌓여요 🌿",
+} as const;
+
+/** 최근 기록 카드 안 — 저장 문장 소제목 */
+export const RECENT_RECORDS_SAVED_SUBCOPY = {
+  subhead: "저장한 문장",
+  viewAll: "전체 저장 문장 보기 ›",
 } as const;
 
 /** 어제→오늘 우선 10조합 (카피 시트 §4, tone-engine과 동기화 권장) */
