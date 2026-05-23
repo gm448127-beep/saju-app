@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useRef, useState, type TouchEvent } from "react";
+import { BIRTH_TIME_MARKETING } from "@/lib/engine-copy";
 import { INTRO_SLIDE2_IMAGE } from "@/lib/intro-onboarding-assets";
 
 const SLIDE_COUNT = 3;
@@ -17,7 +18,9 @@ function SlideCaptionBlock({ caption, subcaption }: { caption: string; subcaptio
   return (
     <div className="mx-auto w-full max-w-md space-y-2 text-center">
       <p className="text-xl font-bold leading-snug text-[#2F282B] sm:text-2xl">{caption}</p>
-      <p className="text-sm leading-relaxed text-[#2F282B]/80 sm:text-base">{subcaption}</p>
+      <p className="whitespace-pre-line text-sm leading-relaxed text-[#2F282B]/80 sm:text-base">
+        {subcaption}
+      </p>
     </div>
   );
 }
@@ -105,7 +108,10 @@ function Slide3Center() {
 
       <div className="relative z-10 w-full max-w-sm space-y-4">
         <p className="text-2xl font-bold leading-snug text-[#2F282B] sm:text-3xl">
-          생년월일만 알려주시면 돼요
+          {BIRTH_TIME_MARKETING.onboardingSlide3Title}
+        </p>
+        <p className="whitespace-pre-line text-sm leading-relaxed text-[#2F282B]/70 sm:text-base">
+          {BIRTH_TIME_MARKETING.subcopy}
         </p>
         <p className="text-base leading-relaxed text-[#2F282B]/75 sm:text-lg">
           한 번만 입력하면 매일 자동으로
@@ -171,7 +177,7 @@ export default function IntroOnboarding({ onSkip, onStart }: IntroOnboardingProp
             src="/miim.png"
             alt="운명비서 안내"
             caption="매일 아침, 오늘의 나를 읽어드립니다"
-            subcaption="결정·관계·감정·균형 — 사주로 정리하는 차분한 리포트"
+            subcaption={BIRTH_TIME_MARKETING.subcopy}
           />
 
           <FullImageSlide

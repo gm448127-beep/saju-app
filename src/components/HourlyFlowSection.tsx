@@ -1,5 +1,6 @@
 "use client";
 
+import { BIRTH_TIME_MARKETING } from "@/lib/engine-copy";
 import {
   LineChart,
   Line,
@@ -27,6 +28,7 @@ export interface HourlyFlowSlot {
   avoid?: string;
   relations?: string[];
   advice?: string;
+  isMyHour?: boolean;
 }
 
 interface HourlyFlowSectionProps {
@@ -115,14 +117,18 @@ function SijinDetailCard({
 }) {
   const scoreColor = slot.score >= 70 ? "#5FB88A" : slot.score >= 50 ? "#E8A87C" : "#D87A8C";
 
+  const isMyHour = slot.isMyHour;
+
   return (
     <div
       className={`rounded-xl border p-3 ${
-        isPeak
-          ? "border-[#D9C8C0] bg-[#FAF8F5]"
-          : isCaution
+        isMyHour
+          ? "border-[#8B6F47] bg-[#FFF8EE] ring-1 ring-[#8B6F47]/25"
+          : isPeak
             ? "border-[#D9C8C0] bg-[#FAF8F5]"
-            : "border-[#E2D7D0] bg-white"
+            : isCaution
+              ? "border-[#D9C8C0] bg-[#FAF8F5]"
+              : "border-[#E2D7D0] bg-white"
       }`}
     >
       <div className="flex justify-between items-start gap-2 mb-2">
@@ -131,6 +137,11 @@ function SijinDetailCard({
           <div className="min-w-0">
             <p style={{ fontFamily: "Jua, sans-serif" }} className="text-sm text-[#3D3338]">
               {slot.hour} · {slot.range}시
+              {isMyHour && (
+                <span className="ml-1.5 inline-block rounded-full bg-[#8B6F47] px-1.5 py-0.5 text-[10px] font-bold text-[#F5F1EB] align-middle">
+                  내 시(時)
+                </span>
+              )}
             </p>
             <p className="text-[11px] text-[#8A7E78]">
               시진 · {slot.element} · {slot.keyword}
@@ -184,7 +195,7 @@ export default function HourlyFlowSection({
     <div className="card">
       <div className="mb-4 flex justify-between items-end">
         <div>
-          <h2 className="label mb-1">12시진 운세 흐름</h2>
+          <h2 className="label mb-1">{BIRTH_TIME_MARKETING.hourlyFlowTitle}</h2>
           <p className="text-xs text-[#8A7E78] mt-1">12시진 · 시간의 흐름</p>
         </div>
         <p className="text-xs text-[#B8A78D]">하루 리듬</p>
@@ -241,7 +252,22 @@ export default function HourlyFlowSection({
             dataKey="score"
             stroke="#8B6F47"
             strokeWidth={2}
-            dot={{ r: 3, fill: "#8B6F47", strokeWidth: 0 }}
+            dot={(props: { cx?: number; cy?: number; payload?: HourlyFlowSlot }) => {
+              const { cx = 0, cy = 0, payload } = props;
+              if (payload?.isMyHour) {
+                return (
+                  <circle
+                    cx={cx}
+                    cy={cy}
+                    r={5}
+                    fill="#8B6F47"
+                    stroke="#2F282B"
+                    strokeWidth={2}
+                  />
+                );
+              }
+              return <circle cx={cx} cy={cy} r={3} fill="#8B6F47" />;
+            }}
             activeDot={{ r: 5, fill: "#3D3338" }}
           />
         </LineChart>

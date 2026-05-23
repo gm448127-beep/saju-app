@@ -265,7 +265,7 @@ export default function TodayPage() {
   const [year, setYear] = useState("1995");
   const [month, setMonth] = useState("1");
   const [day, setDay] = useState("1");
-  const [timeMode, setTimeMode] = useState<"none" | "slot" | "exact">("none");
+  const [timeMode, setTimeMode] = useState<"none" | "slot" | "exact">("slot");
   const [slotHour, setSlotHour] = useState(9);
   const [exactHour, setExactHour] = useState(9);
   const [exactMinute, setExactMinute] = useState(0);

@@ -16,6 +16,7 @@ import {
 } from "@/lib/user-profile-storage";
 import { getSajuHistory, getTarotFavorites } from "@/lib/archive-storage";
 import {
+  BIRTH_TIME_MARKETING,
   DIFFERENCE_LAYERS,
   ENGINE_ONE_LINER,
   ENGINE_SCOPE_NOTE,
@@ -335,6 +336,9 @@ export default function HomePage() {
       >
         {PRIMARY_TAGLINE}
       </p>
+      <p className="whitespace-pre-line rounded-2xl border border-[#E2D7D0]/80 bg-white px-4 py-3 text-center text-sm leading-relaxed text-[#5A4E48]">
+        {BIRTH_TIME_MARKETING.subcopy}
+      </p>
 
       <section className="overflow-hidden rounded-[30px] border border-[#E2D7D0] bg-white p-3 shadow-[0_18px_48px_rgba(61,51,56,0.07)] sm:p-4">
         <div
@@ -561,6 +565,9 @@ export default function HomePage() {
           </h2>
           <p className="mt-2 text-lg text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
             {PRIMARY_TAGLINE}
+          </p>
+          <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-[#5A4E48]">
+            {BIRTH_TIME_MARKETING.subcopy}
           </p>
           <p className="mt-3 rounded-2xl border border-[#E2D7D0] bg-[#FFF8EE] px-4 py-3 text-sm leading-relaxed text-[#4A403B]">
             <span className="font-bold text-[#8B6F47]">해석 엔진 · </span>

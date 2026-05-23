@@ -29,6 +29,7 @@ type HourlyFlowItem = {
   score: number;
   branch: string;
   sipsin: string;
+  isMyHour?: boolean;
 };
 
 type TodayPostBody = {
@@ -84,6 +85,26 @@ describe("POST /api/today", () => {
     expect(second.hourlyFlow).toEqual(first.hourlyFlow);
   });
 
+  it("hour 입력 시 태어난 시지와 같은 슬롯에 isMyHour가 true다", async () => {
+    const data = await callTodayApi({ ...BASE_PAYLOAD });
+    const myHourSlots = data.hourlyFlow.filter((slot) => slot.isMyHour);
+
+    expect(myHourSlots.length).toBe(1);
+    expect(data.hourlyFlow.every((slot) => !slot.isMyHour || slot === myHourSlots[0])).toBe(true);
+  });
+
+  it("hour 미입력 시 hourlyFlow의 isMyHour는 모두 false다", async () => {
+    const data = await callTodayApi({
+      year: BASE_PAYLOAD.year,
+      month: BASE_PAYLOAD.month,
+      day: BASE_PAYLOAD.day,
+      gender: BASE_PAYLOAD.gender,
+      isLunar: BASE_PAYLOAD.isLunar,
+    });
+
+    expect(data.hourlyFlow.every((slot) => !slot.isMyHour)).toBe(true);
+  });
+
   it("hour 미입력 vs 입력 시 hourlyFlow 점수 분포가 달라진다", async () => {
     const withHour = await callTodayApi({ ...BASE_PAYLOAD });
     const withoutHour = await callTodayApi({
@@ -110,5 +131,52 @@ describe("POST /api/today", () => {
       expect(score).toBeGreaterThanOrEqual(20);
       expect(score).toBeLessThanOrEqual(99);
     }
+  });
+
+  it("시간 모름(timeMode none)과 동일하게 hour 없이 호출해도 200·isMyHour 없음", async () => {
+    const data = await callTodayApi({
+      year: BASE_PAYLOAD.year,
+      month: BASE_PAYLOAD.month,
+      day: BASE_PAYLOAD.day,
+      gender: BASE_PAYLOAD.gender,
+      isLunar: BASE_PAYLOAD.isLunar,
+    });
+
+    expect(data.scores.overall).toBeGreaterThanOrEqual(20);
+    expect(data.hourlyFlow).toHaveLength(12);
+    expect(data.hourlyFlow.every((slot) => !slot.isMyHour)).toBe(true);
+  });
+
+  it("hour 입력 시 isMyHour는 시주 지지와 일치한다(9:30 → 진 시진)", async () => {
+    const data = await callTodayApi({ ...BASE_PAYLOAD });
+    const mySlot = data.hourlyFlow.find((slot) => slot.isMyHour);
+
+    expect(mySlot).toBeDefined();
+    // 만세력 시주 지지(이 프로필 9:30) — 벽시각 巳와 다를 수 있음
+    expect(mySlot?.branch).toBe("진");
+  });
+
+  it("siBonus·시간별 seed 변화가 전체 점수를 비정상적으로 치우치지 않는다", async () => {
+    const hourSamples = [0, 3, 6, 9, 12, 15, 18, 21];
+    const overalls: number[] = [];
+
+    for (const hour of hourSamples) {
+      const data = await callTodayApi({
+        ...BASE_PAYLOAD,
+        hour,
+        minute: 0,
+      });
+      overalls.push(data.scores.overall);
+      expect(data.scores.overall).toBeGreaterThanOrEqual(20);
+      expect(data.scores.overall).toBeLessThanOrEqual(99);
+    }
+
+    const mean = overalls.reduce((a, b) => a + b, 0) / overalls.length;
+    const spread = Math.max(...overalls) - Math.min(...overalls);
+
+    expect(mean).toBeGreaterThanOrEqual(40);
+    expect(mean).toBeLessThanOrEqual(88);
+    expect(spread).toBeLessThanOrEqual(45);
+    expect(new Set(overalls).size).toBeGreaterThan(1);
   });
 });

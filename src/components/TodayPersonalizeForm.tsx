@@ -73,22 +73,16 @@ export default function TodayPersonalizeForm(props: TodayPersonalizeFormProps) {
         </div>
 
         <form onSubmit={onSubmit} className="relative space-y-5 px-5 py-6 sm:px-7 sm:py-7">
-          <BirthDateNumberInputs
-            year={year}
-            month={month}
-            day={day}
-            onYearChange={onYearChange}
-            onMonthChange={onMonthChange}
-            onDayChange={onDayChange}
-          />
-
           <div>
-            <label className="mb-2 block text-xs font-semibold text-[#8B6F47]">출생시간</label>
+            <label className="mb-1 block text-xs font-semibold text-[#8B6F47]">출생시간 (시주)</label>
+            <p className="mt-1 mb-2 text-xs leading-relaxed text-[#8B6F47]">
+              태어난 시(時)는 그날 진짜 내 흐름을 가르는 핵심이에요. 알면 꼭 넣어주세요.
+            </p>
             <div className="grid grid-cols-3 gap-2">
               {([
-                ["none", "모름"],
-                ["slot", "시간대"],
-                ["exact", "시/분 입력"],
+                ["slot", "시간대 선택"],
+                ["exact", "시·분 입력"],
+                ["none", "시간 모름"],
               ] as const).map(([mode, label]) => (
                 <button
                   key={mode}
@@ -146,7 +140,21 @@ export default function TodayPersonalizeForm(props: TodayPersonalizeFormProps) {
                 </div>
               </div>
             )}
+            {timeMode === "none" && (
+              <p className="mt-2 text-xs text-[#8A7E78]">
+                시간을 몰라도 오늘의 흐름은 볼 수 있어요. 다만 태어난 시를 넣으면 시간대별 흐름이 훨씬 정밀해집니다.
+              </p>
+            )}
           </div>
+
+          <BirthDateNumberInputs
+            year={year}
+            month={month}
+            day={day}
+            onYearChange={onYearChange}
+            onMonthChange={onMonthChange}
+            onDayChange={onDayChange}
+          />
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>

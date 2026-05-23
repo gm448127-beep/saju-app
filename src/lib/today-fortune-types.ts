@@ -85,6 +85,8 @@ export interface HourlyFlowSlot {
   avoid?: string;
   relations?: string[];
   advice?: string;
+  /** 태어난 시지와 같은 시진이면 true */
+  isMyHour?: boolean;
 }
 
 export interface TimeAdviceItem {

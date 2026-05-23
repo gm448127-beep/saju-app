@@ -61,7 +61,7 @@ export const TODAY_EMPTY_COPY = {
   badgeSample: "예시",
   title: "오늘의 흐름",
   ctaLead: "지금은 일반 흐름이에요",
-  ctaAction: "내 결로 보려면 생년월일만 입력",
+  ctaAction: "내 결로 보려면 생년월일·시 입력",
   ctaButton: "1초 입력하고 내 흐름 보기",
   scoreDisclaimer: "아래 숫자는 내 점수가 아니라, 오늘 하루 전체의 예시 흐름입니다.",
   scoreSectionLabel: "오늘 전체 · 예시 점수",
@@ -69,7 +69,7 @@ export const TODAY_EMPTY_COPY = {
   afterInputNote: "점수·어제 비교·행동 가이드는 입력 후 내 사주 기준으로 계산됩니다.",
   formTitle: "내 결로 읽기",
   formSubtitle:
-    "지금 보신 흐름은 오늘 전체 기준입니다. 생년월일을 넣으면 내 점수와 행동 가이드로 바뀝니다.",
+    "지금 보신 흐름은 오늘 전체 기준입니다. 생년월일과 태어난 시를 넣으면 내 점수·시간대 흐름이 더 정밀해집니다.",
   formSubmit: "내 흐름 보기",
 } as const;
 
@@ -78,7 +78,7 @@ export const HOME_PATTERN_COPY = {
   emptyInsight: "오늘부터 패턴이 쌓이기 시작해요",
   emptySub: "매일의 결이 쌓이면 여기에 주간 패턴이 보입니다",
   emptyNudgeWithProfile: "오늘 한 번만 읽어도 첫 점이 찍힙니다",
-  emptyNudgeNoProfile: "생년월일만 넣고 오늘운세를 읽으면 첫 점이 찍힙니다",
+  emptyNudgeNoProfile: "생년월일·태어난 시를 넣고 읽으면 첫 점이 찍힙니다",
   emptyCta: "오늘운세 읽고 시작하기",
   emptyStatsMuted: "아직 기록이 없어요 · 오늘부터 채워집니다",
   startedInsight: "오늘부터 패턴이 쌓이기 시작했어요",

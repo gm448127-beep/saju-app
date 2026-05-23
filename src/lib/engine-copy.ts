@@ -7,6 +7,14 @@
 export const PRIMARY_TAGLINE =
   "매일 아침, 내 사주 기준으로 오늘의 흐름을 1분 안에 읽어드립니다";
 
+/** 시(時) 차별화 — 「유일」 단정 없이 사실 기반 */
+export const BIRTH_TIME_MARKETING = {
+  onboardingSlide3Title: "생년월일과 태어난 시까지 보면, 오늘이 더 정확해져요",
+  subcopy:
+    "대부분의 오늘의 운세는 생일까지만 봅니다.\n운명비서는 태어난 시(時)까지 읽어 하루의 결을 가릅니다.",
+  hourlyFlowTitle: "오늘, 당신의 시(時)에 맞춘 시간대별 흐름",
+} as const;
+
 /** 기술 한 줄 — 신뢰·보조 설명 */
 export const ENGINE_ONE_LINER =
   "내 일간 × 오늘 일진의 십성과 사주 원국의 천·지 합·충을 규칙으로 계산해 5축 점수와 「오늘의 결」을 만듭니다. (매번 새로 지어내는 AI 문장이 아닙니다)";
@@ -23,8 +31,8 @@ export const DIFFERENCE_LAYERS: ReadonlyArray<{
 }> = [
   {
     badge: "엔진",
-    line1: "일간 기준 십성·합·충",
-    line2: "같은 생일·같은 날이면\n같은 점수·같은 결",
+    line1: "생일 + 태어난 시(時) 반영",
+    line2: "일간·시주·12시진까지\n규칙으로 계산",
   },
   {
     badge: "표현",

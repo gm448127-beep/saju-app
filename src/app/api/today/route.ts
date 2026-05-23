@@ -480,7 +480,8 @@ function getHourlyFlow(
   myDayOh: string,
   myGanIdx: number,
   baseScore: number,
-  rng: () => number
+  rng: () => number,
+  mySiBranch?: string,
 ) {
   return SIJIN.map(({ branch, label, hanja, range }) => {
     const meta = SIJIN_META[branch];
@@ -497,6 +498,21 @@ function getHourlyFlow(
       if (r.type === "육충") relAdj -= 8;
       if (r.type === "형" || r.type === "자형") relAdj -= 4;
       if (r.type === "해" || r.type === "파") relAdj -= 2;
+    }
+
+    // 태어난 시지와 각 시진의 관계 (본인 시주 시간대 강조)
+    if (mySiBranch) {
+      if (branch === mySiBranch) {
+        relAdj += 6;
+      } else {
+        const siRels = findJijiRelations([mySiBranch], branch);
+        for (const r of siRels) {
+          if (r.type === "육합" || r.type === "삼합" || r.type === "방합") relAdj += 4;
+          if (r.type === "육충") relAdj -= 6;
+          if (r.type === "형" || r.type === "자형") relAdj -= 3;
+          if (r.type === "해" || r.type === "파") relAdj -= 2;
+        }
+      }
     }
 
     const raw = Math.round(sipsinBase * 0.5 + baseScore * 0.4 + relAdj + (rng() - 0.5) * 6);
@@ -528,6 +544,7 @@ function getHourlyFlow(
       avoid: meta.avoid,
       relations,
       advice: buildSijinAdvice(branch, sipsin, score, labelText, rels),
+      isMyHour: mySiBranch ? branch === mySiBranch : false,
     };
   });
 }
@@ -1135,7 +1152,14 @@ export async function POST(request: NextRequest) {
         : "미입력",
     };
 
-    const hourlyFlow = getHourlyFlow(myBranches, myDayOh, myGanIdx, scores.overall, rng);
+    const hourlyFlow = getHourlyFlow(
+      myBranches,
+      myDayOh,
+      myGanIdx,
+      scores.overall,
+      rng,
+      hasHour ? siBranch : undefined,
+    );
     const timeAdvice = buildTimeAdviceFromFlow(
       hourlyFlow,
       TIME_ADVICE[todaySipsin] || TIME_ADVICE["비견"]
