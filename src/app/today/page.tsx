@@ -12,6 +12,8 @@ import TimeAdviceSection from "@/components/TimeAdviceSection";
 import TodayActionGuideSection from "@/components/TodayActionGuideSection";
 import TodayEmptyState from "@/components/TodayEmptyState";
 import TodayFiveCardReport from "@/components/TodayFiveCardReport";
+import TodayPageHeader from "@/components/today/TodayPageHeader";
+import TodayScoreBasisBar from "@/components/today/TodayScoreBasisBar";
 import TodayStoryShareButton from "@/components/TodayStoryShareButton";
 import TodayPersonalizeForm, { isValidBirthDate } from "@/components/TodayPersonalizeForm";
 import { TODAY_TAB_COPY } from "@/lib/today-page-copy";
@@ -23,7 +25,14 @@ import {
   ONBOARDING_INPUT_TARGET_TODAY,
 } from "@/lib/onboarding-storage";
 import {
+  birthKeyFromTodayPayload,
+  clampFortuneScore,
+  serializeTodayPayload,
+  type TodayFetchPayload,
+} from "@/lib/today-score-display";
+import {
   profileBirthTimeSummary,
+  profileToBirthKey,
   profileToTodayPayload,
   type UserBirthProfile,
 } from "@/lib/user-profile-storage";
@@ -284,11 +293,50 @@ export default function TodayPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState<TodayTab>("summary");
+  const [lastFetchedPayload, setLastFetchedPayload] = useState<TodayFetchPayload | null>(null);
   const resultRef = useRef<HTMLDivElement>(null);
+
+  const formPayload = useMemo((): TodayFetchPayload => {
+    let hour: number | undefined;
+    let minute: number | undefined;
+    if (timeMode === "exact") {
+      hour = exactHour;
+      minute = exactMinute;
+    } else if (timeMode === "slot") {
+      hour = slotHour;
+      minute = 0;
+    }
+    return {
+      year: Number(year),
+      month: Number(month),
+      day: Number(day),
+      hour,
+      minute,
+      isLunar: calendarType !== "solar",
+      gender,
+    };
+  }, [
+    year,
+    month,
+    day,
+    timeMode,
+    slotHour,
+    exactHour,
+    exactMinute,
+    calendarType,
+    gender,
+  ]);
 
   const isPersonalized = Boolean(result?.dailyReport);
   const personalizedReport = isPersonalized ? (result.dailyReport as DailyFortuneContent) : null;
-  const birthKey = `${year}-${month}-${day}-${gender}`;
+  const birthKey = useMemo(() => {
+    if (profile) return profileToBirthKey(profile);
+    return birthKeyFromTodayPayload(formPayload);
+  }, [profile, formPayload]);
+  const scoreStale =
+    Boolean(result?.scores?.overall) &&
+    lastFetchedPayload !== null &&
+    serializeTodayPayload(lastFetchedPayload) !== serializeTodayPayload(formPayload);
   const todayLabel = formatTodayLabel();
   const commonPreview = useMemo(() => buildDailyFortuneContent(), []);
 
@@ -367,6 +415,7 @@ export default function TodayPage() {
         const json = await res.json();
         if (!res.ok) throw new Error(json.error || "분석 실패");
         setResult(json);
+        setLastFetchedPayload(payload);
         setActiveTab("summary");
         if (scrollToResult) {
           window.setTimeout(() => {
@@ -416,27 +465,18 @@ export default function TodayPage() {
     }
 
     persistProfileFromForm();
-
-    let hour: number | undefined;
-    let minute: number | undefined;
-    if (timeMode === "exact") {
-      hour = exactHour;
-      minute = exactMinute;
-    } else if (timeMode === "slot") {
-      hour = slotHour;
-      minute = 0;
-    }
-
-    await fetchTodayReport({
-      year: Number(year),
-      month: Number(month),
-      day: Number(day),
-      hour,
-      minute,
-      isLunar: calendarType !== "solar",
-      gender,
-    });
+    await fetchTodayReport(formPayload);
   };
+
+  const recalculateFromForm = useCallback(async () => {
+    if (!isValidBirthDate(year, month, day)) {
+      setError("생년월일을 숫자로 정확히 입력해주세요.");
+      return;
+    }
+    setError("");
+    persistProfileFromForm();
+    await fetchTodayReport(formPayload);
+  }, [fetchTodayReport, formPayload, persistProfileFromForm, year, month, day]);
 
   const statItems: Omit<TodayStatItem, "score">[] = result
     ? [
@@ -505,18 +545,11 @@ export default function TodayPage() {
       {isPersonalized && personalizedReport && (
         <div ref={resultRef} className="space-y-6">
           <section aria-label="나의 오늘의 흐름" className="space-y-6">
-            <header className="flex flex-wrap items-end justify-between gap-3 border-b border-[#E8D7C4] pb-4">
-              <div>
-                <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">오늘의 운세</p>
-                <h1 className="mt-1 text-2xl text-[#2F282B] sm:text-3xl" style={{ fontFamily: "Jua, sans-serif" }}>
-                  {profile ? `${displayName}의 오늘` : "나의 오늘"}
-                </h1>
-                <p className="mt-1 text-sm text-[#8A7E78]">{todayLabel}</p>
-              </div>
-              <p className="max-w-xs text-right text-xs leading-relaxed text-[#8A7E78]">
-                <span className="font-semibold text-[#8B6F47]">핵심만</span> 탭에서 ①한 줄 → ②행동 순으로 읽으세요
-              </p>
-            </header>
+            <TodayPageHeader
+              title={profile ? `${displayName}의 오늘` : "나의 오늘"}
+              dateLabel={todayLabel}
+              subtitle="한 줄 → 4축 점수 → 오늘의 흐름 → 행동 가이드 → 시간대별 운세 순으로 읽어보세요."
+            />
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" data-pdf-ignore>
             <p className="text-sm text-[#5A4E48]">저장 · 공유 · PDF</p>
             <div
@@ -568,6 +601,16 @@ export default function TodayPage() {
           </div>
         )}
 
+        {isPersonalized && result?.scores?.overall != null && lastFetchedPayload && (
+          <TodayScoreBasisBar
+            overall={clampFortuneScore(result.scores.overall)}
+            calcDateKey={result.calcDateKey}
+            payload={lastFetchedPayload}
+            stale={scoreStale}
+            onRecalculate={() => void recalculateFromForm()}
+          />
+        )}
+
         {isPersonalized && personalizedReport && activeTab === "summary" && (
           <TodayFiveCardReport
             report={personalizedReport}
@@ -575,6 +618,10 @@ export default function TodayPage() {
             result={result}
             birthKey={birthKey}
             dateLabel={todayLabel}
+            hourlyFlow={result.hourlyFlow}
+            hourlyFlowIntro={result.hourlyFlowIntro}
+            hourlyPeak={result.hourlyPeak}
+            hourlyCaution={result.hourlyCaution}
             onOpenDetail={() => {
               setActiveTab("detail");
               window.setTimeout(() => {
@@ -589,9 +636,9 @@ export default function TodayPage() {
 
         {isPersonalized && activeTab === "detail" && (
           <div className="space-y-6">
-            <p className="rounded-2xl border border-[#E8D7C4] bg-[#FFF8EE] px-4 py-3 text-sm text-[#5A4E48]">
-              <span className="font-bold text-[#8B6F47]">자세히</span> 탭 — 점수 breakdown, 12시진 그래프, 상세 가이드를
-              모두 볼 수 있어요.
+            <p className="rounded-2xl border border-[#E8D7C4] bg-[#FAF5ED] px-4 py-3 text-sm text-[#5A4E48]">
+              <span className="font-bold text-[#8B6F47]">자세히</span> 탭 — 브리핑·5대운·상세 행동 가이드입니다. 12시진은
+              핵심만 탭 하단에서도 볼 수 있어요.
             </p>
             <TodayBriefingReport result={result} />
             <DomainScoreSummary domains={result.domainScores} />

@@ -4,13 +4,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import { ACTION_GUIDE_COPY } from "@/lib/history-copy";
-import TodayHourlyTeaser from "@/components/today/TodayHourlyTeaser";
+import HourlyFlowSection, { type HourlyFlowSlot } from "@/components/HourlyFlowSection";
 import TodayReadingGuide from "@/components/today/TodayReadingGuide";
 import MyeongriBasisToggle from "@/components/MyeongriBasisToggle";
 import AxisScorePanel from "@/components/AxisScorePanel";
-import TodayScoreHero from "@/components/TodayScoreHero";
 import ToneDecisionChip from "@/components/ToneDecisionChip";
-import { TODAY_CARD_META, type TodayCardPriority } from "@/lib/today-page-copy";
+import { TODAY_CARD_META, TODAY_CARD_SURFACE } from "@/lib/today-page-copy";
 import { buildTodayMyeongriBasis, buildToneChipTooltip } from "@/lib/today-basis-helpers";
 import {
   buildComparisonInsight,
@@ -26,54 +25,31 @@ import {
   saveTodayRecord,
   splitGuideLines,
 } from "@/lib/today-report-helpers";
-
-const PRIORITY_STYLES: Record<TodayCardPriority, string> = {
-  primary:
-    "border-2 border-[#8B6F47]/45 shadow-[0_14px_36px_rgba(139,111,71,0.14)] ring-1 ring-[#8B6F47]/10",
-  secondary: "border border-[#E2D7D0] shadow-[0_8px_22px_rgba(61,51,56,0.05)]",
-  optional: "border border-[#E2D7D0]/90 shadow-[0_4px_14px_rgba(61,51,56,0.04)] opacity-[0.98]",
-};
+import {
+  apiScoresToAxisAreas,
+  clampFortuneScore,
+  type TodayApiScores,
+} from "@/lib/today-score-display";
 
 function CardShell({
   cardId,
   children,
-  className = "",
 }: {
   cardId: keyof typeof TODAY_CARD_META;
   children: React.ReactNode;
-  className?: string;
 }) {
   const meta = TODAY_CARD_META[cardId];
   return (
-    <article
-      id={`today-card-${cardId}`}
-      className={`scroll-mt-24 rounded-[26px] px-5 py-5 ${PRIORITY_STYLES[meta.priority]} ${className}`}
-    >
+    <article id={`today-card-${cardId}`} className={TODAY_CARD_SURFACE}>
       <div className="flex flex-wrap items-center gap-2">
         {meta.step != null && (
-          <span
-            className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
-              meta.priority === "primary"
-                ? "bg-[#2F282B] text-[#F5F1EB]"
-                : "bg-[#EDE4DC] text-[#5A4E48]"
-            }`}
-          >
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#2F282B] text-xs font-bold text-[#F5F1EB]">
             {meta.step}
           </span>
         )}
-        <p
-          className={`text-sm font-bold tracking-tight ${
-            meta.priority === "primary" ? "text-[#2F282B]" : "text-[#6B5E58]"
-          }`}
-          style={meta.priority === "primary" ? { fontFamily: "Jua, sans-serif" } : undefined}
-        >
+        <p className="text-sm font-bold text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
           {meta.title}
         </p>
-        {meta.priority === "primary" && (
-          <span className="rounded-full bg-[#FFF8EE] px-2 py-0.5 text-[10px] font-bold text-[#8B6F47]">
-            필수
-          </span>
-        )}
       </div>
       {children}
     </article>
@@ -89,6 +65,10 @@ interface TodayFiveCardReportProps {
   };
   birthKey?: string;
   dateLabel?: string;
+  hourlyFlow?: HourlyFlowSlot[];
+  hourlyFlowIntro?: string;
+  hourlyPeak?: HourlyFlowSlot;
+  hourlyCaution?: HourlyFlowSlot;
   onOpenDetail?: () => void;
 }
 
@@ -118,7 +98,6 @@ type TodayBriefingSlice = {
   scoreTone?: string;
 };
 
-/** MY TODAY 요약 블록 — scoreTone(평/길)은 등급만, 본문은 여러 소스를 합친다 */
 function buildMyTodaySummary(
   result: TodayFiveCardReportProps["result"],
   report: DailyFortuneContent,
@@ -126,20 +105,27 @@ function buildMyTodaySummary(
 ) {
   const briefing = result?.briefing as TodayBriefingSlice | undefined;
   const summaryText = typeof result?.summary === "string" ? result.summary.trim() : "";
-  const sentence = report.sentence?.trim() || "";
+  const flowParts = splitFlowText(report.flow);
   const lead =
     briefing?.oneLine?.trim() ||
     briefing?.headline?.trim() ||
     summaryText ||
-    splitFlowText(report.flow).headline ||
+    flowParts.headline ||
     getScoreInterpretation(overall, getTodayStatus(overall));
 
   return {
-    sentence,
+    sentence: report.sentence?.trim() || "",
     lead,
     grade: briefing?.scoreTone?.trim(),
   };
 }
+
+const TIME_SLOT_LABELS: Record<string, string> = {
+  오전: "🌅",
+  오후: "☀️",
+  저녁: "🌆",
+  밤: "🌙",
+};
 
 export default function TodayFiveCardReport({
   report,
@@ -147,32 +133,51 @@ export default function TodayFiveCardReport({
   result,
   birthKey = "common",
   dateLabel,
+  hourlyFlow,
+  hourlyFlowIntro,
+  hourlyPeak,
+  hourlyCaution,
   onOpenDetail,
 }: TodayFiveCardReportProps) {
-  const [emotionOpen, setEmotionOpen] = useState(false);
   const isPersonalized = mode === "personalized" && Boolean(result);
   const dateKey = report.seedKey.split("-")[0] ?? "";
   const scores = result?.scores ?? {};
+  const apiScores: TodayApiScores | null =
+    isPersonalized && typeof scores.overall === "number"
+      ? {
+          overall: scores.overall,
+          wealth: scores.wealth,
+          love: scores.love,
+          career: scores.career,
+          health: scores.health,
+          luck: scores.luck,
+        }
+      : null;
   const axisOverall = buildOverallFromAxis(report);
-  const overall = isPersonalized ? clampScore(scores.overall ?? axisOverall) : axisOverall;
+  const overall =
+    isPersonalized && apiScores
+      ? clampFortuneScore(apiScores.overall)
+      : isPersonalized
+        ? clampScore(Number(scores.overall) || axisOverall)
+        : axisOverall;
   const status = isPersonalized ? getTodayStatus(overall) : report.toneLabel;
   const myTodaySummary = isPersonalized ? buildMyTodaySummary(result, report, overall) : null;
-  const interpretation = isPersonalized
-    ? myTodaySummary?.lead || report.emotionPoint.description
-    : report.emotionPoint.description;
   const tonePrefix = isPersonalized ? "나의 오늘" : "오늘의 결";
-  const areas = [
-    { key: "relation", label: "관계", score: clampScore(report.axisScores.relation) },
-    { key: "decision", label: "결정", score: clampScore(report.axisScores.decision) },
-    { key: "emotion", label: "감정", score: clampScore(report.axisScores.emotion) },
-    { key: "balance", label: "균형", score: clampScore(report.axisScores.balance) },
-  ];
+  const areas = apiScores
+    ? apiScoresToAxisAreas(apiScores)
+    : [
+        { key: "relation", label: "관계", score: clampScore(report.axisScores.relation) },
+        { key: "decision", label: "결정", score: clampScore(report.axisScores.decision) },
+        { key: "emotion", label: "감정", score: clampScore(report.axisScores.emotion) },
+        { key: "balance", label: "균형", score: clampScore(report.axisScores.balance) },
+      ];
   const savedAreas = {
     relation: areas.find((area) => area.key === "relation")?.score ?? overall,
     decision: areas.find((area) => area.key === "decision")?.score ?? overall,
     emotion: areas.find((area) => area.key === "emotion")?.score ?? overall,
-    balance: report.axisScores ? clampScore(report.axisScores.balance) : overall,
+    balance: areas.find((area) => area.key === "balance")?.score ?? overall,
   };
+
   const history = getTodayHistory();
   const previousRecord = getPreviousDayRecord(history, dateKey, birthKey);
   const overallComparison = buildOverallComparison(previousRecord, overall);
@@ -193,17 +198,7 @@ export default function TodayFiveCardReport({
 
   const [saved, setSaved] = useState(false);
   const [savePulse, setSavePulse] = useState(false);
-  const [compareOpen, setCompareOpen] = useState(hasRealYesterday);
-  /** 모바일: 점수 히어로만 먼저 · lg에서는 항상 전체 펼침 */
-  const [detailExpanded, setDetailExpanded] = useState(false);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 1024px)");
-    const sync = () => setDetailExpanded(mq.matches);
-    sync();
-    mq.addEventListener("change", sync);
-    return () => mq.removeEventListener("change", sync);
-  }, []);
+  const [compareOpen, setCompareOpen] = useState(false);
 
   const flowParts = splitFlowText(report.flow);
   const myeongriBasisSections = isPersonalized ? buildTodayMyeongriBasis(result) : [];
@@ -217,7 +212,6 @@ export default function TodayFiveCardReport({
     setSaved(hasSavedToday(dateKey, birthKey));
   }, [birthKey, dateKey, isPersonalized]);
 
-  // /today 진입 시 해당 날짜·birthKey 기준으로 자동 저장 (같은 날 재진입 시 최신으로 덮어씀)
   useEffect(() => {
     saveTodayRecord({
       savedAt: new Date().toISOString(),
@@ -272,10 +266,14 @@ export default function TodayFiveCardReport({
     }
   };
 
+  const summaryLead = isPersonalized
+    ? myTodaySummary?.lead
+    : report.emotionPoint.description;
+
   return (
-    <section className="space-y-4">
+    <section className="space-y-8">
       {!isPersonalized && (
-        <div className="mb-1">
+        <div>
           <h1 className="text-2xl text-[#2F282B] sm:text-3xl" style={{ fontFamily: "Jua, sans-serif" }}>
             오늘의 흐름
           </h1>
@@ -283,125 +281,77 @@ export default function TodayFiveCardReport({
         </div>
       )}
 
-      {isPersonalized && (
-        <div className="lg:hidden">
-          <TodayScoreHero
-            overall={overall}
-            status={status}
-            areas={areas}
-            overallComparison={overallComparison}
-            comparisons={comparisons}
-            toneChipLabel={toneChipLabel}
-            toneChipTooltip={toneChipTooltip}
-            grade={myTodaySummary?.grade}
-            sentence={myTodaySummary?.sentence}
-            lead={myTodaySummary?.lead}
-            dateLabel={dateLabel}
-            detailExpanded={detailExpanded}
-            onToggleDetail={() => {
-              setDetailExpanded((open) => {
-                const next = !open;
-                if (next) {
-                  requestAnimationFrame(() => {
-                    document.getElementById("today-detail-start")?.scrollIntoView({
-                      behavior: "smooth",
-                      block: "start",
-                    });
-                  });
-                }
-                return next;
-              });
-            }}
-            saved={saved}
-            onSave={handleSave}
-            onToggleCompare={() => setCompareOpen((open) => !open)}
-            compareOpen={compareOpen}
-          />
-        </div>
-      )}
-
-      {isPersonalized && compareOpen && !detailExpanded && (
-        <div className="animate-fade-in space-y-2 rounded-[24px] border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4 lg:hidden">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-bold text-[#8B6F47]">어제와의 변화</p>
-            <span className="text-[10px] font-semibold text-[#8A7E78]">
-              {hasRealYesterday ? "저장된 기록 기준" : "첫 방문 예시"}
-            </span>
-          </div>
-          {comparisons.map((item) => {
-            const isUp = item.delta >= 0;
-            return (
-              <div key={item.key} className="rounded-xl border border-[#E2D7D0] bg-white px-3 py-2.5">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-semibold text-[#4A403B]">{item.label}</p>
-                  <p className={`text-sm font-bold ${isUp ? "text-[#8B6F47]" : "text-[#7A4A3D]"}`}>
-                    {isUp ? "▲" : "▼"} {Math.abs(item.delta)}
-                  </p>
-                </div>
-                <p className="mt-1 text-xs text-[#8A7E78]">
-                  {item.previousScore} → {item.score}
-                  {!item.isReal && " · 예시"}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
       {isPersonalized && <TodayReadingGuide />}
 
-      {/* 점수 + 어제 대비 — 데스크톱 전체 / 모바일 펼친 상세 */}
-      <div
-        className={`rounded-[28px] border-2 border-[#2F282B]/15 bg-white px-5 py-5 shadow-[0_16px_40px_rgba(47,40,43,0.08)] ${
-          isPersonalized && !detailExpanded ? "max-lg:hidden" : ""
-        } ${isPersonalized ? "hidden lg:block" : ""}`}
-      >
-        <p className="mb-3 text-[11px] font-bold tracking-[0.14em] text-[#8B6F47]">오늘 종합 점수</p>
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">
-                {isPersonalized ? "MY TODAY" : "TODAY REPORT"}
-              </p>
-              <ToneDecisionChip
-                label={toneChipLabel}
-                tooltip={toneChipTooltip}
-                variant="warm"
-              />
-              {myTodaySummary?.grade && (
-                <span className="rounded-full border border-[#E2D7D0] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#8A7E78]">
-                  등급 {myTodaySummary.grade}
-                </span>
-              )}
-              {!isPersonalized && (
-                <span className="rounded-full border border-[#E2D7D0] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#8A7E78]">
-                  공통 흐름
-                </span>
-              )}
-            </div>
+      {isPersonalized && (
+        <div
+          className="flex flex-wrap gap-2 rounded-[26px] border border-[#E8D7C4] bg-[#FAF5ED] px-4 py-3"
+          data-pdf-ignore
+        >
+          <button
+            type="button"
+            onClick={handleSave}
+            className={`min-h-10 rounded-xl px-4 py-2 text-xs font-bold transition ${saved ? "bg-white text-[#8B6F47]" : "bg-[#2F282B] text-white"} ${savePulse ? "scale-105" : ""}`}
+          >
+            {saved ? "저장됨 ✓" : "저장하기"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setCompareOpen((open) => !open)}
+            className={`min-h-10 rounded-xl border px-4 py-2 text-xs font-bold ${
+              compareOpen ? "border-[#8B6F47] bg-white text-[#8B6F47]" : "border-[#E8D7C4] bg-white text-[#2F282B]"
+            }`}
+          >
+            어제와 비교
+          </button>
+          <Link
+            href="#today-share-actions"
+            className="inline-flex min-h-10 items-center rounded-xl border border-[#E8D7C4] bg-white px-4 py-2 text-xs font-bold text-[#2F282B]"
+          >
+            공유
+          </Link>
+          <Link
+            href="/history"
+            className="inline-flex min-h-10 items-center rounded-xl border border-[#E8D7C4] bg-white px-4 py-2 text-xs font-bold text-[#2F282B]"
+          >
+            기록
+          </Link>
+        </div>
+      )}
 
-            {isPersonalized && myTodaySummary ? (
-              <div className="mt-4 w-full max-w-xl space-y-3">
-                {myTodaySummary.sentence && (
-                  <p
-                    className="text-lg leading-snug text-[#2F282B] sm:text-xl"
-                    style={{ fontFamily: "Jua, sans-serif" }}
-                  >
-                    {myTodaySummary.sentence}
-                  </p>
-                )}
-                <div className="rounded-2xl border border-[#E8D7C4] bg-[#FFF8EE] px-4 py-3">
-                  <p className="text-[11px] font-bold text-[#8B6F47]">오늘 흐름 요약</p>
-                  <p className="mt-2 text-sm leading-relaxed text-[#4A403B]">{myTodaySummary.lead}</p>
-                </div>
-              </div>
-            ) : (
-              <p className="mt-4 w-full max-w-xl text-sm leading-relaxed text-[#5A4E48]">{interpretation}</p>
-            )}
-          </div>
+      {/* ① 한 줄 요약 */}
+      <CardShell cardId="sentence">
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <ToneDecisionChip label={toneChipLabel} tooltip={toneChipTooltip} variant="warm" />
+          {myTodaySummary?.grade && (
+            <span className="rounded-full border border-[#E8D7C4] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#8A7E78]">
+              등급 {myTodaySummary.grade}
+            </span>
+          )}
+          {!isPersonalized && (
+            <span className="rounded-full border border-[#E8D7C4] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#8A7E78]">
+              공통 흐름
+            </span>
+          )}
+        </div>
+        <h2 className="mt-4 text-2xl leading-snug text-[#2F282B] sm:text-3xl" style={{ fontFamily: "Jua, sans-serif" }}>
+          {report.sentence}
+        </h2>
+        {summaryLead && summaryLead !== report.sentence && (
+          <p className="mt-3 text-sm leading-relaxed text-[#5A4E48]">{summaryLead}</p>
+        )}
+        <p className="mt-4 border-t border-[#E8D7C4]/80 pt-4 text-base leading-relaxed text-[#4A403B]">
+          <span className="text-[#8B6F47]">&ldquo;</span>
+          {report.saveSentence}
+          <span className="text-[#8B6F47]">&rdquo;</span>
+        </p>
+      </CardShell>
 
+      {/* ② 4축 점수 */}
+      <CardShell cardId="scores">
+        <p className="mt-1 text-xs text-[#8A7E78]">{status}</p>
+        <div className="mt-4">
           <AxisScorePanel
-            className="lg:max-w-sm"
             overall={overall}
             areas={areas}
             overallComparison={overallComparison}
@@ -409,243 +359,95 @@ export default function TodayFiveCardReport({
           />
         </div>
 
-        {isPersonalized && (
-          <>
-        <div className="mt-4 rounded-2xl border border-[#E8D7C4] bg-[#FFF8EE] px-4 py-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-xs font-bold text-[#8B6F47]">어제보다 오늘</p>
-            <span className="rounded-full border border-[#E2D7D0] bg-white px-2 py-0.5 text-[10px] font-bold text-[#8B6F47]">
-              {hasRealYesterday ? "내 기록 기준" : "예시 흐름"}
-            </span>
-          </div>
-
-          {overallComparison ? (
-            <div className="mt-3 flex flex-wrap items-end gap-3">
-              <div className="flex items-end gap-2">
-                <p className="text-2xl font-bold leading-none text-[#A09488]">{overallComparison.previousOverall}</p>
-                <span className="pb-0.5 text-sm text-[#A09488]">→</span>
-                <p className="text-3xl font-bold leading-none text-[#2F282B]">{overall}</p>
-              </div>
-              <span
-                className={`rounded-full px-2.5 py-1 text-xs font-bold ${
-                  overallComparison.delta >= 0
-                    ? "bg-white text-[#8B6F47]"
-                    : "bg-white text-[#7A4A3D]"
-                }`}
-              >
-                {overallComparison.delta >= 0 ? "▲" : "▼"} {Math.abs(overallComparison.delta)}
-              </span>
-            </div>
-          ) : null}
-
-          <p className="mt-3 text-sm leading-relaxed text-[#4A403B]">{yesterdayHeadline}</p>
-
-          <div className="mt-3 flex flex-wrap gap-2">
-            {comparisons.map((item) => {
-              const isUp = item.delta >= 0;
-              return (
-                <span
-                  key={item.key}
-                  className="inline-flex items-center gap-1 rounded-full border border-[#E2D7D0] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#5A4E48]"
-                >
-                  {item.label}
-                  <span className={isUp ? "text-[#8B6F47]" : "text-[#7A4A3D]"}>
-                    {isUp ? "▲" : "▼"}
-                    {Math.abs(item.delta)}
-                  </span>
-                </span>
-              );
-            })}
-          </div>
-
-          {!hasRealYesterday && (
-            <p className="mt-3 text-[11px] leading-relaxed text-[#8A7E78]">
-              내일부터는 어제 기록과 실제 점수 변화를 비교할 수 있습니다.
-            </p>
-          )}
-        </div>
-
-        <div className="mt-3 flex gap-2">
-          {threeDayTrend.map((item) => (
-            <div
-              key={item.label}
-              className={`flex-1 rounded-xl border px-2 py-2 text-center ${
-                item.label === "오늘" ? "border-[#C49A4A]/40 bg-[#FFF8EE]" : "border-[#E2D7D0] bg-[#FFFDF9]"
-              }`}
-            >
-              <p className="text-[10px] text-[#8A7E78]">{item.label}</p>
-              <p className="text-xs font-bold text-[#8B6F47]">{item.status}</p>
-              <p className="text-[10px] text-[#A09488]">{item.score}</p>
-              {!item.isReal && item.label !== "오늘" && (
-                <p className="mt-0.5 text-[9px] text-[#C4B8AE]">예시</p>
-              )}
-            </div>
-          ))}
-        </div>
-          </>
-        )}
-      </div>
-
-      {isPersonalized && detailExpanded && (
-        <div id="today-detail-start" className="scroll-mt-20 space-y-4 lg:hidden">
-          <div className="rounded-2xl border border-[#E8D7C4] bg-[#FFF8EE] px-4 py-4">
+        {isPersonalized && compareOpen && (
+          <div className="mt-5 space-y-3 border-t border-[#E8D7C4] pt-5">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="text-xs font-bold text-[#8B6F47]">어제보다 오늘</p>
-              <span className="rounded-full border border-[#E2D7D0] bg-white px-2 py-0.5 text-[10px] font-bold text-[#8B6F47]">
+              <span className="text-[10px] font-semibold text-[#8A7E78]">
                 {hasRealYesterday ? "내 기록 기준" : "예시 흐름"}
               </span>
             </div>
-            {overallComparison ? (
-              <div className="mt-3 flex flex-wrap items-end gap-3">
-                <div className="flex items-end gap-2">
-                  <p className="text-2xl font-bold leading-none text-[#A09488]">{overallComparison.previousOverall}</p>
-                  <span className="pb-0.5 text-sm text-[#A09488]">→</span>
-                  <p className="text-3xl font-bold leading-none text-[#2F282B]">{overall}</p>
-                </div>
+            {overallComparison && (
+              <div className="flex flex-wrap items-end gap-3">
+                <p className="text-2xl font-bold text-[#A09488]">{overallComparison.previousOverall}</p>
+                <span className="text-[#A09488]">→</span>
+                <p className="text-3xl font-bold text-[#2F282B]">{overall}</p>
                 <span
-                  className={`rounded-full px-2.5 py-1 text-xs font-bold ${
-                    overallComparison.delta >= 0 ? "bg-white text-[#8B6F47]" : "bg-white text-[#7A4A3D]"
+                  className={`rounded-full bg-white px-2.5 py-1 text-xs font-bold ${
+                    overallComparison.delta >= 0 ? "text-[#8B6F47]" : "text-[#7A4A3D]"
                   }`}
                 >
                   {overallComparison.delta >= 0 ? "▲" : "▼"} {Math.abs(overallComparison.delta)}
                 </span>
               </div>
-            ) : null}
-            <p className="mt-3 text-sm leading-relaxed text-[#4A403B]">{yesterdayHeadline}</p>
-          </div>
-          <div className="flex gap-2">
-            {threeDayTrend.map((item) => (
-              <div
-                key={item.label}
-                className={`flex-1 rounded-xl border px-2 py-2 text-center ${
-                  item.label === "오늘" ? "border-[#C49A4A]/40 bg-[#FFF8EE]" : "border-[#E2D7D0] bg-[#FFFDF9]"
-                }`}
-              >
-                <p className="text-[10px] text-[#8A7E78]">{item.label}</p>
-                <p className="text-xs font-bold text-[#8B6F47]">{item.status}</p>
-                <p className="text-[10px] text-[#A09488]">{item.score}</p>
-              </div>
-            ))}
-          </div>
-          {compareOpen && (
-            <div className="animate-fade-in space-y-2 rounded-[24px] border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4">
-              <p className="text-xs font-bold text-[#8B6F47]">어제와의 변화 · 상세</p>
+            )}
+            <p className="text-sm leading-relaxed text-[#4A403B]">{yesterdayHeadline}</p>
+            <div className="flex flex-wrap gap-2">
               {comparisons.map((item) => {
                 const isUp = item.delta >= 0;
                 return (
-                  <div key={item.key} className="rounded-xl border border-[#E2D7D0] bg-white px-3 py-2.5">
-                    <div className="flex items-center justify-between gap-3">
-                      <p className="text-sm font-semibold text-[#4A403B]">{item.label}</p>
-                      <p className={`text-sm font-bold ${isUp ? "text-[#8B6F47]" : "text-[#7A4A3D]"}`}>
-                        {isUp ? "▲" : "▼"} {Math.abs(item.delta)}
-                      </p>
-                    </div>
-                    <p className="mt-1 text-xs text-[#8A7E78]">
-                      {item.previousScore} → {item.score}
-                    </p>
-                  </div>
+                  <span
+                    key={item.key}
+                    className="inline-flex items-center gap-1 rounded-full border border-[#E8D7C4] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#5A4E48]"
+                  >
+                    {item.label}
+                    <span className={isUp ? "text-[#8B6F47]" : "text-[#7A4A3D]"}>
+                      {isUp ? "▲" : "▼"}
+                      {Math.abs(item.delta)}
+                    </span>
+                  </span>
                 );
               })}
             </div>
-          )}
-        </div>
-      )}
-
-      <div className={isPersonalized && !detailExpanded ? "max-lg:hidden space-y-4" : "space-y-4"}>
-      {isPersonalized && (
-      <>
-      {/* 인터랙션 — 데스크톱 */}
-      <div className="sticky bottom-3 z-20 hidden flex-wrap gap-2 rounded-2xl border border-[#E2D7D0] bg-white/95 p-2 shadow-[0_8px_24px_rgba(61,51,56,0.1)] backdrop-blur lg:flex lg:static lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
-        <button
-          type="button"
-          onClick={handleSave}
-          className={`min-h-11 rounded-xl px-4 py-2.5 text-xs font-bold transition ${saved ? "bg-[#FFF8EE] text-[#8B6F47]" : "bg-[#2F282B] text-white"} ${savePulse ? "scale-105" : ""}`}
-        >
-          {saved ? "저장됨 ✓" : "저장하기"}
-        </button>
-        <button
-          type="button"
-          onClick={() => setCompareOpen((open) => !open)}
-          className="min-h-11 rounded-xl border border-[#D9C8C0] bg-white px-4 py-2.5 text-xs font-bold text-[#2F282B]"
-        >
-          어제와 비교
-        </button>
-        <Link
-          href="#today-share-actions"
-          className="inline-flex min-h-11 items-center rounded-xl border border-[#D9C8C0] bg-white px-4 py-2.5 text-xs font-bold text-[#2F282B]"
-        >
-          공유 카드
-        </Link>
-        <Link
-          href="/history"
-          className="inline-flex min-h-11 items-center rounded-xl border border-[#D9C8C0] bg-white px-4 py-2.5 text-xs font-bold text-[#2F282B]"
-        >
-          기록 보기
-        </Link>
-      </div>
-
-      {compareOpen && (
-        <div className="animate-fade-in hidden space-y-2 rounded-[24px] border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4 lg:block">
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs font-bold text-[#8B6F47]">어제와의 변화</p>
-            <span className="text-[10px] font-semibold text-[#8A7E78]">
-              {hasRealYesterday ? "저장된 기록 기준" : "첫 방문 예시"}
-            </span>
-          </div>
-          {comparisons.map((item) => {
-            const isUp = item.delta >= 0;
-            return (
-              <div key={item.key} className="rounded-xl border border-[#E2D7D0] bg-white px-3 py-2.5">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm font-semibold text-[#4A403B]">{item.label}</p>
-                  <p className={`text-sm font-bold ${isUp ? "text-[#8B6F47]" : "text-[#7A4A3D]"}`}>
-                    {isUp ? "▲" : "▼"} {Math.abs(item.delta)}
-                  </p>
+            <div className="flex gap-2">
+              {threeDayTrend.map((item) => (
+                <div
+                  key={item.label}
+                  className={`flex-1 rounded-xl border px-2 py-2 text-center ${
+                    item.label === "오늘" ? "border-[#C49A4A]/40 bg-white" : "border-[#E8D7C4] bg-white/60"
+                  }`}
+                >
+                  <p className="text-[10px] text-[#8A7E78]">{item.label}</p>
+                  <p className="text-xs font-bold text-[#8B6F47]">{item.status}</p>
+                  <p className="text-[10px] text-[#A09488]">{item.score}</p>
                 </div>
-                <p className="mt-1 text-xs text-[#8A7E78]">
-                  {item.previousScore} → {item.score}
-                  {!item.isReal && " · 예시"}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-      )}
-      </>
-      )}
-
-      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-[#E8D7C4] bg-[#FFFDF8] px-4 py-3">
-        <ToneDecisionChip
-          label={`오늘의 결 · ${report.toneLabel}`}
-          tooltip={toneChipTooltip}
-          size="md"
-          variant="white"
-        />
-        {dateLabel && <span className="text-xs font-semibold text-[#8A7E78]">{dateLabel}</span>}
-        {!isPersonalized && (
-          <span className="rounded-full border border-[#E2D7D0] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#8A7E78]">
-            공통 흐름
-          </span>
+              ))}
+            </div>
+          </div>
         )}
-      </div>
-
-      {/* ① 오늘의 한 줄 */}
-      <CardShell cardId="sentence" className="bg-[#FFFDF8]">
-        <h2 className="mt-4 text-3xl leading-tight text-[#2F282B] sm:text-4xl" style={{ fontFamily: "Jua, sans-serif" }}>
-          {report.sentence}
-        </h2>
-        <div className="mt-5 rounded-2xl border border-[#E2D7D0] bg-white px-4 py-4">
-          <p className="text-[11px] font-bold text-[#8B6F47]">오늘 기억할 말</p>
-          <p className="mt-2 text-lg leading-relaxed text-[#3D3338]" style={{ fontFamily: "Jua, sans-serif" }}>
-            &ldquo;{report.saveSentence}&rdquo;
-          </p>
-        </div>
       </CardShell>
 
-      {/* ② 행동 가이드 — 한 줄 다음 우선 */}
-      <CardShell cardId="action" className="bg-white">
+      {/* ③ 오늘의 흐름 — 오전/오후/저녁/밤 */}
+      <CardShell cardId="flow">
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div className="rounded-2xl border border-[#D9C8C0] bg-[#FAF8F5] px-4 py-4">
+          {report.timeSlots.map((slot) => (
+            <div
+              key={slot.label}
+              className="rounded-2xl border border-[#E8D7C4] bg-white/70 px-4 py-3"
+            >
+              <p className="text-xs font-bold text-[#8B6F47]">
+                {TIME_SLOT_LABELS[slot.label] ?? ""} {slot.label}
+                <span className="ml-1.5 font-normal text-[#8A7E78]">· {slot.keyword}</span>
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-[#4A403B]">{slot.description}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-5 text-lg leading-snug text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
+          {flowParts.headline}
+        </p>
+        {flowParts.body && (
+          <p className="mt-3 text-sm leading-relaxed text-[#4A403B]">{flowParts.body}</p>
+        )}
+        {myeongriBasisSections.length > 0 && (
+          <MyeongriBasisToggle sections={myeongriBasisSections} className="mt-5" />
+        )}
+      </CardShell>
+
+      {/* ④ 행동 가이드 */}
+      <CardShell cardId="action">
+        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="rounded-2xl border border-[#E8D7C4] bg-white/70 px-4 py-4">
             <p className="text-xs font-bold text-[#3D5838]">{ACTION_GUIDE_COPY.dosLabel}</p>
             <ul className="mt-3 space-y-2">
               {splitGuideLines(report.actionGuide.dos).map((line) => (
@@ -656,7 +458,7 @@ export default function TodayFiveCardReport({
               ))}
             </ul>
           </div>
-          <div className="rounded-2xl border border-[#E2D7D0] bg-[#FFFDF9] px-4 py-4">
+          <div className="rounded-2xl border border-[#E8D7C4] bg-white/70 px-4 py-4">
             <p className="text-xs font-bold text-[#7A4A3D]">{ACTION_GUIDE_COPY.dontsLabel}</p>
             <ul className="mt-3 space-y-2">
               {splitGuideLines(report.actionGuide.donts).map((line) => (
@@ -669,58 +471,46 @@ export default function TodayFiveCardReport({
           </div>
         </div>
         <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <div className="rounded-xl bg-[#FAF8F5] px-3 py-3">
-            <p className="text-[11px] font-semibold text-[#8B6F47]">관계의 결</p>
+          <div className="rounded-xl border border-[#E8D7C4]/80 bg-white/60 px-3 py-3">
+            <p className="text-[11px] font-semibold text-[#8B6F47]">관계</p>
             <p className="mt-1 text-sm text-[#4A403B]">{report.actionGuide.relationTip}</p>
           </div>
-          <div className="rounded-xl bg-[#FAF8F5] px-3 py-3">
-            <p className="text-[11px] font-semibold text-[#8B6F47]">일과 돈의 기준</p>
+          <div className="rounded-xl border border-[#E8D7C4]/80 bg-white/60 px-3 py-3">
+            <p className="text-[11px] font-semibold text-[#8B6F47]">일과 돈</p>
             <p className="mt-1 text-sm text-[#4A403B]">{report.actionGuide.workMoneyTip}</p>
           </div>
         </div>
       </CardShell>
 
-      {/* ③ 오늘의 흐름 */}
-      <CardShell cardId="flow" className="bg-[#F5EDE3]/80">
-        <p className="mt-4 text-xl leading-snug text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-          {flowParts.headline}
-        </p>
-        {flowParts.body && (
-          <p className="mt-3 text-sm leading-relaxed text-[#4A403B]">{flowParts.body}</p>
-        )}
-        {myeongriBasisSections.length > 0 && (
-          <MyeongriBasisToggle sections={myeongriBasisSections} className="mt-5" />
-        )}
-      </CardShell>
-
-      {isPersonalized && onOpenDetail && <TodayHourlyTeaser onOpenDetail={onOpenDetail} />}
-
-      {/* 감정 — 선택(접기) */}
-      <CardShell cardId="emotion" className="bg-[#F8F0ED]/60">
-        <button
-          type="button"
-          onClick={() => setEmotionOpen((v) => !v)}
-          className="mt-1 flex w-full items-center justify-between gap-2 text-left"
-        >
-          <span className="text-xs text-[#8A7E78]">여유 있을 때 펼쳐보기</span>
-          <span className="text-sm font-bold text-[#8B6F47]">{emotionOpen ? "접기" : "펼치기"}</span>
-        </button>
-        {emotionOpen && (
-          <>
-            <p className="mt-4 text-lg leading-snug text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-              {report.emotionPoint.description}
+      {/* ⑤ 시간대별 운세 */}
+      {hourlyFlow && hourlyFlow.length > 0 ? (
+        <CardShell cardId="hourly">
+          <div className="mt-4 -mx-1">
+            <HourlyFlowSection
+              hourlyFlow={hourlyFlow}
+              hourlyFlowIntro={hourlyFlowIntro}
+              hourlyPeak={hourlyPeak}
+              hourlyCaution={hourlyCaution}
+            />
+          </div>
+        </CardShell>
+      ) : (
+        isPersonalized &&
+        onOpenDetail && (
+          <div className={`${TODAY_CARD_SURFACE} text-center`}>
+            <p className="text-sm text-[#5A4E48]">
+              출생시간을 넣으면 12시진 그래프가 여기에 표시됩니다.
             </p>
-            <div className="mt-4 space-y-3">
-              {report.emotionPoint.tips.map((tip) => (
-                <div key={tip} className="rounded-2xl border border-[#E2D7D0]/80 bg-white/80 px-4 py-3">
-                  <p className="text-sm leading-relaxed text-[#4A403B]">{tip}</p>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
-      </CardShell>
-      </div>
+            <button
+              type="button"
+              onClick={onOpenDetail}
+              className="mt-3 rounded-xl bg-[#2F282B] px-4 py-2.5 text-xs font-bold text-white"
+            >
+              자세히 탭에서 보기
+            </button>
+          </div>
+        )
+      )}
     </section>
   );
 }

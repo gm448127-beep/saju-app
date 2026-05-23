@@ -6,13 +6,12 @@ import {
   TONE_ORDER,
   TONE_TRANSITION_COMMENTS,
 } from "@/lib/today-tone-data";
+import { getTodayDateKeyKst } from "@/lib/kst-date";
+import { clampFortuneScore } from "@/lib/today-score-display";
 import type { ToneKey, TodayToneReport, UserSajuProfile } from "@/lib/today-tone-types";
 
 function dateKey(date: Date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}${month}${day}`;
+  return getTodayDateKeyKst(date);
 }
 
 function formatDateLabel(date: Date) {
@@ -29,7 +28,7 @@ export function hashSeed(value: string) {
 }
 
 function clampScore(value: number) {
-  return Math.max(20, Math.min(99, Math.round(value)));
+  return clampFortuneScore(value);
 }
 
 function pickFromPool<T>(items: readonly T[], seed: number, step = 0) {
@@ -79,14 +78,30 @@ export function resolveFinalTone(date: Date, profile?: UserSajuProfile): ToneKey
 }
 
 function buildToneScores(toneKey: ToneKey, seed: number, profile?: UserSajuProfile) {
+  const api = profile?.scores;
+  if (api?.overall != null) {
+    const overall = clampScore(api.overall);
+    const love = clampScore(api.love ?? overall);
+    const career = clampScore(api.career ?? overall);
+    const health = clampScore(api.health ?? overall);
+    const wealth = clampScore(api.wealth ?? overall);
+    const luck = clampScore(api.luck ?? overall);
+    return {
+      total: overall,
+      relation: love,
+      decision: career,
+      emotion: health,
+      balance: clampScore(Math.round((wealth + luck) / 2)),
+    };
+  }
+
   const tone = TONE_DEFINITIONS[toneKey];
   const relation = clampScore(tone.baseScores.relation + ((seed >> 1) % 5) - 2);
   const decision = clampScore(tone.baseScores.decision + ((seed >> 3) % 5) - 2);
   const emotion = clampScore(tone.baseScores.emotion + ((seed >> 5) % 5) - 2);
   const balance = clampScore(tone.baseScores.balance + ((seed >> 7) % 5) - 2);
-  const apiOverall = profile?.scores?.overall;
   const total = clampScore(
-    apiOverall ?? Math.round(relation * 0.28 + decision * 0.28 + emotion * 0.24 + balance * 0.2),
+    Math.round(relation * 0.28 + decision * 0.28 + emotion * 0.24 + balance * 0.2),
   );
 
   return { total, relation, decision, emotion, balance };
