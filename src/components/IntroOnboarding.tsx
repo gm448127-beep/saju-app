@@ -213,7 +213,7 @@ export default function IntroOnboarding({ onSkip, onStart }: IntroOnboardingProp
             onClick={onStart}
             className="min-h-12 w-full rounded-2xl bg-[#2F282B] px-6 py-3.5 text-lg font-bold text-[#F5F1EB] shadow-[0_14px_32px_rgba(47,40,43,0.22)] transition active:scale-[0.98]"
           >
-            내 결로 시작하기
+            생년월일 넣고 내 결로 시작하기
           </button>
         ) : (
           <button

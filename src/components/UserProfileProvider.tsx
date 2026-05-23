@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   createContext,
   useCallback,
@@ -12,7 +12,13 @@ import {
 } from "react";
 import IntroOnboarding from "@/components/IntroOnboarding";
 import OnboardingModal from "@/components/OnboardingModal";
-import { isIntroOnboarded, setIntroOnboarded } from "@/lib/onboarding-storage";
+import {
+  hasOnboardingInputTarget,
+  isIntroOnboarded,
+  ONBOARDING_INPUT_TARGET_TODAY,
+  setIntroOnboarded,
+  setOnboardingInputTarget,
+} from "@/lib/onboarding-storage";
 import {
   getProfileDisplayName,
   getUserProfile,
@@ -48,6 +54,7 @@ export function useUserProfileOptional() {
 
 export default function UserProfileProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [profile, setProfile] = useState<UserBirthProfile | null>(null);
   const [isReady, setIsReady] = useState(false);
   const [showIntro, setShowIntro] = useState(false);
@@ -75,12 +82,14 @@ export default function UserProfileProvider({ children }: { children: ReactNode 
       return;
     }
     setShowIntro(false);
-    if (!profile && !onboardingDismissed) {
+    const useTodayBirthForm =
+      hasOnboardingInputTarget() || pathname === "/today";
+    if (!profile && !onboardingDismissed && !useTodayBirthForm) {
       setShowOnboarding(true);
     } else {
       setShowOnboarding(false);
     }
-  }, [isReady, profile, onboardingDismissed]);
+  }, [isReady, profile, onboardingDismissed, pathname]);
 
   const finishIntro = useCallback(() => {
     setIntroOnboarded();
@@ -101,14 +110,19 @@ export default function UserProfileProvider({ children }: { children: ReactNode 
       displayName: getProfileDisplayName(profile),
       showOnboarding,
       saveProfile,
-      openOnboarding: () => setShowOnboarding(true),
+      openOnboarding: () => {
+        setOnboardingInputTarget(ONBOARDING_INPUT_TARGET_TODAY);
+        setOnboardingDismissed(true);
+        setShowOnboarding(false);
+        router.push("/today#personalize");
+      },
       closeOnboarding: () => {
         setOnboardingDismissed(true);
         setShowOnboarding(false);
       },
       refreshProfile,
     }),
-    [profile, isReady, showOnboarding, saveProfile, refreshProfile],
+    [profile, isReady, showOnboarding, saveProfile, refreshProfile, router],
   );
 
   return (
@@ -119,6 +133,9 @@ export default function UserProfileProvider({ children }: { children: ReactNode 
           onSkip={() => finishIntro()}
           onStart={() => {
             finishIntro();
+            setOnboardingInputTarget(ONBOARDING_INPUT_TARGET_TODAY);
+            setOnboardingDismissed(true);
+            setShowOnboarding(false);
             router.push("/today#personalize");
           }}
         />

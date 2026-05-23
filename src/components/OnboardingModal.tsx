@@ -33,7 +33,7 @@ export default function OnboardingModal({ open, onComplete, onClose }: Onboardin
   const [month, setMonth] = useState("");
   const [day, setDay] = useState("");
   const [gender, setGender] = useState<"남" | "여">("여");
-  const [timeMode, setTimeMode] = useState<"none" | "slot" | "exact">("none");
+  const [timeMode, setTimeMode] = useState<"none" | "slot" | "exact">("slot");
   const [slotHour, setSlotHour] = useState(9);
   const [exactHour, setExactHour] = useState(9);
   const [exactMinute, setExactMinute] = useState(0);
@@ -61,7 +61,7 @@ export default function OnboardingModal({ open, onComplete, onClose }: Onboardin
       exactHour,
       exactMinute,
     });
-    router.push("/");
+    router.push("/today");
   };
 
   return (
@@ -112,9 +112,9 @@ export default function OnboardingModal({ open, onComplete, onClose }: Onboardin
             <div className="grid grid-cols-3 gap-2">
               {(
                 [
-                  ["none", "모름"],
-                  ["slot", "시간대"],
-                  ["exact", "시/분"],
+                  ["slot", "시간대 선택"],
+                  ["exact", "시·분 입력"],
+                  ["none", "시간 모름"],
                 ] as const
               ).map(([mode, label]) => (
                 <button

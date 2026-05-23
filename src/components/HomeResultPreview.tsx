@@ -115,7 +115,7 @@ export default function HomeResultPreview({
           </p>
         </div>
         <Link
-          href="/today"
+          href="/today#personalize"
           className="inline-flex items-center gap-2 rounded-full border border-[#D9C8C0] bg-[#FAF8F5] px-4 py-2 text-xs font-bold text-[#2F282B] transition hover:bg-white"
         >
           {isPersonalized ? "오늘 리포트 보기" : TODAY_EMPTY_COPY.ctaButton}
@@ -125,7 +125,7 @@ export default function HomeResultPreview({
 
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.15fr_0.85fr]">
         <Link
-          href="/today"
+          href="/today#personalize"
           className="group relative overflow-hidden rounded-[26px] border border-[#E8D7C4] bg-[#FFF8EE] px-5 py-5 shadow-[0_12px_32px_rgba(61,51,56,0.05)] transition hover:-translate-y-0.5"
         >
           <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/40" />
@@ -201,7 +201,7 @@ export default function HomeResultPreview({
         </Link>
 
         <Link
-          href="/today"
+          href="/today#personalize"
           className="group flex flex-col rounded-[26px] border border-[#E2D7D0] bg-white px-5 py-5 shadow-[0_12px_32px_rgba(61,51,56,0.05)] transition hover:-translate-y-0.5"
         >
           <p className="text-xs font-bold text-[#8B6F47]">지금 잘 맞는 움직임</p>

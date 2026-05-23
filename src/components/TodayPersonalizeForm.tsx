@@ -33,6 +33,8 @@ interface TodayPersonalizeFormProps {
   loading: boolean;
   error: string;
   isPersonalized?: boolean;
+  /** 인트로 CTA 직후 입력 폼 강조 */
+  highlighted?: boolean;
   onYearChange: (value: string) => void;
   onMonthChange: (value: string) => void;
   onDayChange: (value: string) => void;
@@ -48,7 +50,7 @@ interface TodayPersonalizeFormProps {
 export default function TodayPersonalizeForm(props: TodayPersonalizeFormProps) {
   const {
     year, month, day, timeMode, slotHour, exactHour, exactMinute,
-    calendarType, gender, loading, error, isPersonalized = false,
+    calendarType, gender, loading, error, isPersonalized = false, highlighted = false,
     onYearChange, onMonthChange, onDayChange,
     onTimeModeChange, onSlotHourChange, onExactHourChange, onExactMinuteChange,
     onCalendarTypeChange, onGenderChange, onSubmit,
@@ -56,7 +58,13 @@ export default function TodayPersonalizeForm(props: TodayPersonalizeFormProps) {
 
   return (
     <section id="personalize" className="scroll-mt-24">
-      <div className="relative overflow-hidden rounded-[28px] border border-[#E2D7D0] bg-white shadow-[0_14px_38px_rgba(61,51,56,0.06)]">
+      <div
+        className={`relative overflow-hidden rounded-[28px] border bg-white shadow-[0_14px_38px_rgba(61,51,56,0.06)] transition-shadow duration-500 ${
+          highlighted
+            ? "border-[#8B6F47] ring-2 ring-[#8B6F47]/30 shadow-[0_18px_48px_rgba(139,111,71,0.18)]"
+            : "border-[#E2D7D0]"
+        }`}
+      >
         <div className="absolute -right-16 -top-20 h-48 w-48 rounded-full bg-[#F1E7DE]/80" />
         <div className="absolute -bottom-20 left-6 h-44 w-44 rounded-full bg-[#FAF8F5]" />
 

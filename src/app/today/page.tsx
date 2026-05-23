@@ -18,6 +18,10 @@ import { ENGINE_ONE_LINER, PRIMARY_TAGLINE } from "@/lib/engine-copy";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import {
+  consumeOnboardingInputTarget,
+  ONBOARDING_INPUT_TARGET_TODAY,
+} from "@/lib/onboarding-storage";
+import {
   profileToTodayPayload,
   type UserBirthProfile,
 } from "@/lib/user-profile-storage";
@@ -284,9 +288,38 @@ export default function TodayPage() {
   const todayLabel = formatTodayLabel();
   const commonPreview = useMemo(() => buildDailyFortuneContent(), []);
 
-  const scrollToPersonalizeForm = () => {
+  const [highlightPersonalize, setHighlightPersonalize] = useState(false);
+
+  const scrollToPersonalizeForm = useCallback(() => {
     document.getElementById("personalize")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
+  }, []);
+
+  useEffect(() => {
+    let scrollTimer: ReturnType<typeof window.setTimeout> | undefined;
+    let highlightTimer: ReturnType<typeof window.setTimeout> | undefined;
+
+    const fromIntro =
+      consumeOnboardingInputTarget() === ONBOARDING_INPUT_TARGET_TODAY;
+    const fromHash = window.location.hash === "#personalize";
+
+    if (fromIntro || fromHash) {
+      setHighlightPersonalize(true);
+      scrollTimer = window.setTimeout(() => {
+        scrollToPersonalizeForm();
+        highlightTimer = window.setTimeout(() => setHighlightPersonalize(false), 2400);
+      }, fromIntro ? 120 : 0);
+    }
+
+    const onHashChange = () => {
+      if (window.location.hash === "#personalize") scrollToPersonalizeForm();
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => {
+      if (scrollTimer) window.clearTimeout(scrollTimer);
+      if (highlightTimer) window.clearTimeout(highlightTimer);
+      window.removeEventListener("hashchange", onHashChange);
+    };
+  }, [scrollToPersonalizeForm]);
 
   const persistProfileFromForm = useCallback(() => {
     if (!isValidBirthDate(year, month, day)) return;
@@ -425,6 +458,7 @@ export default function TodayPage() {
       loading={loading}
       error={error}
       isPersonalized={isPersonalized}
+      highlighted={highlightPersonalize}
       onYearChange={setYear}
       onMonthChange={setMonth}
       onDayChange={setDay}
