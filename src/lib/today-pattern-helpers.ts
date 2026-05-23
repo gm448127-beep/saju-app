@@ -5,6 +5,7 @@ import {
   WEEK_INSIGHT_COPY,
   type HistoryFilter,
 } from "@/lib/history-copy";
+import { getTodayDateKeyKst } from "@/lib/kst-date";
 import type { ToneKey } from "@/lib/today-tone-types";
 import { buildToneTransitionComment } from "@/lib/today-tone-engine";
 import {
@@ -40,12 +41,9 @@ export type SavedSentenceItem = {
   toneKey?: ToneKey;
 };
 
-/** 오늘 날짜 키 (YYYYMMDD) */
+/** 오늘 날짜 키 (YYYYMMDD, KST) */
 export function getTodayDateKey(date = new Date()) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, "0");
-  const d = String(date.getDate()).padStart(2, "0");
-  return `${y}${m}${d}`;
+  return getTodayDateKeyKst(date);
 }
 
 /** URL용 날짜 (YYYY-MM-DD) ↔ 저장 키 (YYYYMMDD) */

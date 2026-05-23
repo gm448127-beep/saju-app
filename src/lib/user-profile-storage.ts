@@ -93,7 +93,7 @@ export function profileBirthSummary(profile: UserBirthProfile): string {
       : profile.calendarType === "lunarLeap"
         ? "윤달"
         : "양력";
-  return `${profile.year}.${profile.month}.${profile.day} · ${profile.gender} · ${cal}`;
+  return `${profile.year}.${profile.month}.${profile.day} · ${profile.gender} · ${cal} · ${profileBirthTimeSummary(profile)}`;
 }
 
 export function profileToBirthHour(profile: UserBirthProfile): {
@@ -109,9 +109,35 @@ export function profileToBirthHour(profile: UserBirthProfile): {
   return {};
 }
 
-/** 오늘 기록·히스토리 매칭용 birthKey */
+/** 오늘 기록·히스토리 매칭용 birthKey (출생시간 포함 시 구분) */
 export function profileToBirthKey(profile: UserBirthProfile) {
-  return `${profile.year}-${profile.month}-${profile.day}-${profile.gender}`;
+  const { hour, minute } = profileToBirthHour(profile);
+  const timePart =
+    hour !== undefined ? `-h${hour}m${minute ?? 0}` : "-noHour";
+  return `${profile.year}-${profile.month}-${profile.day}-${profile.gender}${timePart}`;
+}
+
+/** 프로필 출생시간 요약 (기기 간 점수 차이 확인용) */
+export function profileBirthTimeSummary(profile: UserBirthProfile): string {
+  if (profile.timeMode === "none") return "출생시간 미입력";
+  if (profile.timeMode === "exact") {
+    return `출생시간 ${String(profile.exactHour).padStart(2, "0")}:${String(profile.exactMinute).padStart(2, "0")}`;
+  }
+  const labels: Record<number, string> = {
+    23: "자시",
+    1: "축시",
+    3: "인시",
+    5: "묘시",
+    7: "진시",
+    9: "사시",
+    11: "오시",
+    13: "미시",
+    15: "신시",
+    17: "유시",
+    19: "술시",
+    21: "해시",
+  };
+  return `출생시간 ${labels[profile.slotHour] ?? `${profile.slotHour}시`}`;
 }
 
 export function profileToTodayPayload(profile: UserBirthProfile) {

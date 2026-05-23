@@ -15,6 +15,7 @@ import TodayFiveCardReport from "@/components/TodayFiveCardReport";
 import TodayStoryShareButton from "@/components/TodayStoryShareButton";
 import TodayPersonalizeForm, { isValidBirthDate } from "@/components/TodayPersonalizeForm";
 import { ENGINE_ONE_LINER, PRIMARY_TAGLINE } from "@/lib/engine-copy";
+import { formatKstDateLabel } from "@/lib/kst-date";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import {
@@ -22,6 +23,7 @@ import {
   ONBOARDING_INPUT_TARGET_TODAY,
 } from "@/lib/onboarding-storage";
 import {
+  profileBirthTimeSummary,
   profileToTodayPayload,
   type UserBirthProfile,
 } from "@/lib/user-profile-storage";
@@ -35,8 +37,10 @@ const TAB_ITEMS = [
 type TodayTab = (typeof TAB_ITEMS)[number]["key"];
 
 function formatTodayLabel(date = new Date()) {
-  const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
-  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")} (${weekdays[date.getDay()]})`;
+  const label = formatKstDateLabel(date);
+  const m = label.match(/^(\d+)년 (\d+)월 (\d+)일 \((.)요일\)$/);
+  if (!m) return label;
+  return `${m[1]}.${String(m[2]).padStart(2, "0")}.${String(m[3]).padStart(2, "0")} (${m[4]})`;
 }
 
 function SectionTitle({ title, caption }: { title: string; caption?: string }) {
@@ -483,7 +487,7 @@ export default function TodayPage() {
           ) : profile ? (
             <StoredProfileBar
               profile={profile}
-              subtitle="저장된 사주 기준으로 자동 분석합니다"
+              subtitle={`한국 시간 기준 오늘 · ${profileBirthTimeSummary(profile)} · PC·폰 프로필이 같으면 점수도 같습니다`}
               onEdit={scrollToPersonalizeForm}
             />
           ) : (

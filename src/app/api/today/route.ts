@@ -6,6 +6,12 @@ import { matchCharacter } from "@/data/matchCharacter";
 import { HOURLY_FLOW_INTRO, SCORE_LABEL_DESC, SIJIN_META } from "@/data/sijinDict";
 import { SIPSIN_DICT } from "@/data/wisdomDict";
 import { buildSajuTriggers, triggersToLegacyLines } from "@/lib/saju-triggers";
+import {
+  formatKstDateLabel,
+  getKstDateParts,
+  getTodayDateKeyKst,
+  kstDateAnchor,
+} from "@/lib/kst-date";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
 import { computeOhaengCountFromPillars } from "@/lib/today-tone-engine";
 
@@ -1009,12 +1015,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "생년월일을 입력해주세요." }, { status: 400 });
     }
 
-    const today = new Date();
-    const tY = today.getFullYear();
-    const tM = today.getMonth() + 1;
-    const tD = today.getDate();
-    const dayOfWeek = ["일","월","화","수","목","금","토"][today.getDay()];
-    const dateStr = `${tY}년 ${tM}월 ${tD}일 (${dayOfWeek}요일)`;
+    const now = new Date();
+    const {
+      year: tY,
+      month: tM,
+      day: tD,
+      dayOfWeek: tDow,
+    } = getKstDateParts(now);
+    const today = kstDateAnchor({ year: tY, month: tM, day: tD, dayOfWeek: tDow });
+    const dayOfWeek = ["일", "월", "화", "수", "목", "금", "토"][tDow];
+    const dateStr = formatKstDateLabel(now);
+    const calcDateKey = getTodayDateKeyKst(now);
 
     const todayCalc = calculateSaju(
       buildSajuInput(tY, tM, tD, { gender: "남", hour: 12, minute: 0 })
@@ -1224,6 +1235,9 @@ export async function POST(request: NextRequest) {
 
     const response = {
       date: dateStr,
+      calcDateKey,
+      calcTimezone: "Asia/Seoul",
+      birthHourSent: hasHour ? { hour: +hour, minute: hasMinute ? +minute : 0 } : null,
       todayGan: `${tdStem}(${CHEONGAN_HANJA[tdStem]})`,
       todayJi: `${tdBranch}(${JIJI_HANJA[tdBranch]})`,
       todayGanOhaeng: tdStemOh,
