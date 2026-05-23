@@ -71,6 +71,8 @@ export const TODAY_EMPTY_COPY = {
   formSubtitle:
     "지금 보신 흐름은 오늘 전체 기준입니다. 생년월일과 태어난 시를 넣으면 내 점수·시간대 흐름이 더 정밀해집니다.",
   formSubmit: "내 흐름 보기",
+  /** /today#personalize 상단 안내 */
+  personalizeIntro: "생년월일만 알려주시면 내 결로 읽어드려요 🌿",
 } as const;
 
 /** 홈 PATTERN 카드 미리보기 */

@@ -1,43 +1,6 @@
 "use client";
 
-import Image from "next/image";
-import { useState } from "react";
-
-const AVATAR_SIZE_PX = 80;
-
-function MiinHeaderAvatar() {
-  const [imageFailed, setImageFailed] = useState(false);
-
-  if (imageFailed) {
-    return (
-      <div
-        className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#E8D7C4] bg-[#F5EDE3] shadow-[0_4px_14px_rgba(139,111,71,0.12)]"
-        role="img"
-        aria-label="미인"
-      >
-        <span
-          className="text-[2rem] font-bold leading-none text-[#8B6F47]"
-          style={{ fontFamily: "Jua, sans-serif" }}
-          aria-hidden
-        >
-          命
-        </span>
-      </div>
-    );
-  }
-
-  return (
-    <Image
-      src="/miin.png"
-      alt="미인"
-      width={AVATAR_SIZE_PX}
-      height={AVATAR_SIZE_PX}
-      className="h-20 w-20 shrink-0 rounded-full border border-[#E8D7C4] bg-[#FFF8EE] object-cover object-center shadow-[0_4px_14px_rgba(139,111,71,0.15)]"
-      priority
-      onError={() => setImageFailed(true)}
-    />
-  );
-}
+import MiinAvatar from "@/components/MiinAvatar";
 
 type TodayPageHeaderProps = {
   title: string;
@@ -59,7 +22,7 @@ export default function TodayPageHeader({ title, dateLabel, subtitle }: TodayPag
           <p className="mt-2 max-w-md text-xs leading-relaxed text-[#8A7E78]">{subtitle}</p>
         )}
       </div>
-      <MiinHeaderAvatar />
+      <MiinAvatar size={80} priority />
     </header>
   );
 }

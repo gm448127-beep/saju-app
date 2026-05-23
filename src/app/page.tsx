@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import HomePatternCard from "@/components/HomePatternCard";
 import HomeResultPreview from "@/components/HomeResultPreview";
+import MiinAvatar from "@/components/MiinAvatar";
 import MobileSnapRow, { MobileSnapCard } from "@/components/MobileSnapRow";
 import { useUserProfile } from "@/components/UserProfileProvider";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
@@ -15,13 +16,7 @@ import {
   profileToTodayPayload,
 } from "@/lib/user-profile-storage";
 import { getSajuHistory, getTarotFavorites } from "@/lib/archive-storage";
-import {
-  BIRTH_TIME_MARKETING,
-  DIFFERENCE_LAYERS,
-  ENGINE_ONE_LINER,
-  ENGINE_SCOPE_NOTE,
-  PRIMARY_TAGLINE,
-} from "@/lib/engine-copy";
+import { BIRTH_TIME_MARKETING, HOME_READING_WAY_CARDS, PRIMARY_TAGLINE } from "@/lib/engine-copy";
 import { buildHomePatternCard, buildHomeWeeklyCard } from "@/lib/today-pattern-helpers";
 import { getUnifiedArchiveStats, getTodayHistory } from "@/lib/today-report-helpers";
 
@@ -518,15 +513,13 @@ export default function HomePage() {
       </MobileSnapRow>
 
       <section className="relative overflow-hidden rounded-[30px] border border-[#E2D7D0] bg-white shadow-[0_18px_48px_rgba(61,51,56,0.07)]">
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[#F1E7DE]" />
           <div className="absolute -bottom-28 left-8 h-80 w-80 rounded-full bg-[#F8F3EE]" />
-          <div className="absolute bottom-16 right-14 hidden h-36 w-36 rounded-full border border-[#D9C8C0] sm:block" />
-          <div className="absolute right-24 top-20 hidden h-20 w-20 rounded-full bg-[#EFE6DD] sm:block" />
         </div>
 
-        <div className="relative px-6 py-8 sm:px-10 sm:py-10">
-          <div className="max-w-2xl">
+        <div className="relative flex flex-col gap-6 px-6 py-8 sm:flex-row sm:items-end sm:justify-between sm:gap-8 sm:px-10 sm:py-10">
+          <div className="max-w-2xl min-w-0 flex-1">
             <h2 className="text-2xl leading-tight text-[#2F282B] sm:text-3xl lg:text-4xl" style={{ fontFamily: "Jua, sans-serif" }}>
               오늘의 흐름을
               <br />
@@ -536,7 +529,7 @@ export default function HomePage() {
               {PRIMARY_TAGLINE}
             </p>
             <p className="mt-2 text-sm leading-relaxed text-[#6B5E58]">
-              사주·오늘의 흐름·토정·궁합·AI 상담까지, 매일 다시 찾게 되는 리포트를 모았습니다.
+              사주·오늘의 흐름·토정·궁합·AI 상담까지 한곳에서 이어집니다.
             </p>
 
             <div className="mt-5 flex flex-col gap-2 sm:mt-6 sm:flex-row">
@@ -554,38 +547,28 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
+          <div className="flex shrink-0 justify-end sm:justify-end">
+            <MiinAvatar size={144} className="ring-4 ring-[#F5EDE3] ring-offset-2 ring-offset-white" priority />
+          </div>
         </div>
       </section>
 
       <section className="rounded-[30px] border border-[#E2D7D0] bg-white px-5 py-6 shadow-[0_18px_48px_rgba(61,51,56,0.06)] sm:px-7">
-        <div className="mb-4">
-          <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">WHY UNMYEONG SECRETARY</p>
-          <h2 className="mt-2 text-2xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-            운명비서가 흐름을 읽는 방식
-          </h2>
-          <p className="mt-2 text-lg text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-            {PRIMARY_TAGLINE}
-          </p>
-          <p className="mt-3 whitespace-pre-line text-sm leading-relaxed text-[#5A4E48]">
-            {BIRTH_TIME_MARKETING.subcopy}
-          </p>
-          <p className="mt-3 rounded-2xl border border-[#E2D7D0] bg-[#FFF8EE] px-4 py-3 text-sm leading-relaxed text-[#4A403B]">
-            <span className="font-bold text-[#8B6F47]">해석 엔진 · </span>
-            {ENGINE_ONE_LINER}
-          </p>
-          <p className="mt-2 text-xs leading-relaxed text-[#8A7E78]">{ENGINE_SCOPE_NOTE}</p>
-        </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {DIFFERENCE_LAYERS.map((layer, index) => (
-            <div key={layer.badge} className="rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4">
-              <p className="mb-2 text-xs font-bold text-[#8B6F47]">
-                0{index + 1} · {layer.badge}
+        <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">WHY UNMYEONG SECRETARY</p>
+        <h2 className="mt-2 text-2xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
+          운명비서가 흐름을 읽는 방식
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed text-[#6B5E58]">
+          명리 계산 → 매일 리포트 → 필요할 때 AI 상담까지, 한 사주 기준으로 이어집니다.
+        </p>
+        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {HOME_READING_WAY_CARDS.map((card) => (
+            <div key={card.num} className="rounded-2xl border border-[#E8D7C4] bg-[#FAF5ED] px-4 py-4">
+              <p className="text-xs font-bold text-[#8B6F47]">{card.num}</p>
+              <p className="mt-1 text-base text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
+                {card.title}
               </p>
-              <p className="whitespace-pre-line text-sm leading-relaxed text-[#3D3338]">
-                {layer.line1}
-                {"\n"}
-                {layer.line2}
-              </p>
+              <p className="mt-2 text-sm leading-relaxed text-[#5A4E48]">{card.description}</p>
             </div>
           ))}
         </div>

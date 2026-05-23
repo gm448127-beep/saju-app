@@ -10,7 +10,6 @@ import SajuTriggerSection from "@/components/SajuTriggerSection";
 import TodayStatsSection, { type TodayStatItem } from "@/components/TodayStatsSection";
 import TimeAdviceSection from "@/components/TimeAdviceSection";
 import TodayActionGuideSection from "@/components/TodayActionGuideSection";
-import TodayEmptyState from "@/components/TodayEmptyState";
 import TodayFiveCardReport from "@/components/TodayFiveCardReport";
 import TodayPageHeader from "@/components/today/TodayPageHeader";
 import TodayScoreBasisBar from "@/components/today/TodayScoreBasisBar";
@@ -18,7 +17,6 @@ import TodayStoryShareButton from "@/components/TodayStoryShareButton";
 import TodayPersonalizeForm, { isValidBirthDate } from "@/components/TodayPersonalizeForm";
 import { TODAY_TAB_COPY } from "@/lib/today-page-copy";
 import { formatKstDateLabel } from "@/lib/kst-date";
-import { buildDailyFortuneContent } from "@/lib/today-content-engine";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import {
   consumeOnboardingInputTarget,
@@ -338,8 +336,6 @@ export default function TodayPage() {
     lastFetchedPayload !== null &&
     serializeTodayPayload(lastFetchedPayload) !== serializeTodayPayload(formPayload);
   const todayLabel = formatTodayLabel();
-  const commonPreview = useMemo(() => buildDailyFortuneContent(), []);
-
   const [highlightPersonalize, setHighlightPersonalize] = useState(false);
 
   const scrollToPersonalizeForm = useCallback(() => {
@@ -517,34 +513,33 @@ export default function TodayPage() {
   );
 
   return (
-    <div className="space-y-10">
+    <>
       {!isPersonalized && (
-        <>
+        <div className="-my-6 flex h-[calc(100dvh-3.5rem)] flex-col">
           {profile && loading ? (
-            <div className="rounded-[24px] border border-[#E8D7C4] bg-[#FFFDF8] px-5 py-8 text-center">
+            <div className="mb-3 shrink-0 rounded-[24px] border border-[#E8D7C4] bg-[#FFFDF8] px-5 py-5 text-center">
               <p className="text-sm font-semibold text-[#8B6F47]">{displayName}의 오늘 흐름을 읽는 중…</p>
             </div>
           ) : profile ? (
-            <StoredProfileBar
-              profile={profile}
-              subtitle={`한국 시간 기준 오늘 · ${profileBirthTimeSummary(profile)} · PC·폰 프로필이 같으면 점수도 같습니다`}
-              onEdit={scrollToPersonalizeForm}
-            />
-          ) : (
-            <TodayEmptyState
-              dateLabel={todayLabel}
-              toneLabel={commonPreview.toneLabel}
-              sentence={commonPreview.sentence}
-              onScrollToForm={scrollToPersonalizeForm}
-            />
-          )}
-          {personalizeForm}
-        </>
+            <div className="mb-3 shrink-0">
+              <StoredProfileBar
+                profile={profile}
+                subtitle={`한국 시간 기준 오늘 · ${profileBirthTimeSummary(profile)} · PC·폰 프로필이 같으면 점수도 같습니다`}
+                onEdit={scrollToPersonalizeForm}
+              />
+            </div>
+          ) : null}
+          <div className="flex min-h-0 flex-1 flex-col">
+            {personalizeForm}
+          </div>
+        </div>
       )}
 
-      {isPersonalized && personalizedReport && (
-        <div ref={resultRef} className="space-y-6">
-          <section aria-label="나의 오늘의 흐름" className="space-y-6">
+      {isPersonalized && (
+        <div className="space-y-10">
+          {personalizedReport && (
+            <div ref={resultRef} className="space-y-6">
+              <section aria-label="나의 오늘의 흐름" className="space-y-6">
             <TodayPageHeader
               title={profile ? `${displayName}의 오늘` : "나의 오늘"}
               dateLabel={todayLabel}
@@ -570,11 +565,10 @@ export default function TodayPage() {
             </div>
           </div>
 
-        {isPersonalized && personalizedReport && (
-          <div
-            className="rounded-xl border border-[#E2D7D0] bg-white/95 p-0.5 shadow-[0_6px_18px_rgba(61,51,56,0.05)] backdrop-blur sm:sticky sm:top-16 sm:z-10 sm:rounded-2xl sm:p-1"
-            data-pdf-ignore
-          >
+                <div
+                  className="rounded-xl border border-[#E2D7D0] bg-white/95 p-0.5 shadow-[0_6px_18px_rgba(61,51,56,0.05)] backdrop-blur sm:sticky sm:top-16 sm:z-10 sm:rounded-2xl sm:p-1"
+                  data-pdf-ignore
+                >
             <div className="grid grid-cols-3 gap-0.5 sm:gap-1">
               {TAB_ITEMS.map((tab) => (
                 <button
@@ -597,21 +591,20 @@ export default function TodayPage() {
                   </span>
                 </button>
               ))}
-            </div>
-          </div>
-        )}
+                </div>
+              </div>
 
-        {isPersonalized && result?.scores?.overall != null && lastFetchedPayload && (
+              {result?.scores?.overall != null && lastFetchedPayload && (
           <TodayScoreBasisBar
             overall={clampFortuneScore(result.scores.overall)}
             calcDateKey={result.calcDateKey}
             payload={lastFetchedPayload}
             stale={scoreStale}
             onRecalculate={() => void recalculateFromForm()}
-          />
-        )}
+              />
+              )}
 
-        {isPersonalized && personalizedReport && activeTab === "summary" && (
+              {activeTab === "summary" && (
           <TodayFiveCardReport
             report={personalizedReport}
             mode="personalized"
@@ -631,10 +624,10 @@ export default function TodayPage() {
                 });
               }, 80);
             }}
-          />
-        )}
+              />
+              )}
 
-        {isPersonalized && activeTab === "detail" && (
+              {activeTab === "detail" && (
           <div className="space-y-6">
             <p className="rounded-2xl border border-[#E8D7C4] bg-[#FAF5ED] px-4 py-3 text-sm text-[#5A4E48]">
               <span className="font-bold text-[#8B6F47]">자세히</span> 탭 — 브리핑·5대운·상세 행동 가이드입니다. 12시진은
@@ -671,10 +664,10 @@ export default function TodayPage() {
               warning={result.warning}
               sipsinTitle={result.sipsinTitle}
             />
-          </div>
-        )}
+              </div>
+              )}
 
-        {isPersonalized && activeTab === "myeongsik" && (
+              {activeTab === "myeongsik" && (
           <div className="space-y-6">
             <MyeongsikReport report={result.myeongsikReport} />
             {(result.sajuTriggers?.length > 0 || result.gearAnalysis?.length > 0) && (
@@ -684,18 +677,16 @@ export default function TodayPage() {
                 pillars={result.pillars}
               />
             )}
-          </div>
-        )}
-          </section>
-        </div>
-      )}
+              </div>
+              )}
+              </section>
+            </div>
+          )}
 
-      {isPersonalized && (
-        <>
           <div className="border-t border-[#E2D7D0] pt-2" aria-hidden="true" />
           {personalizeForm}
-        </>
+        </div>
       )}
-    </div>
+    </>
   );
 }

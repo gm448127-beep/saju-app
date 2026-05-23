@@ -23,6 +23,25 @@ export const ENGINE_ONE_LINER =
 export const ENGINE_SCOPE_NOTE =
   "오늘의 흐름에는 신살·LLM을 넣지 않습니다. 신살·대운은 사주 리포트, 깊은 대화는 AI 상담에서 이어집니다.";
 
+/** 홈 — 운명비서가 흐름을 읽는 방식 (3카드) */
+export const HOME_READING_WAY_CARDS = [
+  {
+    num: "01",
+    title: "명리 엔진",
+    description: "생년월일·시(時)와 오늘 일진을 규칙으로 계산해 5축 점수와 「오늘의 결」을 만듭니다.",
+  },
+  {
+    num: "02",
+    title: "매일 리포트",
+    description: "오늘의 한 줄·12시진·행동 가이드를 매일 같은 기준으로 읽고 기록에 쌓습니다.",
+  },
+  {
+    num: "03",
+    title: "AI 상담",
+    description: "사주 맥락을 바탕으로 걸리는 마음을 대화로 깊게 정리합니다.",
+  },
+] as const;
+
 /** 01·02·03 = 엔진 / 표현 / 기록 (톤과 기술 역할 분리) */
 export const DIFFERENCE_LAYERS: ReadonlyArray<{
   badge: string;

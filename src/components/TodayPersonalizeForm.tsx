@@ -1,6 +1,7 @@
 "use client";
 
 import BirthDateNumberInputs, { isValidBirthDate } from "@/components/BirthDateNumberInputs";
+import MiinAvatar from "@/components/MiinAvatar";
 import { TODAY_EMPTY_COPY } from "@/lib/history-copy";
 
 const TIME_SLOTS = [
@@ -57,9 +58,9 @@ export default function TodayPersonalizeForm(props: TodayPersonalizeFormProps) {
   } = props;
 
   return (
-    <section id="personalize" className="scroll-mt-24">
+    <section id="personalize" className="scroll-mt-24 flex min-h-0 w-full flex-1 flex-col">
       <div
-        className={`relative overflow-hidden rounded-[28px] border bg-white shadow-[0_14px_38px_rgba(61,51,56,0.06)] transition-shadow duration-500 ${
+        className={`relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[28px] border bg-white shadow-[0_14px_38px_rgba(61,51,56,0.06)] transition-shadow duration-500 ${
           highlighted
             ? "border-[#8B6F47] ring-2 ring-[#8B6F47]/30 shadow-[0_18px_48px_rgba(139,111,71,0.18)]"
             : "border-[#E2D7D0]"
@@ -68,19 +69,31 @@ export default function TodayPersonalizeForm(props: TodayPersonalizeFormProps) {
         <div className="absolute -right-16 -top-20 h-48 w-48 rounded-full bg-[#F1E7DE]/80" />
         <div className="absolute -bottom-20 left-6 h-44 w-44 rounded-full bg-[#FAF8F5]" />
 
-        <div className="relative border-b border-[#E2D7D0]/80 px-5 py-6 sm:px-7">
-          <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">PERSONAL FLOW</p>
-          <h2 className="mt-2 text-2xl text-[#2F282B] sm:text-3xl" style={{ fontFamily: "Jua, sans-serif" }}>
-            {isPersonalized ? "다른 사주로 다시 정렬" : TODAY_EMPTY_COPY.formTitle}
-          </h2>
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-[#6B5E58]">
-            {isPersonalized
-              ? "생년월일을 바꾸면 같은 날의 흐름이 다른 결·점수로 다시 그려집니다."
-              : TODAY_EMPTY_COPY.formSubtitle}
-          </p>
-        </div>
+        {!isPersonalized ? (
+          <div className="relative flex items-center gap-3 px-5 pt-5 sm:px-7">
+            <MiinAvatar size={48} priority />
+            <p
+              className="min-w-0 flex-1 text-sm leading-relaxed text-[#4A403B] sm:text-base"
+              style={{ fontFamily: "Jua, sans-serif" }}
+            >
+              {TODAY_EMPTY_COPY.personalizeIntro}
+            </p>
+          </div>
+        ) : (
+          <div className="relative border-b border-[#E2D7D0]/80 px-5 py-6 sm:px-7">
+            <h2 className="text-2xl text-[#2F282B] sm:text-3xl" style={{ fontFamily: "Jua, sans-serif" }}>
+              다른 사주로 다시 정렬
+            </h2>
+            <p className="mt-2 max-w-xl text-sm leading-relaxed text-[#6B5E58]">
+              생년월일을 바꾸면 같은 날의 흐름이 다른 결·점수로 다시 그려집니다.
+            </p>
+          </div>
+        )}
 
-        <form onSubmit={onSubmit} className="relative space-y-5 px-5 py-6 sm:px-7 sm:py-7">
+        <form
+          onSubmit={onSubmit}
+          className={`relative flex min-h-0 flex-1 flex-col space-y-5 overflow-y-auto px-5 pb-6 sm:px-7 sm:pb-7 ${isPersonalized ? "py-6 sm:py-7" : "pt-4"}`}
+        >
           <div>
             <label className="mb-1 block text-xs font-semibold text-[#8B6F47]">출생시간 (시주)</label>
             <p className="mt-1 mb-2 text-xs leading-relaxed text-[#8B6F47]">
@@ -218,7 +231,7 @@ export default function TodayPersonalizeForm(props: TodayPersonalizeFormProps) {
           <button
             type="submit"
             disabled={loading || !isValidBirthDate(year, month, day)}
-            className="w-full rounded-[20px] bg-[#2F282B] px-5 py-4 text-lg font-bold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-auto w-full shrink-0 rounded-[20px] bg-[#2F282B] px-5 py-4 text-lg font-bold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
             style={{ fontFamily: "Jua, sans-serif" }}
           >
             {loading ? "내 흐름 정렬 중..." : isPersonalized ? "다시 정렬하기" : TODAY_EMPTY_COPY.formSubmit}
