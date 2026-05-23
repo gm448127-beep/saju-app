@@ -4,10 +4,13 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import { ACTION_GUIDE_COPY } from "@/lib/history-copy";
+import TodayHourlyTeaser from "@/components/today/TodayHourlyTeaser";
+import TodayReadingGuide from "@/components/today/TodayReadingGuide";
 import MyeongriBasisToggle from "@/components/MyeongriBasisToggle";
 import AxisScorePanel from "@/components/AxisScorePanel";
 import TodayScoreHero from "@/components/TodayScoreHero";
 import ToneDecisionChip from "@/components/ToneDecisionChip";
+import { TODAY_CARD_META, type TodayCardPriority } from "@/lib/today-page-copy";
 import { buildTodayMyeongriBasis, buildToneChipTooltip } from "@/lib/today-basis-helpers";
 import {
   buildComparisonInsight,
@@ -24,18 +27,54 @@ import {
   splitGuideLines,
 } from "@/lib/today-report-helpers";
 
+const PRIORITY_STYLES: Record<TodayCardPriority, string> = {
+  primary:
+    "border-2 border-[#8B6F47]/45 shadow-[0_14px_36px_rgba(139,111,71,0.14)] ring-1 ring-[#8B6F47]/10",
+  secondary: "border border-[#E2D7D0] shadow-[0_8px_22px_rgba(61,51,56,0.05)]",
+  optional: "border border-[#E2D7D0]/90 shadow-[0_4px_14px_rgba(61,51,56,0.04)] opacity-[0.98]",
+};
+
 function CardShell({
-  title,
+  cardId,
   children,
   className = "",
 }: {
-  title: string;
+  cardId: keyof typeof TODAY_CARD_META;
   children: React.ReactNode;
   className?: string;
 }) {
+  const meta = TODAY_CARD_META[cardId];
   return (
-    <article className={`rounded-[26px] border px-5 py-5 shadow-[0_10px_28px_rgba(61,51,56,0.05)] ${className}`}>
-      <p className="text-[11px] font-bold tracking-[0.12em] text-[#8B6F47]">{title}</p>
+    <article
+      id={`today-card-${cardId}`}
+      className={`scroll-mt-24 rounded-[26px] px-5 py-5 ${PRIORITY_STYLES[meta.priority]} ${className}`}
+    >
+      <div className="flex flex-wrap items-center gap-2">
+        {meta.step != null && (
+          <span
+            className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${
+              meta.priority === "primary"
+                ? "bg-[#2F282B] text-[#F5F1EB]"
+                : "bg-[#EDE4DC] text-[#5A4E48]"
+            }`}
+          >
+            {meta.step}
+          </span>
+        )}
+        <p
+          className={`text-sm font-bold tracking-tight ${
+            meta.priority === "primary" ? "text-[#2F282B]" : "text-[#6B5E58]"
+          }`}
+          style={meta.priority === "primary" ? { fontFamily: "Jua, sans-serif" } : undefined}
+        >
+          {meta.title}
+        </p>
+        {meta.priority === "primary" && (
+          <span className="rounded-full bg-[#FFF8EE] px-2 py-0.5 text-[10px] font-bold text-[#8B6F47]">
+            필수
+          </span>
+        )}
+      </div>
       {children}
     </article>
   );
@@ -50,6 +89,7 @@ interface TodayFiveCardReportProps {
   };
   birthKey?: string;
   dateLabel?: string;
+  onOpenDetail?: () => void;
 }
 
 function buildOverallFromAxis(report: DailyFortuneContent) {
@@ -107,7 +147,9 @@ export default function TodayFiveCardReport({
   result,
   birthKey = "common",
   dateLabel,
+  onOpenDetail,
 }: TodayFiveCardReportProps) {
+  const [emotionOpen, setEmotionOpen] = useState(false);
   const isPersonalized = mode === "personalized" && Boolean(result);
   const dateKey = report.seedKey.split("-")[0] ?? "";
   const scores = result?.scores ?? {};
@@ -152,7 +194,6 @@ export default function TodayFiveCardReport({
   const [saved, setSaved] = useState(false);
   const [savePulse, setSavePulse] = useState(false);
   const [compareOpen, setCompareOpen] = useState(hasRealYesterday);
-  const [activeSlot, setActiveSlot] = useState<string | null>(null);
   /** 모바일: 점수 히어로만 먼저 · lg에서는 항상 전체 펼침 */
   const [detailExpanded, setDetailExpanded] = useState(false);
 
@@ -170,7 +211,6 @@ export default function TodayFiveCardReport({
     ? buildToneChipTooltip(result, report.toneLabel)
     : null;
   const toneChipLabel = `${tonePrefix} · ${report.toneLabel}`;
-  const timeSlots = report.timeSlots;
 
   useEffect(() => {
     if (!isPersonalized) return;
@@ -308,12 +348,15 @@ export default function TodayFiveCardReport({
         </div>
       )}
 
+      {isPersonalized && <TodayReadingGuide />}
+
       {/* 점수 + 어제 대비 — 데스크톱 전체 / 모바일 펼친 상세 */}
       <div
-        className={`rounded-[28px] border border-[#E2D7D0] bg-white px-5 py-5 shadow-[0_14px_38px_rgba(61,51,56,0.06)] ${
+        className={`rounded-[28px] border-2 border-[#2F282B]/15 bg-white px-5 py-5 shadow-[0_16px_40px_rgba(47,40,43,0.08)] ${
           isPersonalized && !detailExpanded ? "max-lg:hidden" : ""
         } ${isPersonalized ? "hidden lg:block" : ""}`}
       >
+        <p className="mb-3 text-[11px] font-bold tracking-[0.14em] text-[#8B6F47]">오늘 종합 점수</p>
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
@@ -571,31 +614,23 @@ export default function TodayFiveCardReport({
       </>
       )}
 
-      {/* 오늘의 결 — CARD 01 직전 */}
-      <div className="rounded-2xl border border-[#E8D7C4] bg-[#FFFDF8] px-4 py-3">
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <ToneDecisionChip
-            label={`오늘의 결 · ${report.toneLabel}`}
-            tooltip={toneChipTooltip}
-            size="md"
-            variant="white"
-          />
-          {dateLabel && <span className="text-xs font-semibold text-[#8A7E78]">{dateLabel}</span>}
-          {!isPersonalized && (
-            <span className="rounded-full border border-[#E2D7D0] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#8A7E78]">
-              공통 흐름
-            </span>
-          )}
-          {isPersonalized && (
-            <span className="rounded-full border border-[#E2D7D0] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#8A7E78]">
-              나의 흐름
-            </span>
-          )}
-        </div>
+      <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-[#E8D7C4] bg-[#FFFDF8] px-4 py-3">
+        <ToneDecisionChip
+          label={`오늘의 결 · ${report.toneLabel}`}
+          tooltip={toneChipTooltip}
+          size="md"
+          variant="white"
+        />
+        {dateLabel && <span className="text-xs font-semibold text-[#8A7E78]">{dateLabel}</span>}
+        {!isPersonalized && (
+          <span className="rounded-full border border-[#E2D7D0] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#8A7E78]">
+            공통 흐름
+          </span>
+        )}
       </div>
 
-      {/* 카드 1: 오늘의 한 줄 */}
-      <CardShell title="CARD 01 · 오늘의 한 줄" className="border-[#E8D7C4] bg-[#FFFDF8]">
+      {/* ① 오늘의 한 줄 */}
+      <CardShell cardId="sentence" className="bg-[#FFFDF8]">
         <h2 className="mt-4 text-3xl leading-tight text-[#2F282B] sm:text-4xl" style={{ fontFamily: "Jua, sans-serif" }}>
           {report.sentence}
         </h2>
@@ -607,21 +642,8 @@ export default function TodayFiveCardReport({
         </div>
       </CardShell>
 
-      {/* 카드 2: 오늘의 흐름 */}
-      <CardShell title="CARD 02 · 오늘의 흐름" className="border-[#E2D7D0] bg-[#F5EDE3]">
-        <p className="mt-4 text-xl leading-snug text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-          {flowParts.headline}
-        </p>
-        {flowParts.body && (
-          <p className="mt-3 text-sm leading-relaxed text-[#4A403B]">{flowParts.body}</p>
-        )}
-        {myeongriBasisSections.length > 0 && (
-          <MyeongriBasisToggle sections={myeongriBasisSections} className="mt-5" />
-        )}
-      </CardShell>
-
-      {/* 카드 3: 행동 가이드 */}
-      <CardShell title="CARD 03 · 행동 가이드" className="border-[#E2D7D0] bg-white">
+      {/* ② 행동 가이드 — 한 줄 다음 우선 */}
+      <CardShell cardId="action" className="bg-white">
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="rounded-2xl border border-[#D9C8C0] bg-[#FAF8F5] px-4 py-4">
             <p className="text-xs font-bold text-[#3D5838]">{ACTION_GUIDE_COPY.dosLabel}</p>
@@ -658,43 +680,45 @@ export default function TodayFiveCardReport({
         </div>
       </CardShell>
 
-      {/* 카드 4: 감정 포인트 */}
-      <CardShell title="CARD 04 · 감정 포인트" className="border-[#E8D7D0] bg-[#F8F0ED]">
+      {/* ③ 오늘의 흐름 */}
+      <CardShell cardId="flow" className="bg-[#F5EDE3]/80">
         <p className="mt-4 text-xl leading-snug text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-          {report.emotionPoint.description}
+          {flowParts.headline}
         </p>
-        <div className="mt-5 space-y-4">
-          {report.emotionPoint.tips.map((tip) => (
-            <div key={tip} className="rounded-2xl border border-[#E2D7D0]/80 bg-white/70 px-4 py-3">
-              <p className="text-sm leading-relaxed text-[#4A403B]">{tip}</p>
-            </div>
-          ))}
-        </div>
+        {flowParts.body && (
+          <p className="mt-3 text-sm leading-relaxed text-[#4A403B]">{flowParts.body}</p>
+        )}
+        {myeongriBasisSections.length > 0 && (
+          <MyeongriBasisToggle sections={myeongriBasisSections} className="mt-5" />
+        )}
       </CardShell>
 
-      {/* 카드 5: 시간대 운세 */}
-      <CardShell title="CARD 05 · 시간대 운세" className="border-[#E2D7D0] bg-white">
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {timeSlots.map((slot) => (
-            <button
-              key={slot.label}
-              type="button"
-              onClick={() => setActiveSlot(activeSlot === slot.label ? null : slot.label)}
-              className={`rounded-2xl border px-4 py-4 text-left transition ${
-                activeSlot === slot.label
-                  ? "border-[#8B6F47] bg-[#FFF8EE] shadow-[0_8px_20px_rgba(139,111,71,0.12)]"
-                  : "border-[#E2D7D0] bg-[#FFFDF9]"
-              }`}
-            >
-              <p className="text-xs text-[#8A7E78]">
-                {slot.label} · {slot.keyword}
-              </p>
-              <p className={`mt-2 text-xs leading-relaxed text-[#5A4E48] ${activeSlot === slot.label ? "block" : "line-clamp-3"}`}>
-                {slot.description}
-              </p>
-            </button>
-          ))}
-        </div>
+      {isPersonalized && onOpenDetail && <TodayHourlyTeaser onOpenDetail={onOpenDetail} />}
+
+      {/* 감정 — 선택(접기) */}
+      <CardShell cardId="emotion" className="bg-[#F8F0ED]/60">
+        <button
+          type="button"
+          onClick={() => setEmotionOpen((v) => !v)}
+          className="mt-1 flex w-full items-center justify-between gap-2 text-left"
+        >
+          <span className="text-xs text-[#8A7E78]">여유 있을 때 펼쳐보기</span>
+          <span className="text-sm font-bold text-[#8B6F47]">{emotionOpen ? "접기" : "펼치기"}</span>
+        </button>
+        {emotionOpen && (
+          <>
+            <p className="mt-4 text-lg leading-snug text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
+              {report.emotionPoint.description}
+            </p>
+            <div className="mt-4 space-y-3">
+              {report.emotionPoint.tips.map((tip) => (
+                <div key={tip} className="rounded-2xl border border-[#E2D7D0]/80 bg-white/80 px-4 py-3">
+                  <p className="text-sm leading-relaxed text-[#4A403B]">{tip}</p>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </CardShell>
       </div>
     </section>

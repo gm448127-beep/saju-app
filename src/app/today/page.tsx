@@ -14,7 +14,7 @@ import TodayEmptyState from "@/components/TodayEmptyState";
 import TodayFiveCardReport from "@/components/TodayFiveCardReport";
 import TodayStoryShareButton from "@/components/TodayStoryShareButton";
 import TodayPersonalizeForm, { isValidBirthDate } from "@/components/TodayPersonalizeForm";
-import { ENGINE_ONE_LINER, PRIMARY_TAGLINE } from "@/lib/engine-copy";
+import { TODAY_TAB_COPY } from "@/lib/today-page-copy";
 import { formatKstDateLabel } from "@/lib/kst-date";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
@@ -29,9 +29,9 @@ import {
 } from "@/lib/user-profile-storage";
 
 const TAB_ITEMS = [
-  { key: "summary", label: "요약" },
-  { key: "detail", label: "상세" },
-  { key: "myeongsik", label: "명식" },
+  TODAY_TAB_COPY.summary,
+  TODAY_TAB_COPY.detail,
+  TODAY_TAB_COPY.myeongsik,
 ] as const;
 
 type TodayTab = (typeof TAB_ITEMS)[number]["key"];
@@ -505,19 +505,20 @@ export default function TodayPage() {
       {isPersonalized && personalizedReport && (
         <div ref={resultRef} className="space-y-6">
           <section aria-label="나의 오늘의 흐름" className="space-y-6">
-            <div className="rounded-[24px] border border-[#E8D7C4] bg-[#FFFDF8] px-5 py-4">
-              <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">MY TODAY</p>
-              <h2 className="mt-1 text-xl text-[#2F282B] sm:text-2xl" style={{ fontFamily: "Jua, sans-serif" }}>
-                {profile ? `${displayName}의 오늘` : "나의 오늘의 흐름"}
-              </h2>
-              <p className="mt-1 text-sm text-[#8A7E78]">{todayLabel}</p>
-              <p className="mt-2 text-sm text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-                {PRIMARY_TAGLINE}
+            <header className="flex flex-wrap items-end justify-between gap-3 border-b border-[#E8D7C4] pb-4">
+              <div>
+                <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">오늘의 운세</p>
+                <h1 className="mt-1 text-2xl text-[#2F282B] sm:text-3xl" style={{ fontFamily: "Jua, sans-serif" }}>
+                  {profile ? `${displayName}의 오늘` : "나의 오늘"}
+                </h1>
+                <p className="mt-1 text-sm text-[#8A7E78]">{todayLabel}</p>
+              </div>
+              <p className="max-w-xs text-right text-xs leading-relaxed text-[#8A7E78]">
+                <span className="font-semibold text-[#8B6F47]">핵심만</span> 탭에서 ①한 줄 → ②행동 순으로 읽으세요
               </p>
-              <p className="mt-1 text-xs leading-relaxed text-[#8A7E78]">{ENGINE_ONE_LINER}</p>
-            </div>
+            </header>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" data-pdf-ignore>
-            <p className="text-sm text-[#5A4E48]">점수 · 어제 비교 · 상세 리포트</p>
+            <p className="text-sm text-[#5A4E48]">저장 · 공유 · PDF</p>
             <div
               id="today-share-actions"
               className="flex w-full flex-col gap-2 sm:w-auto sm:min-w-[min(100%,420px)]"
@@ -547,13 +548,20 @@ export default function TodayPage() {
                   key={tab.key}
                   type="button"
                   onClick={() => setActiveTab(tab.key)}
-                  className={`min-h-11 rounded-lg px-2 py-2.5 text-xs font-semibold transition sm:rounded-xl sm:px-3 sm:text-sm ${
+                  className={`flex min-h-12 flex-col items-center justify-center rounded-lg px-1 py-2 transition sm:rounded-xl sm:px-2 ${
                     activeTab === tab.key
                       ? "bg-[#2F282B] text-white"
                       : "text-[#8A7E78] hover:bg-[#FAF8F5] hover:text-[#3D3338]"
                   }`}
                 >
-                  {tab.label}
+                  <span className="text-xs font-bold sm:text-sm">{tab.label}</span>
+                  <span
+                    className={`mt-0.5 text-[9px] sm:text-[10px] ${
+                      activeTab === tab.key ? "text-[#F5F1EB]/85" : "text-[#A09488]"
+                    }`}
+                  >
+                    {tab.hint}
+                  </span>
                 </button>
               ))}
             </div>
@@ -567,11 +575,24 @@ export default function TodayPage() {
             result={result}
             birthKey={birthKey}
             dateLabel={todayLabel}
+            onOpenDetail={() => {
+              setActiveTab("detail");
+              window.setTimeout(() => {
+                document.getElementById("today-hourly-flow")?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }, 80);
+            }}
           />
         )}
 
         {isPersonalized && activeTab === "detail" && (
           <div className="space-y-6">
+            <p className="rounded-2xl border border-[#E8D7C4] bg-[#FFF8EE] px-4 py-3 text-sm text-[#5A4E48]">
+              <span className="font-bold text-[#8B6F47]">자세히</span> 탭 — 점수 breakdown, 12시진 그래프, 상세 가이드를
+              모두 볼 수 있어요.
+            </p>
             <TodayBriefingReport result={result} />
             <DomainScoreSummary domains={result.domainScores} />
             <TodayStatsSection
@@ -583,12 +604,14 @@ export default function TodayPage() {
             />
             <DetailedFortuneReport items={result.detailedFortunes} />
             {result.hourlyFlow && (
+              <div id="today-hourly-flow" className="scroll-mt-24">
               <HourlyFlowSection
                 hourlyFlow={result.hourlyFlow}
                 hourlyFlowIntro={result.hourlyFlowIntro}
                 hourlyPeak={result.hourlyPeak}
                 hourlyCaution={result.hourlyCaution}
               />
+              </div>
             )}
             <TimeAdviceSection items={result.timeAdvice ?? []} />
             <TodayActionGuideSection
