@@ -1,6 +1,6 @@
 "use client";
 
-import PatternDots from "@/components/pattern/PatternDots";
+import PatternLast7DaysStrip from "@/components/pattern/PatternLast7DaysStrip";
 import {
   HISTORY_PREVIEW_COPY,
   LAST_7_DAYS_COPY,
@@ -56,22 +56,9 @@ export default function HistoryEmptyPreviews() {
         <h2 className="mt-1 text-lg text-[#C4B8AE]" style={{ fontFamily: "Jua, sans-serif" }}>
           {LAST_7_DAYS_COPY.headline}
         </h2>
-        <div className="mt-4 space-y-2">
-          {last7.map((day) => (
-            <div
-              key={day.dateKey}
-              className="flex items-center justify-between gap-3 rounded-xl border border-[#F0EBE6] bg-[#FAFAF8] px-3 py-2.5 opacity-80"
-            >
-              <span className="text-xs font-semibold text-[#C4B8AE]">
-                {day.shortDate}
-                <span className="ml-1">({day.weekday})</span>
-              </span>
-              <div className="flex items-center gap-3">
-                <PatternDots filled={2} />
-                <span className="text-xs text-[#D4C8BE]">—</span>
-              </div>
-            </div>
-          ))}
+        <div className="mt-4 opacity-80">
+          <PatternLast7DaysStrip days={last7} />
+          <p className="mt-5 text-center text-[11px] text-[#C4B8AE]">{LAST_7_DAYS_COPY.footerHint}</p>
         </div>
       </PreviewShell>
 

@@ -7,8 +7,7 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import HistoryEmptyPreviews from "@/components/pattern/HistoryEmptyPreviews";
 import HistoryOtherRecords from "@/components/pattern/HistoryOtherRecords";
 import HistoryPageSkeleton from "@/components/pattern/HistoryPageSkeleton";
-import PatternDots from "@/components/pattern/PatternDots";
-import PatternEmptyDayLine from "@/components/pattern/PatternEmptyDayLine";
+import PatternLast7DaysStrip from "@/components/pattern/PatternLast7DaysStrip";
 import {
   getSajuHistory,
   getTarotFavorites,
@@ -302,41 +301,18 @@ function HistoryPageContent() {
                   : HISTORY_SECTION_EMPTY_COPY.last7Days}
               </p>
             )}
-            <div className="mt-4 space-y-2.5">
-              {last7.map((day) => (
-                <button
-                  key={day.dateKey}
-                  type="button"
-                  disabled={!day.hasRecord}
-                  onClick={() => day.hasRecord && router.push(`/history/${dateKeyToSlug(day.dateKey)}`)}
-                  className={`flex w-full items-center justify-between gap-3 rounded-xl border px-3 py-3 text-left transition ${
-                    day.hasRecord
-                      ? "border-[#E8D7C4] bg-white/80 hover:border-[#8B6F47]/40"
-                      : "border-transparent bg-transparent cursor-default"
-                  }`}
-                >
-                  <span className="text-xs font-semibold text-[#6B5E58]">
-                    {day.shortDate}
-                    <span className="ml-1 text-[#A09488]">({day.weekday})</span>
-                  </span>
-                  <div className="flex min-h-[1.25rem] items-center gap-3">
-                    {day.hasRecord ? (
-                      <>
-                        <PatternDots filled={day.dotsFilled} />
-                        <span className="text-xs font-bold text-[#8B6F47]">{day.toneLabel}</span>
-                      </>
-                    ) : (
-                      <PatternEmptyDayLine />
-                    )}
-                  </div>
-                </button>
-              ))}
-            </div>
+            <PatternLast7DaysStrip
+              days={last7}
+              onDayClick={(dateKey) => router.push(`/history/${dateKeyToSlug(dateKey)}`)}
+            />
             {showLast7WarmupHint && (
-              <p className="mt-5 text-center text-sm leading-relaxed text-[#8B6F47]">
+              <p className="mt-4 text-center text-sm leading-relaxed text-[#8B6F47]">
                 {LAST_7_DAYS_COPY.warmupHint}
               </p>
             )}
+            <p className="mt-5 text-center text-[11px] leading-relaxed text-[#A09488]">
+              {LAST_7_DAYS_COPY.footerHint}
+            </p>
           </section>
 
           {/* 최근 기록 (+ 저장한 문장) */}
