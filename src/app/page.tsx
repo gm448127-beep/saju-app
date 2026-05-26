@@ -19,6 +19,7 @@ import { getSajuHistory, getTarotFavorites } from "@/lib/archive-storage";
 import { BIRTH_TIME_MARKETING, HOME_READING_WAY_CARDS, PRIMARY_TAGLINE } from "@/lib/engine-copy";
 import { buildHomePatternCard, buildHomeWeeklyCard } from "@/lib/today-pattern-helpers";
 import { getUnifiedArchiveStats, getTodayHistory } from "@/lib/today-report-helpers";
+import { AI_CHAT_ENABLED } from "@/lib/feature-flags";
 
 type FeatureSlide = {
   href: string;
@@ -146,10 +147,12 @@ function buildLiveCards(
   {
     title: "오늘의 추천",
     eyebrow: "PICK",
-    text: "걸리는 마음이 남는다면\nAI상담으로 더 깊게 읽어보세요",
-    cta: "상담 열기",
+    text: AI_CHAT_ENABLED
+      ? "걸리는 마음이 남는다면\nAI상담으로 더 깊게 읽어보세요"
+      : "오늘의 흐름이 걸리면\n한 번 더 깊게 읽어보세요",
+    cta: AI_CHAT_ENABLED ? "상담 열기" : "오늘 보기",
     cardClass: "border-[#C49A4A] bg-white",
-    href: dailyContent.recommendation.href,
+    href: AI_CHAT_ENABLED ? dailyContent.recommendation.href : "/today",
   },
   ];
 }
@@ -529,7 +532,9 @@ export default function HomePage() {
               {PRIMARY_TAGLINE}
             </p>
             <p className="mt-2 text-sm leading-relaxed text-[#6B5E58]">
-              사주·오늘의 흐름·토정·궁합·AI 상담까지 한곳에서 이어집니다.
+              {AI_CHAT_ENABLED
+                ? "사주·오늘의 흐름·토정·궁합·AI 상담까지 한곳에서 이어집니다."
+                : "사주·오늘의 흐름·토정·궁합까지 한곳에서 이어집니다."}
             </p>
 
             <div className="mt-5 flex flex-col gap-2 sm:mt-6 sm:flex-row">
@@ -539,12 +544,14 @@ export default function HomePage() {
               >
                 오늘 읽기
               </Link>
-              <Link
-                href="/chat"
-                className="inline-flex items-center justify-center rounded-2xl border border-[#D9C8C0] bg-white px-5 py-3 text-sm font-bold text-[#2F282B] transition hover:bg-[#FAF8F5]"
-              >
-                AI 상담
-              </Link>
+              {AI_CHAT_ENABLED && (
+                <Link
+                  href="/chat"
+                  className="inline-flex items-center justify-center rounded-2xl border border-[#D9C8C0] bg-white px-5 py-3 text-sm font-bold text-[#2F282B] transition hover:bg-[#FAF8F5]"
+                >
+                  AI 상담
+                </Link>
+              )}
             </div>
           </div>
           <div className="flex shrink-0 justify-end sm:justify-end">
@@ -559,7 +566,9 @@ export default function HomePage() {
           운명비서가 흐름을 읽는 방식
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-[#6B5E58]">
-          명리 계산 → 매일 리포트 → 필요할 때 AI 상담까지, 한 사주 기준으로 이어집니다.
+          {AI_CHAT_ENABLED
+            ? "명리 계산 → 매일 리포트 → 필요할 때 AI 상담까지, 한 사주 기준으로 이어집니다."
+            : "명리 계산 → 매일 리포트까지, 한 사주 기준으로 이어집니다."}
         </p>
         <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {HOME_READING_WAY_CARDS.map((card) => (

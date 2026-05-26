@@ -1,3 +1,4 @@
+import { AI_CHAT_ENABLED } from "@/lib/feature-flags";
 import { TONE_DEFINITIONS } from "@/lib/today-tone-data";
 import { generateTodayToneReport, hashSeed as toneHashSeed } from "@/lib/today-tone-engine";
 import type { ToneKey, ToneStatus, UserSajuProfile } from "@/lib/today-tone-types";
@@ -79,7 +80,9 @@ function buildRecommendation(date: Date, seed: number) {
 
   const fallback = [
     { title: "타로", text: "타로 리포트로 오늘 마음의 결을 가볍게 읽어보세요.", href: "/tarot" },
-    { title: "AI상담", text: "오늘의 흐름이 걸리는 지점이 있다면, AI상담에서 한 번 더 깊게 정리해보세요.", href: "/chat" },
+    ...(AI_CHAT_ENABLED
+      ? [{ title: "AI상담", text: "오늘의 흐름이 걸리는 지점이 있다면, AI상담에서 한 번 더 깊게 정리해보세요.", href: "/chat" }]
+      : []),
     { title: "오늘의 흐름", text: "오늘의 리포트로 지금 필요한 움직임을 정리해보세요.", href: "/today" },
   ];
 

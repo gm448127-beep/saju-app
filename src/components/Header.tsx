@@ -7,6 +7,7 @@ import {
   getUserProfile,
   PROFILE_UPDATED_EVENT,
 } from "@/lib/user-profile-storage";
+import { AI_CHAT_ENABLED } from "@/lib/feature-flags";
 
 const NAV_ITEMS = [
   { href: "/today", label: "오늘운세", color: "#3D3338" },
@@ -15,7 +16,8 @@ const NAV_ITEMS = [
   { href: "/compatibility", label: "궁합", color: "#3D3338" },
   { href: "/tarot", label: "타로", color: "#3D3338" },
   { href: "/dream", label: "꿈해몽", color: "#3D3338" },
-  { href: "/chat", label: "AI상담", color: "#3D3338" },
+  // AI_CHAT_ENABLED가 true일 때만 노출
+  ...(AI_CHAT_ENABLED ? [{ href: "/chat", label: "AI상담", color: "#3D3338" }] : []),
 ];
 
 export default function Header() {

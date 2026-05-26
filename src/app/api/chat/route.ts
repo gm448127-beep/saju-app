@@ -1,8 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { buildChatSajuContext } from '@/lib/chat-saju-context';
+import { AI_CHAT_ENABLED } from '@/lib/feature-flags';
 
 export async function POST(request: NextRequest) {
   try {
+    if (!AI_CHAT_ENABLED) {
+      return NextResponse.json(
+        { error: 'AI 상담은 준비 중입니다. 잠시 후 다시 이용해 주세요.' },
+        { status: 503 },
+      );
+    }
+
     const { message, birthData, chatHistory } = await request.json();
     if (!message) return NextResponse.json({ error: '메시지를 입력해주세요.' }, { status: 400 });
 

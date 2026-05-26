@@ -1,6 +1,8 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { AI_CHAT_ENABLED } from '@/lib/feature-flags';
 import BirthDateNumberInputs, { isValidBirthDate } from '@/components/BirthDateNumberInputs';
 import StoredProfileBar from '@/components/StoredProfileBar';
 import { useUserProfile } from '@/components/UserProfileProvider';
@@ -54,7 +56,34 @@ const TIME_SLOTS = [
   { value: 21, label: '해시 (21:00~23:00)' },
 ];
 
+function ChatComingSoon() {
+  return (
+    <div className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-lg flex-col items-center justify-center px-4 py-16 text-center">
+      <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">AI 상담</p>
+      <h1 className="mt-3 text-2xl text-[#2F282B]" style={{ fontFamily: 'Jua, sans-serif' }}>
+        준비 중입니다
+      </h1>
+      <p className="mt-4 text-sm leading-relaxed text-[#6B5E58]">
+        AI 상담 기능을 더 안정적으로 다듬는 중입니다.
+        <br />
+        오늘의 흐름·사주·궁합은 그대로 이용하실 수 있습니다.
+      </p>
+      <Link
+        href="/today"
+        className="mt-8 inline-flex rounded-2xl bg-[#2F282B] px-6 py-3 text-sm font-bold text-white transition hover:brightness-110"
+      >
+        오늘의 흐름 보기
+      </Link>
+    </div>
+  );
+}
+
 export default function ChatPage() {
+  if (!AI_CHAT_ENABLED) return <ChatComingSoon />;
+  return <ChatPageActive />;
+}
+
+function ChatPageActive() {
   const { profile, saveProfile, displayName } = useUserProfile();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
