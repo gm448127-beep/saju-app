@@ -33,7 +33,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen md:bg-[#ebe7e0]">
         <ClientProviders>
-          <div className="app-viewport mx-auto flex min-h-[100dvh] w-full max-w-[430px] flex-col bg-gradient-to-b from-white to-[#FAF8F5] shadow-none md:my-3 md:min-h-[calc(100dvh-1.5rem)] md:rounded-[1.75rem] md:border md:border-[#ddd5c6]/80 md:shadow-[0_24px_64px_rgba(47,40,43,0.12)]">
+          <div className="app-viewport mx-auto flex min-h-[100dvh] w-full max-w-[430px] flex-col shadow-none md:my-3 md:min-h-[calc(100dvh-1.5rem)] md:rounded-[1.75rem] md:border md:border-[#ddd5c6]/80 md:shadow-[0_24px_64px_rgba(47,40,43,0.12)]">
             <Header />
             <main className="flex-1 px-4 py-6">{children}</main>
           </div>
