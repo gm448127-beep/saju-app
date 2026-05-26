@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import StoredProfileBar from "@/components/StoredProfileBar";
@@ -45,7 +45,7 @@ type TodayTab = (typeof TAB_ITEMS)[number]["key"];
 
 function formatTodayLabel(date = new Date()) {
   const label = formatKstDateLabel(date);
-  const m = label.match(/^(\d+)년 (\d+)월 (\d+)일 \((.)요일\)$/);
+  const m = label.match(/^(\d+)?? (\d+)?? (\d+)?? \((.)????\)$/);
   if (!m) return label;
   return `${m[1]}.${String(m[2]).padStart(2, "0")}.${String(m[3]).padStart(2, "0")} (${m[4]})`;
 }
@@ -75,14 +75,14 @@ function TodayBriefingReport({ result }: { result: any }) {
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#5A4E48]">{briefing.headline}</p>
           </div>
           <div className="rounded-3xl border border-[#E2D7D0] bg-[#FAF8F5] px-6 py-4 text-center">
-            <p className="text-xs text-[#8A7E78]">종합 점수</p>
+            <p className="text-xs text-[#8A7E78]">???? ????</p>
             <p className="mt-1 text-5xl font-bold text-[#2F282B]">{result.scores.overall}</p>
             <p className="mt-1 text-sm text-[#8B6F47]">{briefing.scoreTone}</p>
           </div>
         </div>
 
         <div className="mt-6 rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] px-5 py-4">
-          <p className="text-xs tracking-[0.12em] text-[#8B6F47]">핵심 한 줄</p>
+          <p className="text-xs tracking-[0.12em] text-[#8B6F47]">??? ?? ??</p>
           <p className="mt-2 text-lg leading-relaxed text-[#3D3338]" style={{ fontFamily: "Jua, sans-serif" }}>
             {briefing.oneLine}
           </p>
@@ -90,7 +90,7 @@ function TodayBriefingReport({ result }: { result: any }) {
       </div>
 
       <div className="card">
-        <SectionTitle title="오늘의 브리핑" caption="십성, 일진, 합충, 시간 흐름을 종합한 요약입니다." />
+        <SectionTitle title="?????? ????" caption="???, ????, ????, ?�? ???? ?????? ???????." />
         <div className="space-y-3">
           {briefing.executiveSummary?.map((line: string, index: number) => (
             <div key={index} className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
@@ -100,11 +100,11 @@ function TodayBriefingReport({ result }: { result: any }) {
         </div>
         <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
           <div className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
-            <p className="text-xs font-semibold text-[#8B6F47]">오늘의 활용법</p>
+            <p className="text-xs font-semibold text-[#8B6F47]">?????? ????</p>
             <p className="mt-2 text-sm leading-relaxed text-[#5A4E48]">{briefing.focus}</p>
           </div>
           <div className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
-            <p className="text-xs font-semibold text-[#8B6F47]">오늘의 주의점</p>
+            <p className="text-xs font-semibold text-[#8B6F47]">?????? ??????</p>
             <p className="mt-2 text-sm leading-relaxed text-[#5A4E48]">{briefing.caution}</p>
           </div>
         </div>
@@ -118,7 +118,7 @@ function DomainScoreSummary({ domains }: { domains?: any[] }) {
 
   return (
     <div className="card">
-      <SectionTitle title="영역별 점수 요약" caption="기존 운세 점수를 바탕으로 오늘 활용할 영역을 세분화했습니다." />
+      <SectionTitle title="?????? ???? ???" caption="???? ?? ?????? ???????? ???? ????? ?????? ???????????." />
       <div className="space-y-3">
         {domains.map((domain) => (
           <div key={domain.key} className="grid grid-cols-[72px_1fr_56px] items-center gap-3">
@@ -168,20 +168,20 @@ function DetailedFortuneReport({ items }: { items?: any[] }) {
           <div className="mt-5 space-y-4 text-sm leading-relaxed text-[#5A4E48]">
             <p>{item.overview}</p>
             <div>
-              <p className="mb-1 font-semibold text-[#3D5838]">긍정 요소</p>
+              <p className="mb-1 font-semibold text-[#3D5838]">???? ???</p>
               <p>{item.positive}</p>
             </div>
             <div>
-              <p className="mb-1 font-semibold text-[#7A4A3D]">주의 요소</p>
+              <p className="mb-1 font-semibold text-[#7A4A3D]">???? ???</p>
               <p>{item.cautionText}</p>
             </div>
             <div className="grid grid-cols-1 gap-3 border-t border-[#E2D7D0] pt-4 md:grid-cols-2">
               <div className="rounded-2xl bg-[#FAF8F5] px-4 py-3">
-                <p className="text-xs font-semibold text-[#8B6F47]">오늘의 행동</p>
+                <p className="text-xs font-semibold text-[#8B6F47]">?????? ??</p>
                 <p className="mt-1">{item.action}</p>
               </div>
               <div className="rounded-2xl bg-[#FAF8F5] px-4 py-3">
-                <p className="text-xs font-semibold text-[#8B6F47]">피하면 좋은 것</p>
+                <p className="text-xs font-semibold text-[#8B6F47]">????? ???? ??</p>
                 <p className="mt-1">{item.avoid}</p>
               </div>
             </div>
@@ -199,7 +199,7 @@ function MyeongsikReport({ report }: { report?: any }) {
   return (
     <div className="space-y-4">
       <div className="card">
-        <SectionTitle title={report.title} caption="오늘의 일진과 나의 원국을 함께 읽은 전문가용 요약입니다." />
+        <SectionTitle title={report.title} caption="?????? ?????? ???? ?????? ??? ???? ???????? ???????." />
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {report.natal.pillars.map((pillar: any) => (
             <div key={pillar.key} className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-4 text-center">
@@ -213,18 +213,18 @@ function MyeongsikReport({ report }: { report?: any }) {
       </div>
 
       <div className="card">
-        <SectionTitle title="오늘 일진" caption="오늘 들어온 천간과 지지가 나에게 어떤 십성으로 작용하는지 정리했습니다." />
+        <SectionTitle title="???? ????" caption="???? ???? �???? ?????? ?????? ?? ??????? ???????? ??????????." />
         <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
           <div className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
-            <p className="text-xs text-[#8A7E78]">오늘 천간</p>
+            <p className="text-xs text-[#8A7E78]">???? �??</p>
             <p className="mt-1 text-base text-[#3D3338]">{report.today.gan}</p>
           </div>
           <div className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
-            <p className="text-xs text-[#8A7E78]">오늘 지지</p>
+            <p className="text-xs text-[#8A7E78]">???? ????</p>
             <p className="mt-1 text-base text-[#3D3338]">{report.today.ji}</p>
           </div>
           <div className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
-            <p className="text-xs text-[#8A7E78]">내 일간 기준</p>
+            <p className="text-xs text-[#8A7E78]">?? ??? ????</p>
             <p className="mt-1 text-base text-[#3D3338]">
               {report.today.sipsin} / {report.today.branchSipsin}
             </p>
@@ -234,12 +234,12 @@ function MyeongsikReport({ report }: { report?: any }) {
 
       {(report.triggers?.length > 0 || report.legacyLines?.length > 0) && (
         <div className="card">
-          <SectionTitle title="반영 요소" caption="점수와 해석에 반영된 합충, 십성, 오행 근거입니다." />
+          <SectionTitle title="??? ???" caption="?????? ????? ????? ????, ???, ???? ???????." />
           <div className="space-y-2">
             {(report.triggers?.length ? report.triggers : report.legacyLines).map((item: any, index: number) => (
               <div key={index} className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
                 <p className="text-sm leading-relaxed text-[#5A4E48]">
-                  {typeof item === "string" ? item : `${item.label || item.title || "반영"} · ${item.desc || item.description || item.reason || ""}`}
+                  {typeof item === "string" ? item : `${item.label || item.title || "???"} ?? ${item.desc || item.description || item.reason || ""}`}
                 </p>
               </div>
             ))}
@@ -285,7 +285,7 @@ export default function TodayPage() {
   const [exactHour, setExactHour] = useState(9);
   const [exactMinute, setExactMinute] = useState(0);
   const [calendarType, setCalendarType] = useState("solar");
-  const [gender, setGender] = useState("남");
+  const [gender, setGender] = useState("??");
 
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
@@ -376,7 +376,7 @@ export default function TodayPage() {
       year,
       month,
       day,
-      gender: gender as "남" | "여",
+      gender: gender as "??" | "??",
       calendarType: calendarType as UserBirthProfile["calendarType"],
       timeMode,
       slotHour,
@@ -409,7 +409,7 @@ export default function TodayPage() {
           body: JSON.stringify(payload),
         });
         const json = await res.json();
-        if (!res.ok) throw new Error(json.error || "분석 실패");
+        if (!res.ok) throw new Error(json.error || "??? ????");
         setResult(json);
         setLastFetchedPayload(payload);
         setActiveTab("summary");
@@ -419,7 +419,7 @@ export default function TodayPage() {
           }, 80);
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : "오류가 발생했습니다.");
+        setError(err instanceof Error ? err.message : "?????? ?????????.");
       } finally {
         setLoading(false);
       }
@@ -456,7 +456,7 @@ export default function TodayPage() {
     setError("");
 
     if (!isValidBirthDate(year, month, day)) {
-      setError("생년월일을 숫자로 정확히 입력해주세요.");
+      setError("????????? ????? ????? ??????????.");
       return;
     }
 
@@ -466,7 +466,7 @@ export default function TodayPage() {
 
   const recalculateFromForm = useCallback(async () => {
     if (!isValidBirthDate(year, month, day)) {
-      setError("생년월일을 숫자로 정확히 입력해주세요.");
+      setError("????????? ????? ????? ??????????.");
       return;
     }
     setError("");
@@ -476,11 +476,11 @@ export default function TodayPage() {
 
   const statItems: Omit<TodayStatItem, "score">[] = result
     ? [
-        { label: "재물운", key: "wealth", color: "#8B6F47", emoji: "" },
-        { label: "애정운", key: "love", color: "#8B6F47", emoji: "" },
-        { label: "직장운", key: "career", color: "#8B6F47", emoji: "" },
-        { label: "건강운", key: "health", color: "#8B6F47", emoji: "" },
-        { label: "행운", key: "luck", color: "#8B6F47", emoji: "" },
+        { label: "????", key: "wealth", color: "#8B6F47", emoji: "" },
+        { label: "??????", key: "love", color: "#8B6F47", emoji: "" },
+        { label: "?????", key: "career", color: "#8B6F47", emoji: "" },
+        { label: "?????", key: "health", color: "#8B6F47", emoji: "" },
+        { label: "???", key: "luck", color: "#8B6F47", emoji: "" },
       ]
     : [];
 
@@ -518,13 +518,13 @@ export default function TodayPage() {
         <div className="-my-6 flex h-[calc(100dvh-3.5rem)] flex-col">
           {profile && loading ? (
             <div className="mb-3 shrink-0 rounded-[24px] border border-[#E8D7C4] bg-[#FFFDF8] px-5 py-5 text-center">
-              <p className="text-sm font-semibold text-[#8B6F47]">{displayName}의 오늘 흐름을 읽는 중…</p>
+              <p className="text-sm font-semibold text-[#8B6F47]">{displayName}?? ???? ???? ??? ???</p>
             </div>
           ) : profile ? (
             <div className="mb-3 shrink-0">
               <StoredProfileBar
                 profile={profile}
-                subtitle={`한국 시간 기준 오늘 · ${profileBirthTimeSummary(profile)} · PC·폰 프로필이 같으면 점수도 같습니다`}
+                subtitle={`??? ?�? ???? ???? ?? ${profileBirthTimeSummary(profile)} ?? PC???? ???????? ?????? ?????? ???????`}
                 onEdit={scrollToPersonalizeForm}
               />
             </div>
@@ -539,14 +539,14 @@ export default function TodayPage() {
         <div className="space-y-10">
           {personalizedReport && (
             <div ref={resultRef} className="space-y-6">
-              <section aria-label="나의 오늘의 흐름" className="space-y-6">
+              <section aria-label="???? ?????? ??" className="space-y-6">
             <TodayPageHeader
-              title={profile ? `${displayName}의 오늘` : "나의 오늘"}
+              title={profile ? `${displayName}?? ????` : "???? ????"}
               dateLabel={todayLabel}
-              subtitle="한 줄 → 4축 점수 → 오늘의 흐름 → 행동 가이드 → 시간대별 운세 순으로 읽어보세요."
+              subtitle="?? ?? ?? 4?? ???? ?? ?????? ?? ?? ?? ????? ?? ?�??? ?? ?????? ???????."
             />
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" data-pdf-ignore>
-            <p className="text-sm text-[#5A4E48]">저장 · 공유 · PDF</p>
+            <p className="text-sm text-[#5A4E48]">???? ?? ???? ?? PDF</p>
             <div
               id="today-share-actions"
               className="flex w-full flex-col gap-2 sm:w-auto sm:min-w-[min(100%,420px)]"
@@ -577,7 +577,7 @@ export default function TodayPage() {
                   onClick={() => setActiveTab(tab.key)}
                   className={`flex min-h-12 flex-col items-center justify-center rounded-lg px-1 py-2 transition sm:rounded-xl sm:px-2 ${
                     activeTab === tab.key
-                      ? "bg-[#2F282B] text-white"
+                      ? "bg-[#7B7355] text-white"
                       : "text-[#8A7E78] hover:bg-[#FAF8F5] hover:text-[#3D3338]"
                   }`}
                 >
@@ -630,8 +630,8 @@ export default function TodayPage() {
               {activeTab === "detail" && (
           <div className="space-y-6">
             <p className="rounded-2xl border border-[#E8D7C4] bg-[#FAF5ED] px-4 py-3 text-sm text-[#5A4E48]">
-              <span className="font-bold text-[#8B6F47]">자세히</span> 탭 — 브리핑·5대운·상세 행동 가이드입니다. 12시진은
-              핵심만 탭 하단에서도 볼 수 있어요.
+              <span className="font-bold text-[#8B6F47]">?????</span> ?? ? ?????5????? ?? ?????????. 12??????
+              ???? ?? ???????? ?? ?? ????.
             </p>
             <TodayBriefingReport result={result} />
             <DomainScoreSummary domains={result.domainScores} />

@@ -3,12 +3,12 @@
 import { useState } from 'react';
 
 const DREAM_EXAMPLES = [
-  '맑은 물을 건너다가 갑자기 파도가 커지는 꿈',
-  '돌아가신 가족이 집에 찾아와 조용히 웃는 꿈',
-  '누군가에게 쫓기다가 낯선 방에 숨는 꿈',
-  '돈이 든 지갑을 줍고도 돌려줄지 고민하는 꿈',
-  '뱀이 내 앞을 지나가는데 이상하게 무섭지 않은 꿈',
-  '시험장에 늦게 도착했는데 문제지를 못 받는 꿈',
+  '�?�? 물�? 건�???��? �?�?��???�?�? 커�???�?,
+  '??�??�???�?족이 �?�?� 찾�???? 조�?�????�?? �?,
+  '??군�??��? �?기?��? ???� 방�?� ?��?? �?,
+  '??이 ??�?�?�? 줍고????려�?�? 고�???�?? �?,
+  '�???????�? �???�???데 ?��?�??�? 무�?��? ??�? �?,
+  '??�???��?� ??�? ??착??�????문�?�?�?�?�?�?? �?,
 ];
 
 function renderContent(content: string) {
@@ -51,7 +51,7 @@ export default function DreamPage() {
   const handleSubmit = async () => {
     const trimmedDream = dream.trim();
     if (trimmedDream.length < 5) {
-      setError('꿈 내용을 조금 더 자세히 적어주세요.');
+      setError('�??��?�??조�? ???��?�???��?�주�?�??');
       return;
     }
 
@@ -68,14 +68,14 @@ export default function DreamPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || '꿈해몽을 불러오지 못했습니다.');
+        setError(data.error || '�?�?�몽�? �?�?�?��? 못�???��????');
         return;
       }
 
       setResult(data.interpretation || '');
     } catch (submitError) {
-      console.error('꿈해몽 요청 실패:', submitError);
-      setError('잠시 후 다시 시도해주세요.');
+      console.error('�?�?��???청 ?��?�:', submitError);
+      setError('?��?? ???��?? ??�??�주?��??.');
     } finally {
       setLoading(false);
     }
@@ -91,12 +91,10 @@ export default function DreamPage() {
             DREAM REPORT
           </p>
           <h1 className="text-3xl leading-tight text-[#2F282B] sm:text-5xl" style={{ fontFamily: 'Jua, sans-serif' }}>
-            꿈이 남긴 신호를
-            <br />
-            차분하게 풀어드릴게요
-          </h1>
+            �?이 ?�긴 ?��?��?            <br />
+            차�???�? ???��??릴�???          </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#4A403B]">
-            무섭게 단정하는 해몽이 아니라, 꿈속 상징을 오늘의 마음가짐과 현실 조언으로 정리합니다.
+            무�?��??��???�?? ?�몽????�???? �?�?� ?��????��????�?�?�?짐과 ??�?� 조�?�?��? ??리?��????
           </p>
         </div>
       </section>
@@ -104,23 +102,23 @@ export default function DreamPage() {
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_320px]">
         <div className="card">
           <div className="mb-4">
-            <h2 className="label mb-1">꿈 내용 입력</h2>
-            <p className="text-xs text-[#8A7E78]">기억나는 장면, 등장한 사람, 장소, 감정을 편하게 적어주세요.</p>
+            <h2 className="label mb-1">�??��?� ??력</h2>
+            <p className="text-xs text-[#8A7E78]">기�?�??�?? ?�면, ?��?�???��??, ?��??, 감�????��??�??��?�주�?�??</p>
           </div>
 
           <textarea
             value={dream}
             onChange={(event) => setDream(event.target.value)}
-            placeholder="예: 낯선 집 안에서 누군가를 기다리다가 갑자기 비가 많이 내렸어요. 이상하게 불안하면서도 마음이 조금 후련했습니다."
+            placeholder="?? ???� �???�?�????군�?�?기�?�리�?��? �?�?��?�?�? �?이 ?�렸?��??. ?��?�??�? �?�????면??�? �?�???조�? ??련??�?�??�?�."
             className="min-h-[180px] w-full resize-none rounded-2xl border-2 border-[#D9C8C0] bg-white px-4 py-3 text-base text-[#2F282B] outline-none focus:border-[#8B6F47]"
           />
 
           <div className="mt-4">
-            <label className="mb-2 block text-sm font-bold text-[#2F282B]">꿈을 꾼 뒤 느낌</label>
+            <label className="mb-2 block text-sm font-bold text-[#2F282B]">�?�? �????��??</label>
             <input
               value={mood}
               onChange={(event) => setMood(event.target.value)}
-              placeholder="예: 불안함, 후련함, 그리움, 이상하게 편안함"
+              placeholder="?? �?�???? ??련?? 그리??, ?��?�??�? ?��????
               className="w-full rounded-2xl border-2 border-[#D9C8C0] bg-white px-4 py-3 text-base text-[#2F282B] outline-none focus:border-[#8B6F47]"
             />
           </div>
@@ -135,16 +133,16 @@ export default function DreamPage() {
             type="button"
             onClick={handleSubmit}
             disabled={loading}
-            className="mt-5 w-full rounded-2xl bg-[#2F282B] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#2F282B]/15 transition hover:-translate-y-0.5 disabled:opacity-50"
+            className="mt-5 w-full rounded-2xl bg-[#7B7355] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#7B7355]/15 transition hover:-translate-y-0.5 disabled:opacity-50"
           >
-            {loading ? '꿈을 해석하는 중...' : '꿈해몽 보기'}
+            {loading ? '�?�? ?��?�??�?? �?..' : '�?�?��?보기'}
           </button>
         </div>
 
         <aside className="self-start rounded-[24px] border border-[#E2D7D0] bg-[#FAF8F5] p-5 shadow-[0_10px_30px_rgba(61,51,56,0.06)]">
-          <p className="mb-2 text-xs tracking-[0.12em] text-[#8B6F47]">입력 예시</p>
+          <p className="mb-2 text-xs tracking-[0.12em] text-[#8B6F47]">??력 ??�??</p>
           <h2 className="mb-3 text-xl text-[#2F282B]" style={{ fontFamily: 'Jua, sans-serif' }}>
-            이렇게 시작해보세요
+            ?��?�???�???�보?��??
           </h2>
           <div className="space-y-2">
             {DREAM_EXAMPLES.map((example) => (
@@ -159,7 +157,7 @@ export default function DreamPage() {
             ))}
           </div>
           <p className="mt-4 text-xs leading-relaxed text-[#6B5E58]">
-            꿈해몽은 참고용입니다. 불편한 꿈도 나쁜 일이 생긴다는 뜻으로 단정하지 않고, 현재 마음의 신호로 차분히 보겠습니다.
+            �?�?�몽�? 참고?��????�?�. �?�?�??�?�? ??�? ?�이 ?�긴?��?? ?��?��??��???�? ??고, ??�?� �?�????��?��?차�???보겠?��????
           </p>
         </aside>
       </section>
@@ -169,7 +167,7 @@ export default function DreamPage() {
           <div className="mb-4 flex items-end justify-between gap-3">
             <div>
               <p className="text-xs tracking-[0.12em] text-[#8B6F47]">DREAM INTERPRETATION</p>
-              <h2 className="label mt-1">운명비서 꿈해몽 리포트</h2>
+              <h2 className="label mt-1">?��?�?�?? �?�?��?리포??/h2>
             </div>
           </div>
           <div className="rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4">

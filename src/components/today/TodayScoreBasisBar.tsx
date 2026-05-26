@@ -10,7 +10,7 @@ type TodayScoreBasisBarProps = {
   onRecalculate?: () => void;
 };
 
-/** 화면에 보이는 점수가 어떤 입력·날짜 기준인지 표시 */
+/** ??면??보이???��??�? ?��?� ??력·?��? 기�??��? ??�?? */
 export default function TodayScoreBasisBar({
   overall,
   calcDateKey,
@@ -29,28 +29,27 @@ export default function TodayScoreBasisBar({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-xs font-bold text-[#8B6F47]">
-            {stale ? "입력이 바뀌었어요 · 아래 점수는 이전 계산" : "지금 보이는 점수 기준"}
+            {stale ? "??력??�?�??�???��?? · ??�?? ?��?????��? �?�?�" : "�?�?보이???��?? 기�?"}
           </p>
           <p className="mt-1 font-bold text-[#2F282B]">
-            종합 <span className="text-2xl">{overall}</span>점
-            {calcDateKey ? (
+            �?�?� <span className="text-2xl">{overall}</span>??            {calcDateKey ? (
               <span className="ml-2 text-xs font-semibold text-[#8A7E78]">
-                (운세 날짜 {calcDateKey})
+                (?��?� ?��? {calcDateKey})
               </span>
             ) : null}
           </p>
           <p className="mt-1 text-xs leading-relaxed text-[#6B5E58]">{formatPayloadSummary(payload)}</p>
           <p className="mt-1 text-[11px] text-[#8A7E78]">
-            관계·결정·감정·균형과 종합 점수는 같은 명리 계산 결과입니다.
+            �?�?·결??·감??·균??과 �?�?� ?��????�?�? �?리 �?�?� 결과??�????
           </p>
         </div>
         {stale && onRecalculate && (
           <button
             type="button"
             onClick={onRecalculate}
-            className="shrink-0 rounded-xl bg-[#2F282B] px-4 py-2 text-xs font-bold text-white"
+            className="shrink-0 rounded-xl bg-[#7B7355] px-4 py-2 text-xs font-bold text-white"
           >
-            다시 계산
+            ?��?? �?�?�
           </button>
         )}
       </div>

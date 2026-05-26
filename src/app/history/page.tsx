@@ -146,7 +146,7 @@ function HistoryPageContent() {
 
   return (
     <div className="space-y-8 pb-10">
-      {/* 헤더 */}
+      {/* ?��? */}
       <section className={`relative overflow-hidden ${PATTERN_CARD_SURFACE} sm:px-7`}>
         <div className="absolute -right-16 -top-20 h-48 w-48 rounded-full bg-[#F1E7DE]/60" />
         <div className="relative flex items-start justify-between gap-4">
@@ -210,7 +210,7 @@ function HistoryPageContent() {
             </p>
             <Link
               href="/today"
-              className="mt-6 inline-flex rounded-2xl bg-[#2F282B] px-5 py-3 text-sm font-bold text-white"
+              className="mt-6 inline-flex rounded-2xl bg-[#7B7355] px-5 py-3 text-sm font-bold text-white"
             >
               {HISTORY_PAGE_EMPTY_COPY.cta}
             </Link>
@@ -222,7 +222,7 @@ function HistoryPageContent() {
         </>
       ) : (
         <>
-          {/* 패턴 리포트 + 반복되는 결 (통합) */}
+          {/* ?��?� 리포??+ �?복??�?? �?(?��?�) */}
           <section className={PATTERN_CARD_SURFACE}>
             <SectionLabel>{PATTERN_REPORT_COPY.sectionLabel}</SectionLabel>
             <h2 className="mt-2 text-xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
@@ -271,7 +271,7 @@ function HistoryPageContent() {
                       {toneFilter === cluster.label && (
                         <span className="sr-only"> {RECURRING_TONES_COPY.chipSelectedSuffix}</span>
                       )}
-                      <span className="ml-1 text-xs text-[#8B6F47]">×{cluster.count}</span>
+                      <span className="ml-1 text-xs text-[#8B6F47]">�?{cluster.count}</span>
                     </button>
                   ))}
                   {toneFilter && (
@@ -315,7 +315,7 @@ function HistoryPageContent() {
             </p>
           </section>
 
-          {/* 최근 기록 (+ 저장한 문장) */}
+          {/* �?근 기록 (+ ???��?? 문�?�) */}
           <section className={`${PATTERN_CARD_SURFACE} space-y-5`}>
             <div className="flex items-end justify-between gap-3">
               <div>

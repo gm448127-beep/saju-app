@@ -349,7 +349,7 @@ export default function CompatibilityPage() {
         onClick={handleSubmit}
         disabled={loading}
         className="w-full py-4 rounded-2xl text-white text-lg transition-all active:scale-[0.98] disabled:opacity-50"
-        style={{ fontFamily: "Jua, sans-serif", background: "#2F282B" }}
+        style={{ fontFamily: "Jua, sans-serif", background: "#7B7355" }}
       >
         {loading ? "분석 중..." : "궁합 분석하기"}
       </button>

@@ -197,7 +197,7 @@ ${
 
           <button type="submit" disabled={loading}
             className="w-full py-3.5 rounded-2xl text-white text-lg transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{ backgroundColor: '#2F282B', fontFamily: 'Jua, sans-serif' }}>
+            style={{ backgroundColor: '#7B7355', fontFamily: 'Jua, sans-serif' }}>
             {loading ? (
               <span className="flex items-center justify-center gap-2">
                 <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">

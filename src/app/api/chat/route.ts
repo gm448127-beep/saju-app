@@ -1,148 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { buildChatSajuContext } from '@/lib/chat-saju-context';
 
 export async function POST(request: NextRequest) {
   try {
     const { message, birthData, chatHistory } = await request.json();
     if (!message) return NextResponse.json({ error: '메시지를 입력해주세요.' }, { status: 400 });
 
-    // 사주 정보가 있으면 컨텍스트에 포함
+    // 사주 원국 맥락 (ssaju 엔진 — 사주·오늘의 흐름과 동일)
     let sajuContext = '';
-    if (birthData && birthData.year) {
-      const CHEONGAN = ['갑','을','병','정','무','기','경','신','임','계'];
-      const JIJI = ['자','축','인','묘','진','사','오','미','신','유','술','해'];
-      const GAN_OHAENG: Record<string,string> = {갑:'목',을:'목',병:'화',정:'화',무:'토',기:'토',경:'금',신:'금',임:'수',계:'수'};
-      const GAN_EUMYANG: Record<string,string> = {갑:'양',을:'음',병:'양',정:'음',무:'양',기:'음',경:'양',신:'음',임:'양',계:'음'};
-      const JI_OHAENG: Record<string,string> = {자:'수',축:'토',인:'목',묘:'목',진:'토',사:'화',오:'화',미:'토',신:'금',유:'금',술:'토',해:'수'};
-      const DDI = ['쥐','소','호랑이','토끼','용','뱀','말','양','원숭이','닭','개','돼지'];
-      const SANGSAENG: Record<string,string> = {목:'화',화:'토',토:'금',금:'수',수:'목'};
-      const SANGGEUK: Record<string,string> = {목:'토',화:'금',토:'수',금:'목',수:'화'};
-
-      const y = Number(birthData.year), m = Number(birthData.month), d = Number(birthData.day);
-      const baseDate = new Date(1900, 0, 1);
-      const targetDate = new Date(y, m - 1, d);
-      const diffDays = Math.floor((targetDate.getTime() - baseDate.getTime()) / 86400000);
-
-      const yearGanIdx = ((y - 4) % 10 + 10) % 10;
-      const yearJiIdx = ((y - 4) % 12 + 12) % 12;
-      const dayGanIdx = ((diffDays % 10) + 10) % 10;
-      const dayJiIdx = ((diffDays % 12) + 12) % 12;
-
-      const dayGan = CHEONGAN[dayGanIdx];
-      const mainElement = GAN_OHAENG[dayGan];
-      const eumyang = GAN_EUMYANG[dayGan];
-      const ddi = DDI[yearJiIdx];
-      const yearGanji = `${CHEONGAN[yearGanIdx]}${JIJI[yearJiIdx]}`;
-
-      const getBirthHour = () => {
-        if (birthData.timeMode === 'slot' && birthData.slotHour !== '') return Number(birthData.slotHour);
-        if (birthData.timeMode === 'exact' && birthData.exactHour !== '') return Number(birthData.exactHour);
-        return null;
-      };
-      const getBirthMinute = () => {
-        if (birthData.timeMode === 'exact' && birthData.exactMinute !== '') return Number(birthData.exactMinute);
-        return 0;
-      };
-      const getHourJiIdx = (hour: number) => {
-        if (hour === 23 || hour === 0) return 0;
-        if (hour === 1 || hour === 2) return 1;
-        if (hour === 3 || hour === 4) return 2;
-        if (hour === 5 || hour === 6) return 3;
-        if (hour === 7 || hour === 8) return 4;
-        if (hour === 9 || hour === 10) return 5;
-        if (hour === 11 || hour === 12) return 6;
-        if (hour === 13 || hour === 14) return 7;
-        if (hour === 15 || hour === 16) return 8;
-        if (hour === 17 || hour === 18) return 9;
-        if (hour === 19 || hour === 20) return 10;
-        return 11;
-      };
-
-      const birthHour = getBirthHour();
-      const birthMinute = getBirthMinute();
-      const hasBirthTime = birthHour !== null;
-      const hourJiIdx = hasBirthTime ? getHourJiIdx(birthHour) : null;
-      const hourGanIdx = hourJiIdx !== null ? ((dayGanIdx % 5) * 2 + hourJiIdx) % 10 : null;
-      const hourGanji = hourGanIdx !== null && hourJiIdx !== null ? `${CHEONGAN[hourGanIdx]}${JIJI[hourJiIdx]}` : '';
-      const birthTimeLabel =
-        birthData.timeMode === 'slot' && hasBirthTime
-          ? `${JIJI[hourJiIdx as number]}시 (${String(birthHour).padStart(2, '0')}:00 전후 시간대)`
-          : birthData.timeMode === 'exact' && hasBirthTime
-            ? `${String(birthHour).padStart(2, '0')}:${String(birthMinute).padStart(2, '0')}`
-            : '모름';
-
-      // 오행 카운트
-      const monthGanBase = (yearGanIdx % 5) * 2 + 2;
-      const monthGanIdx = (monthGanBase + (m - 1)) % 10;
-      const monthJiIdx = (m + 1) % 12;
-      const ohaengCount: Record<string,number> = {목:0,화:0,토:0,금:0,수:0};
-      [
-        { g: yearGanIdx, j: yearJiIdx },
-        { g: monthGanIdx, j: monthJiIdx },
-        { g: dayGanIdx, j: dayJiIdx },
-        ...(hourGanIdx !== null && hourJiIdx !== null ? [{ g: hourGanIdx, j: hourJiIdx }] : []),
-      ].forEach(({ g, j }) => {
-        ohaengCount[GAN_OHAENG[CHEONGAN[g % 10]]]++;
-        ohaengCount[JI_OHAENG[JIJI[j % 12]]]++;
-      });
-
-      const sorted = Object.entries(ohaengCount).sort((a,b) => b[1] - a[1]);
-      const strongest = sorted[0][0];
-      const weakest = sorted[sorted.length - 1][0];
-      const calendarLabel =
-        birthData.calendarType === 'lunarLeap'
-          ? '음력 윤달'
-          : birthData.isLunar
-            ? '음력'
-            : '양력';
-
-      sajuContext = `
-[상담자의 사주 정보]
-- 생년월일: ${y}년 ${m}월 ${d}일 (${calendarLabel}, ${birthData.gender === '여' ? '여성' : '남성'})
-- 태어난 시간: ${birthTimeLabel}
-- 연간지: ${yearGanji}
-- 시간지/시주: ${hasBirthTime ? `${hourGanji} (${JIJI[hourJiIdx as number]}시 기준)` : '출생시간 미입력으로 시주 제외'}
-- 일간(주 오행): ${dayGan} (${mainElement}, ${eumyang})
-- 띠: ${ddi}띠
-- 오행 분포: 목=${ohaengCount['목']}, 화=${ohaengCount['화']}, 토=${ohaengCount['토']}, 금=${ohaengCount['금']}, 수=${ohaengCount['수']}
-- 가장 강한 오행: ${strongest} / 가장 약한 오행: ${weakest}
-- 상생 관계: ${mainElement} → ${SANGSAENG[mainElement]}
-- 상극 관계: ${mainElement} → ${SANGGEUK[mainElement]}
-`;
+    if (birthData?.year) {
+      sajuContext = buildChatSajuContext(birthData) ?? '';
     }
 
-    const systemPrompt = `당신은 '운명비서'라는 이름의 친근하고 전문적인 사주/운세 상담 AI입니다.
+    const systemPrompt = `당신은 '운명비서'라는 이름의 사주/운세 상담 AI입니다. 명리학에 정통한 차분한 상담가입니다.
 
-당신의 성격과 말투:
-- 친근하고 따뜻한 말투를 사용합니다 (존댓말 사용)
-- 이모지는 사용하지 않거나 꼭 필요한 경우에만 최소한으로 사용합니다
-- 전문 용어를 쓸 때는 쉬운 설명을 함께 합니다
-- 긍정적이고 희망적인 조언을 우선하되, 주의사항도 균형있게 전합니다
-- 답변은 충분히 상세하게 하되, 읽기 쉽게 구성합니다
+[말투와 태도]
+- 따뜻하지만 절제된 존댓말을 사용합니다. 점쟁이처럼 단정 짓지 않고, 근거를 들어 차분히 설명합니다.
+- 이모지는 사용하지 않습니다.
+- 전문 용어를 쓸 때는 괄호로 짧게 풀어줍니다. 예: 식신(食神, 표현력과 여유를 뜻하는 기운)
 
-당신의 전문 분야:
-1. 사주팔자 (四柱八字) 해석 - 년주, 월주, 일주, 시주 분석
-2. 오행 (五行) 분석 - 목, 화, 토, 금, 수의 균형과 의미
-3. 십신 (十神) 해석 - 비견, 식신, 재성, 관성, 인성
-4. 음양 (陰陽) 조화
-5. 오늘의 운세, 주간/월간 운세
-6. 궁합 분석 - 연인, 친구, 사업 파트너
-7. 토정비결 - 한 해 운세
-8. 띠별 운세와 성격
-9. 방위, 색상, 숫자 등 행운의 요소
-10. 직업, 연애, 건강, 재물 관련 조언
+[가장 중요한 규칙 - 반드시 지킬 것]
+1. 모든 답변은 이 사람의 사주 데이터(일간, 십성, 합충, 오행 등)에 근거해야 합니다. "당신의 일간이 OO이고, OO과 합/충을 이루기 때문에"처럼 왜 그렇게 해석되는지 근거를 반드시 함께 제시하세요. 사주와 연결되지 않은 일반론으로 답하지 마세요.
+2. 답변은 항상 이 3단계 흐름으로 구성하세요: (가) 사주 근거 - 어떤 기운/구조 때문인지, (나) 그래서 어떤 흐름·경향인지, (다) 그렇다면 구체적으로 어떻게 하면 좋은지. 단순한 위로나 뻔한 조언으로 끝내지 마세요.
+3. 대화가 이어질수록 더 깊이 들어가세요. 첫 답변보다 두 번째, 세 번째 답변이 더 구체적이고 개인화되어야 합니다. 이미 말한 내용을 반복하지 말고, 그 사람 사주의 새로운 측면을 끌어내 답하세요.
+4. 이전 대화에서 사용자가 말한 고민과 맥락을 반드시 이어받으세요. 매번 처음 보는 사람처럼 답하지 마세요. 새 질문을 그 사람의 전체 상황 속에서 해석하세요.
 
-답변 시 주의사항:
-- 사주는 참고용이며 절대적인 것이 아님을 적절히 안내합니다
-- 의학적, 법적 조언은 전문가 상담을 권합니다
-- 부정적인 내용도 희망적인 대안과 함께 전달합니다
-- 질문에 맞는 구체적이고 실용적인 조언을 합니다
-- 사용자가 추가 질문을 하면 이전 대화의 맥락을 이어서 답합니다
-- 질문이 짧거나 애매해도 바로 되묻기만 하지 말고, 가능한 해석을 먼저 제시한 뒤 필요한 경우 보충 질문을 덧붙입니다
-- 앱 개발, 사업 방향, 현재 선택에 대한 질문도 사주 정보와 현실 조언을 연결해 답합니다
+[답변 분량과 구조]
+- 한 답변은 핵심을 담되 너무 길지 않게, 3~5개 문단 정도로 구성합니다.
+- 질문이 짧거나 애매해도 되묻기만 하지 말고, 사주에 근거한 해석을 먼저 제시한 뒤 필요하면 보충 질문을 덧붙이세요.
+
+[주의사항]
+- 사주는 참고용이며 절대적인 것이 아님을 자연스럽게 안내합니다.
+- 부정적인 내용도 희망적인 대안과 함께 전달합니다.
+- 의학적, 법적, 재정적 중대 결정은 전문가 상담을 함께 권합니다.
+
+[전문 분야]
+사주팔자(년·월·일·시주), 오행 균형, 십신 해석, 음양 조화, 오늘·주간·월간 운세, 궁합, 토정비결, 띠별 운세, 행운의 방위·색상·숫자, 직업·연애·건강·재물 조언.
 
 ${sajuContext}
 
-위 사주 정보를 바탕으로 맞춤형 상담을 해주세요. 사주 정보가 없으면 일반적인 운세 상담을 해주세요.`;
+위 사주 정보를 바탕으로, 반드시 사주에 근거한 맞춤형 상담을 해주세요. 사주 정보가 없으면 그 점을 먼저 안내하고 일반적인 상담을 해주세요.`;
 
     // 대화 히스토리 구성
     const messages = [
@@ -214,7 +111,7 @@ function getBuiltInResponse(
   let element = '';
   let ddi = '';
   if (sajuContext) {
-    const elementMatch = sajuContext.match(/일간.*?:\s*\S+\s*\((\S+),/);
+    const elementMatch = sajuContext.match(/일간:\s*\S+\s*\((\S+),/);
     if (elementMatch) element = elementMatch[1];
     const ddiMatch = sajuContext.match(/띠:\s*(\S+)띠/);
     if (ddiMatch) ddi = ddiMatch[1];

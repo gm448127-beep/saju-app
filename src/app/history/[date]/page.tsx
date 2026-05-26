@@ -79,7 +79,7 @@ export default function HistoryDateDetailPage() {
           <p className="text-sm text-[#6B5E58]">
             {formatHistoryDate(dateKey)} {HISTORY_DETAIL_COPY.noRecordSuffix}
           </p>
-          <Link href="/today" className="mt-4 inline-flex rounded-2xl bg-[#2F282B] px-4 py-2.5 text-sm font-bold text-white">
+          <Link href="/today" className="mt-4 inline-flex rounded-2xl bg-[#7B7355] px-4 py-2.5 text-sm font-bold text-white">
             {HISTORY_DETAIL_COPY.readToday}
           </Link>
         </section>
@@ -179,7 +179,7 @@ export default function HistoryDateDetailPage() {
 
       <Link
         href="/today"
-        className="flex w-full items-center justify-center rounded-2xl bg-[#2F282B] py-3.5 text-sm font-bold text-white"
+        className="flex w-full items-center justify-center rounded-2xl bg-[#7B7355] py-3.5 text-sm font-bold text-white"
       >
         {HISTORY_DETAIL_COPY.readTodayAgain}
       </Link>

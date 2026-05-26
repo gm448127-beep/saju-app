@@ -122,10 +122,10 @@ function buildMyTodaySummary(
 }
 
 const TIME_SLOT_LABELS: Record<string, string> = {
-  오전: "🌅",
-  오후: "☀️",
-  저녁: "🌆",
-  밤: "🌙",
+  ????: "???",
+  ?????: "????,
+  ???? "???",
+  ?? "???",
 };
 
 export default function TodayFiveCardReport({
@@ -163,14 +163,14 @@ export default function TodayFiveCardReport({
         : axisOverall;
   const status = isPersonalized ? getTodayStatus(overall) : report.toneLabel;
   const myTodaySummary = isPersonalized ? buildMyTodaySummary(result, report, overall) : null;
-  const tonePrefix = isPersonalized ? "나의 오늘" : "오늘의 결";
+  const tonePrefix = isPersonalized ? "???? ?????" : "?????????;
   const areas = apiScores
     ? apiScoresToAxisAreas(apiScores)
     : [
-        { key: "relation", label: "관계", score: clampScore(report.axisScores.relation) },
-        { key: "decision", label: "결정", score: clampScore(report.axisScores.decision) },
-        { key: "emotion", label: "감정", score: clampScore(report.axisScores.emotion) },
-        { key: "balance", label: "균형", score: clampScore(report.axisScores.balance) },
+        { key: "relation", label: "????, score: clampScore(report.axisScores.relation) },
+        { key: "decision", label: "???", score: clampScore(report.axisScores.decision) },
+        { key: "emotion", label: "???", score: clampScore(report.axisScores.emotion) },
+        { key: "balance", label: "????", score: clampScore(report.axisScores.balance) },
       ];
   const savedAreas = {
     relation: areas.find((area) => area.key === "relation")?.score ?? overall,
@@ -206,7 +206,7 @@ export default function TodayFiveCardReport({
   const toneChipTooltip = isPersonalized
     ? buildToneChipTooltip(result, report.toneLabel)
     : null;
-  const toneChipLabel = `${tonePrefix} · ${report.toneLabel}`;
+  const toneChipLabel = `${tonePrefix} � ${report.toneLabel}`;
 
   useEffect(() => {
     if (!isPersonalized) return;
@@ -277,7 +277,7 @@ export default function TodayFiveCardReport({
       {!isPersonalized && (
         <div>
           <h1 className="text-2xl text-[#2F282B] sm:text-3xl" style={{ fontFamily: "Jua, sans-serif" }}>
-            오늘의 흐름
+            ???????????
           </h1>
           {dateLabel && <p className="mt-1 text-sm text-[#8A7E78]">{dateLabel}</p>}
         </div>
@@ -293,9 +293,9 @@ export default function TodayFiveCardReport({
           <button
             type="button"
             onClick={handleSave}
-            className={`min-h-10 rounded-xl px-4 py-2 text-xs font-bold transition ${saved ? "bg-white text-[#8B6F47]" : "bg-[#2F282B] text-white"} ${savePulse ? "scale-105" : ""}`}
+            className={`min-h-10 rounded-xl px-4 py-2 text-xs font-bold transition ${saved ? "bg-white text-[#8B6F47]" : "bg-[#7B7355] text-white"} ${savePulse ? "scale-105" : ""}`}
           >
-            {saved ? "저장됨 ✓" : "저장하기"}
+            {saved ? "????? ?? : "?????????}
           </button>
           <button
             type="button"
@@ -304,35 +304,35 @@ export default function TodayFiveCardReport({
               compareOpen ? "border-[#8B6F47] bg-white text-[#8B6F47]" : "border-[#E8D7C4] bg-white text-[#2F282B]"
             }`}
           >
-            어제와 비교
+            ?????? ???
           </button>
           <Link
             href="#today-share-actions"
             className="inline-flex min-h-10 items-center rounded-xl border border-[#E8D7C4] bg-white px-4 py-2 text-xs font-bold text-[#2F282B]"
           >
-            공유
+            ????
           </Link>
           <Link
             href="/history"
             className="inline-flex min-h-10 items-center rounded-xl border border-[#E8D7C4] bg-white px-4 py-2 text-xs font-bold text-[#2F282B]"
           >
-            기록
+            ??
           </Link>
         </div>
       )}
 
-      {/* ① 한 줄 요약 */}
+      {/* ??????????? */}
       <CardShell cardId="sentence">
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <ToneDecisionChip label={toneChipLabel} tooltip={toneChipTooltip} variant="warm" />
           {myTodaySummary?.grade && (
             <span className="rounded-full border border-[#E8D7C4] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#8A7E78]">
-              등급 {myTodaySummary.grade}
+              ???? {myTodaySummary.grade}
             </span>
           )}
           {!isPersonalized && (
             <span className="rounded-full border border-[#E8D7C4] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#8A7E78]">
-              공통 흐름
+              ???? ????
             </span>
           )}
         </div>
@@ -349,7 +349,7 @@ export default function TodayFiveCardReport({
         </p>
       </CardShell>
 
-      {/* ② 4축 점수 */}
+      {/* ??4??????? */}
       <CardShell cardId="scores">
         <p className="mt-1 text-xs text-[#8A7E78]">{status}</p>
         <div className="mt-4">
@@ -364,22 +364,22 @@ export default function TodayFiveCardReport({
         {isPersonalized && compareOpen && (
           <div className="mt-5 space-y-3 border-t border-[#E8D7C4] pt-5">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <p className="text-xs font-bold text-[#8B6F47]">어제보다 오늘</p>
+              <p className="text-xs font-bold text-[#8B6F47]">???????? ?????</p>
               <span className="text-[10px] font-semibold text-[#8A7E78]">
-                {hasRealYesterday ? "내 기록 기준" : "예시 흐름"}
+                {hasRealYesterday ? "???? ???" : "????? ????"}
               </span>
             </div>
             {overallComparison && (
               <div className="flex flex-wrap items-end gap-3">
                 <p className="text-2xl font-bold text-[#A09488]">{overallComparison.previousOverall}</p>
-                <span className="text-[#A09488]">→</span>
+                <span className="text-[#A09488]">??/span>
                 <p className="text-3xl font-bold text-[#2F282B]">{overall}</p>
                 <span
                   className={`rounded-full bg-white px-2.5 py-1 text-xs font-bold ${
                     overallComparison.delta >= 0 ? "text-[#8B6F47]" : "text-[#7A4A3D]"
                   }`}
                 >
-                  {overallComparison.delta >= 0 ? "▲" : "▼"} {Math.abs(overallComparison.delta)}
+                  {overallComparison.delta >= 0 ? "?? : "??} {Math.abs(overallComparison.delta)}
                 </span>
               </div>
             )}
@@ -394,7 +394,7 @@ export default function TodayFiveCardReport({
                   >
                     {item.label}
                     <span className={isUp ? "text-[#8B6F47]" : "text-[#7A4A3D]"}>
-                      {isUp ? "▲" : "▼"}
+                      {isUp ? "?? : "??}
                       {Math.abs(item.delta)}
                     </span>
                   </span>
@@ -406,7 +406,7 @@ export default function TodayFiveCardReport({
                 <div
                   key={item.label}
                   className={`flex-1 rounded-xl border px-2 py-2 text-center ${
-                    item.label === "오늘" ? "border-[#C49A4A]/40 bg-white" : "border-[#E8D7C4] bg-white/60"
+                    item.label === "?????" ? "border-[#C49A4A]/40 bg-white" : "border-[#E8D7C4] bg-white/60"
                   }`}
                 >
                   <p className="text-[10px] text-[#8A7E78]">{item.label}</p>
@@ -419,7 +419,7 @@ export default function TodayFiveCardReport({
         )}
       </CardShell>
 
-      {/* ③ 오늘의 흐름 — 오전/오후/저녁/밤 */}
+      {/* ????????????? ??????/?????/??????*/}
       <CardShell cardId="flow">
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {report.timeSlots.map((slot) => (
@@ -429,7 +429,7 @@ export default function TodayFiveCardReport({
             >
               <p className="text-xs font-bold text-[#8B6F47]">
                 {TIME_SLOT_LABELS[slot.label] ?? ""} {slot.label}
-                <span className="ml-1.5 font-normal text-[#8A7E78]">· {slot.keyword}</span>
+                <span className="ml-1.5 font-normal text-[#8A7E78]">� {slot.keyword}</span>
               </p>
               <p className="mt-2 text-sm leading-relaxed text-[#4A403B]">{slot.description}</p>
             </div>
@@ -446,7 +446,7 @@ export default function TodayFiveCardReport({
         )}
       </CardShell>
 
-      {/* ④ 행동 가이드 */}
+      {/* ?????? ??????? */}
       <CardShell cardId="action">
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="rounded-2xl border border-[#E8D7C4] bg-white/70 px-4 py-4">
@@ -454,7 +454,7 @@ export default function TodayFiveCardReport({
             <ul className="mt-3 space-y-2">
               {splitGuideLines(report.actionGuide.dos).map((line) => (
                 <li key={line} className="flex gap-2 text-sm leading-relaxed text-[#4A403B]">
-                  <span className="text-[#8B6F47]">·</span>
+                  <span className="text-[#8B6F47]">�</span>
                   <span>{line}</span>
                 </li>
               ))}
@@ -465,7 +465,7 @@ export default function TodayFiveCardReport({
             <ul className="mt-3 space-y-2">
               {splitGuideLines(report.actionGuide.donts).map((line) => (
                 <li key={line} className="flex gap-2 text-sm leading-relaxed text-[#4A403B]">
-                  <span className="text-[#9A685B]">·</span>
+                  <span className="text-[#9A685B]">�</span>
                   <span>{line}</span>
                 </li>
               ))}
@@ -474,17 +474,17 @@ export default function TodayFiveCardReport({
         </div>
         <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
           <div className="rounded-xl border border-[#E8D7C4]/80 bg-white/60 px-3 py-3">
-            <p className="text-[11px] font-semibold text-[#8B6F47]">관계</p>
+            <p className="text-[11px] font-semibold text-[#8B6F47]">????/p>
             <p className="mt-1 text-sm text-[#4A403B]">{report.actionGuide.relationTip}</p>
           </div>
           <div className="rounded-xl border border-[#E8D7C4]/80 bg-white/60 px-3 py-3">
-            <p className="text-[11px] font-semibold text-[#8B6F47]">일과 돈</p>
+            <p className="text-[11px] font-semibold text-[#8B6F47]">??? ??/p>
             <p className="mt-1 text-sm text-[#4A403B]">{report.actionGuide.workMoneyTip}</p>
           </div>
         </div>
       </CardShell>
 
-      {/* ⑤ 시간대별 운세 */}
+      {/* ??????????????? */}
       {hourlyFlow && hourlyFlow.length > 0 ? (
         <CardShell cardId="hourly">
           <div className="mt-4 -mx-1">
@@ -501,14 +501,14 @@ export default function TodayFiveCardReport({
         onOpenDetail && (
           <div className={`${TODAY_CARD_SURFACE} text-center`}>
             <p className="text-sm text-[#5A4E48]">
-              출생시간을 넣으면 12시진 그래프가 여기에 표시됩니다.
+              ??????????????????12???? ???????? ?????????????????
             </p>
             <button
               type="button"
               onClick={onOpenDetail}
-              className="mt-3 rounded-xl bg-[#2F282B] px-4 py-2.5 text-xs font-bold text-white"
+              className="mt-3 rounded-xl bg-[#7B7355] px-4 py-2.5 text-xs font-bold text-white"
             >
-              자세히 탭에서 보기
+              ???????????????
             </button>
           </div>
         )

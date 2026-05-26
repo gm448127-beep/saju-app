@@ -22,61 +22,61 @@ interface TarotCard {
 }
 
 const CARD_VISUALS: Record<string, { symbol: string; motif: string; tone: string }> = {
-  바보: { symbol: '旅', motif: '새로운 길', tone: 'from-[#FFF8E8] to-[#E8D7B8]' },
-  마법사: { symbol: '術', motif: '의지와 도구', tone: 'from-[#FFF7EF] to-[#E7CDB6]' },
-  여사제: { symbol: '月', motif: '조용한 직감', tone: 'from-[#F8F5FF] to-[#D9CDE8]' },
-  여황제: { symbol: '豊', motif: '풍요와 성장', tone: 'from-[#FFF7F2] to-[#E8C9BC]' },
-  황제: { symbol: '權', motif: '기준과 책임', tone: 'from-[#F7F1EA] to-[#D8C0A6]' },
-  교황: { symbol: '導', motif: '조언과 기준', tone: 'from-[#FBF8EF] to-[#E1D4B7]' },
-  연인: { symbol: '緣', motif: '마음의 선택', tone: 'from-[#FFF4F4] to-[#E9C2C2]' },
-  전차: { symbol: '進', motif: '전진과 승부', tone: 'from-[#F3F7FF] to-[#C8D4E8]' },
-  힘: { symbol: '柔', motif: '부드러운 힘', tone: 'from-[#FFF8EC] to-[#E6CEAA]' },
-  은둔자: { symbol: '燈', motif: '내면의 등불', tone: 'from-[#F8F7F2] to-[#D9D1C2]' },
-  '운명의 수레바퀴': { symbol: '輪', motif: '흐름의 전환', tone: 'from-[#FFF9EE] to-[#E3D1A8]' },
-  정의: { symbol: '衡', motif: '균형과 판단', tone: 'from-[#F7FAF8] to-[#C9D8CF]' },
-  '매달린 사람': { symbol: '待', motif: '멈춤의 의미', tone: 'from-[#F8F5EF] to-[#D9CCB8]' },
-  죽음: { symbol: '轉', motif: '끝과 전환', tone: 'from-[#F7F3F1] to-[#CDBFB9]' },
-  절제: { symbol: '和', motif: '조율과 회복', tone: 'from-[#F7FBF8] to-[#CBE0D1]' },
-  악마: { symbol: '執', motif: '집착의 확인', tone: 'from-[#F9F2EF] to-[#D8B8AE]' },
-  탑: { symbol: '破', motif: '균열과 각성', tone: 'from-[#F8F4EF] to-[#D6BCA2]' },
-  별: { symbol: '星', motif: '희망과 회복', tone: 'from-[#F7FAFF] to-[#C9D8EA]' },
-  달: { symbol: '夢', motif: '불확실한 감정', tone: 'from-[#FAF7FF] to-[#D6C7E4]' },
-  태양: { symbol: '日', motif: '밝은 성취', tone: 'from-[#FFF8E4] to-[#E9CF88]' },
-  심판: { symbol: '醒', motif: '다시 부름', tone: 'from-[#F9F7F2] to-[#D9CBB4]' },
-  세계: { symbol: '完', motif: '완성과 다음 문', tone: 'from-[#F7FBF8] to-[#CBDCCF]' },
+  �?보: { symbol: '??, motif: '??�???�?, tone: 'from-[#FFF8E8] to-[#E8D7B8]' },
+  �?�??? { symbol: '�?, motif: '??�??? ??구', tone: 'from-[#FFF7EF] to-[#E7CDB6]' },
+  ?��?�?? { symbol: '??, motif: '조�?�??직감', tone: 'from-[#F8F5FF] to-[#D9CDE8]' },
+  ?��?�?? { symbol: '�?, motif: '?��???? ?��?�', tone: 'from-[#FFF7F2] to-[#E8C9BC]' },
+  ?��?: { symbol: '�?, motif: '기�?�?�?�??', tone: 'from-[#F7F1EA] to-[#D8C0A6]' },
+  교�?�: { symbol: '�?, motif: '조�?��?기�?', tone: 'from-[#FBF8EF] to-[#E1D4B7]' },
+  ?�인: { symbol: '�?, motif: '�?�????��?�', tone: 'from-[#FFF4F4] to-[#E9C2C2]' },
+  ??차: { symbol: '??, motif: '??�?�??��?', tone: 'from-[#F3F7FF] to-[#C8D4E8]' },
+  ?? { symbol: '??, motif: '�???�?�????, tone: 'from-[#FFF8EC] to-[#E6CEAA]' },
+  ????�?�: { symbol: '??, motif: '?�면???��?', tone: 'from-[#F8F7F2] to-[#D9D1C2]' },
+  '?��?????�?�?�??: { symbol: '�?, motif: '?��?????�??', tone: 'from-[#FFF9EE] to-[#E3D1A8]' },
+  ??�?: { symbol: '�?, motif: '균�??�??��?�', tone: 'from-[#F7FAF8] to-[#C9D8CF]' },
+  '매�?��??��??': { symbol: '�?, motif: '�?춤????�?', tone: 'from-[#F8F5EF] to-[#D9CCB8]' },
+  죽�?: { symbol: '�?, motif: '?�과 ??�??', tone: 'from-[#F7F3F1] to-[#CDBFB9]' },
+  ??�?: { symbol: '??, motif: '조�?��???복', tone: 'from-[#F7FBF8] to-[#CBE0D1]' },
+  ??�?: { symbol: '??, motif: '�?착????인', tone: 'from-[#F9F2EF] to-[#D8B8AE]' },
+  ?? { symbol: '??, motif: '균�?��?각�?�', tone: 'from-[#F8F4EF] to-[#D6BCA2]' },
+  �? { symbol: '??, motif: '?�망�???복', tone: 'from-[#F7FAFF] to-[#C9D8EA]' },
+  ?? { symbol: '�?, motif: '�?�???��?? 감�?', tone: 'from-[#FAF7FF] to-[#D6C7E4]' },
+  ??�??: { symbol: '??, motif: '밝�? ?�취', tone: 'from-[#FFF8E4] to-[#E9CF88]' },
+  ?��?�: { symbol: '??, motif: '?��?? �?�?, tone: 'from-[#F9F7F2] to-[#D9CBB4]' },
+  ?��?: { symbol: '�?, motif: '??�?��??��? �?, tone: 'from-[#F7FBF8] to-[#CBDCCF]' },
 };
 
-const TOPICS = ['일반', '연애', '재물', '직업', '관계', '선택'];
+const TOPICS = ['?��?', '?��?�', '?�물', '직�??', '�?�?, '?��?�'];
 
-const TIME_HORIZONS = ['지금', '3개월 후', '1년 후', '2년 후'] as const;
+const TIME_HORIZONS = ['�?�?, '3�?�?? ??, '1????, '2????] as const;
 
 const QUESTION_GUIDE = [
-  '예/아니오보다 “어떤 태도가 좋을까요?”처럼 물어보면 더 선명합니다.',
-  '상대의 마음을 단정하기보다 “이 관계에서 내가 볼 점은?”처럼 물어보세요.',
-  '기간을 넣으면 좋습니다. 예: 이번 달, 3개월 후, 1년 후, 2년 후의 모습.',
-  '미래 질문은 “수호신이 비추는 가능한 풍경”처럼 열어두고 물어보면 리딩이 깊어집니다.',
+  '????�???�보????�?�????�?�? �?�?�?�????��???물�?�보면 ???��??��????',
+  '?��???�?�????��???기보�?� ??이 �?�?�?�???��? �??��???��???물�?�보�?�??',
+  '기�????��?��?�?�?�??�?�. ?? ?��? ?? 3�?�?? ?? 1???? 2????�? 모�?�.',
+  '미�?? �?문?? ??�???��?�??�?�???�??��?? ?�경?��????��?�?�고 물�?�보면 리�?�??�?�?��?�????',
 ];
 
 const SAMPLE_QUESTIONS = [
-  '지금 이 선택을 해도 괜찮을까요?',
-  '3개월 후 이 일은 어떤 흐름일까요?',
-  '1년 후의 나는 어떤 모습에 가까울까요?',
-  '2년 후 당신의 모습, 카드가 보여주는 방향은?',
-  '그 사람과의 관계 흐름이 궁금합니다.',
+  '�?�????��?�???��? �?찮??�???',
+  '3�?�?? ?????��? ?��?� ?��??��???',
+  '1????�? ??�?? ?��?� 모�?�??�?�?�?��?�???',
+  '2?????��?�??모�?�, 카�??�? 보�?�주�?? 방�?�???',
+  '�??��??과�? �?�??��???궁�??��????',
 ];
 
 function getHorizonFromQuestion(text: string): (typeof TIME_HORIZONS)[number] {
-  if (text.includes('2년 후')) return '2년 후';
-  if (text.includes('1년 후')) return '1년 후';
-  if (text.includes('3개월 후')) return '3개월 후';
-  return '지금';
+  if (text.includes('2????)) return '2????;
+  if (text.includes('1????)) return '1????;
+  if (text.includes('3�?�?? ??)) return '3�?�?? ??;
+  return '�?�?;
 }
 
 const SUIT_ART = {
-  완드: { icon: '✦', line: 'bg-[#B89968]', mark: 'WANDS' },
-  컵: { icon: '◡', line: 'bg-[#7EA4B8]', mark: 'CUPS' },
-  소드: { icon: '◇', line: 'bg-[#8C9AAE]', mark: 'SWORDS' },
-  펜타클: { icon: '◆', line: 'bg-[#9B875E]', mark: 'PENTACLES' },
+  ??�??: { icon: '??, line: 'bg-[#B89968]', mark: 'WANDS' },
+  �? { icon: '??, line: 'bg-[#7EA4B8]', mark: 'CUPS' },
+  ??�??: { icon: '??, line: 'bg-[#8C9AAE]', mark: 'SWORDS' },
+  ??�??? { icon: '??, line: 'bg-[#9B875E]', mark: 'PENTACLES' },
 } as const;
 
 function renderContent(content: string) {
@@ -111,21 +111,21 @@ function renderContent(content: string) {
 
 function getCardVisual(name: string) {
   if (CARD_VISUALS[name]) return CARD_VISUALS[name];
-  if (name.startsWith('완드')) return { symbol: '火', motif: '의지와 추진력', tone: 'from-[#FFF8E8] to-[#E7C28F]' };
-  if (name.startsWith('컵')) return { symbol: '水', motif: '감정과 관계', tone: 'from-[#F3FAFF] to-[#BFD8E8]' };
-  if (name.startsWith('소드')) return { symbol: '風', motif: '생각과 판단', tone: 'from-[#F7FAFF] to-[#CBD3E4]' };
-  if (name.startsWith('펜타클')) return { symbol: '土', motif: '현실과 결과', tone: 'from-[#FAF7EE] to-[#D8C6A4]' };
-  return { symbol: '命', motif: '선택의 신호', tone: 'from-[#FFFDF8] to-[#E8D7C4]' };
+  if (name.startsWith('??�??')) return { symbol: '??, motif: '??�??? �?�???, tone: 'from-[#FFF8E8] to-[#E7C28F]' };
+  if (name.startsWith('�?)) return { symbol: '�?, motif: '감�?�?�?�?, tone: 'from-[#F3FAFF] to-[#BFD8E8]' };
+  if (name.startsWith('??�??')) return { symbol: '�?, motif: '?�각�??��?�', tone: 'from-[#F7FAFF] to-[#CBD3E4]' };
+  if (name.startsWith('??�???)) return { symbol: '??, motif: '??�?��?결과', tone: 'from-[#FAF7EE] to-[#D8C6A4]' };
+  return { symbol: '??, motif: '?��?�???��?�', tone: 'from-[#FFFDF8] to-[#E8D7C4]' };
 }
 
 function getRankLabel(rank?: string) {
   if (!rank) return '';
   const labels: Record<string, string> = {
-    에이스: 'A',
-    페이지: 'P',
-    나이트: 'N',
-    퀸: 'Q',
-    킹: 'K',
+    ?�이?? 'A',
+    ??이�?: 'P',
+    ??이?? 'N',
+    ?? 'Q',
+    ?? 'K',
   };
   return labels[rank] ?? rank;
 }
@@ -135,8 +135,8 @@ function TarotCardArtwork({ card }: { card: TarotCard }) {
   const visual = getCardVisual(card.name);
   const suitArt = card.suit ? SUIT_ART[card.suit as keyof typeof SUIT_ART] : null;
   const rankLabel = getRankLabel(card.rank);
-  const isCourt = ['페이지', '나이트', '퀸', '킹'].includes(card.rank ?? '');
-  const numericCount = card.rank && /^\d+$/.test(card.rank) ? Number(card.rank) : card.rank === '에이스' ? 1 : 0;
+  const isCourt = ['??이�?', '??이??, '??, '??].includes(card.rank ?? '');
+  const numericCount = card.rank && /^\d+$/.test(card.rank) ? Number(card.rank) : card.rank === '?�이?? ? 1 : 0;
   const shouldShowImage = Boolean(card.image && !imageFailed);
 
   return (
@@ -150,7 +150,7 @@ function TarotCardArtwork({ card }: { card: TarotCard }) {
         <div className="relative min-h-[270px] overflow-hidden rounded-[18px] border border-white/80 bg-white/30">
           <img
             src={card.image}
-            alt={`${card.name} 타로 카드 이미지`}
+            alt={`${card.name} ??�?카�?? ?��?�?`}
             className={`${card.isReversed ? 'rotate-180' : ''} h-[270px] w-full object-cover transition-transform`}
             draggable={false}
             onError={() => setImageFailed(true)}
@@ -158,8 +158,7 @@ function TarotCardArtwork({ card }: { card: TarotCard }) {
           <div className="pointer-events-none absolute inset-2 rounded-[14px] border border-white/70" />
           {card.isReversed && (
             <p className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-white/80 px-2 py-1 text-[10px] font-bold text-[#8B6F47]">
-              역방향
-            </p>
+              ??��??            </p>
           )}
         </div>
       ) : (
@@ -193,7 +192,7 @@ function TarotCardArtwork({ card }: { card: TarotCard }) {
           ) : suitArt && isCourt ? (
             <div className="space-y-2 text-[#2F282B]">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-white/80 bg-white/60 text-4xl">
-                {card.rank === '페이지' ? '書' : card.rank === '나이트' ? '馬' : card.rank === '퀸' ? '后' : '王'}
+                {card.rank === '??이�?' ? '?? : card.rank === '??이?? ? '�? : card.rank === '?? ? '?? : '??}
               </div>
               <div className={`mx-auto h-1 w-20 rounded-full ${suitArt.line}`} />
               <p className="text-[10px] font-bold tracking-[0.18em] text-[#8B6F47]">{suitArt.mark}</p>
@@ -216,8 +215,7 @@ function TarotCardArtwork({ card }: { card: TarotCard }) {
           <p className="mt-2 text-[11px] font-semibold text-[#8B6F47]">{visual.motif}</p>
           {card.isReversed && (
             <p className="mt-2 inline-flex rounded-full bg-white/75 px-2 py-1 text-[10px] font-bold text-[#8B6F47]">
-              역방향
-            </p>
+              ??��??            </p>
           )}
         </div>
       </div>
@@ -227,8 +225,8 @@ function TarotCardArtwork({ card }: { card: TarotCard }) {
 }
 
 export default function TarotPage() {
-  const [topic, setTopic] = useState('일반');
-  const [timeHorizon, setTimeHorizon] = useState<(typeof TIME_HORIZONS)[number]>('지금');
+  const [topic, setTopic] = useState('?��?');
+  const [timeHorizon, setTimeHorizon] = useState<(typeof TIME_HORIZONS)[number]>('�?�?);
   const [question, setQuestion] = useState('');
   const [cards, setCards] = useState<TarotCard[]>([]);
   const [reading, setReading] = useState('');
@@ -270,7 +268,7 @@ export default function TarotPage() {
   const handleSubmit = async () => {
     const trimmedQuestion = question.trim();
     if (trimmedQuestion.length < 3) {
-      setError('타로로 보고 싶은 질문을 입력해주세요.');
+      setError('??�?�? 보고 ?��? �?문????력?�주?��??.');
       return;
     }
 
@@ -288,15 +286,15 @@ export default function TarotPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || '타로 리딩을 불러오지 못했습니다.');
+        setError(data.error || '??�?리�?�??�?�?�?��? 못�???��????');
         return;
       }
 
       setCards(data.cards || []);
       setReading(data.reading || '');
     } catch (submitError) {
-      console.error('타로 요청 실패:', submitError);
-      setError('잠시 후 다시 시도해주세요.');
+      console.error('??�???청 ?��?�:', submitError);
+      setError('?��?? ???��?? ??�??�주?��??.');
     } finally {
       setLoading(false);
     }
@@ -312,12 +310,10 @@ export default function TarotPage() {
             TAROT REPORT
           </p>
           <h1 className="text-3xl leading-tight text-[#2F282B] sm:text-5xl" style={{ fontFamily: 'Jua, sans-serif' }}>
-            선택 앞에서 필요한 조언을
-            <br />
-            세 장의 카드로 정리해드릴게요
-          </h1>
+            ?��?� ??�?�????�????조�?�??            <br />
+            ???��? 카�??�???리?��??릴�???          </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#4A403B]">
-            78장 전체 덱으로 현재와 미래의 흐름을 정리합니다. 3개월·1년·2년 후의 모습도 카드가 비추는 가능한 풍경으로 풀어드립니다.
+            78????체 ?��?��???�?�?? 미�?????��?????리?��???? 3�?�??·1??�?????�? 모�?�??카�??�? �?�???�??��?? ?�경?��? ???��??립�????
           </p>
         </div>
       </section>
@@ -325,8 +321,8 @@ export default function TarotPage() {
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_320px]">
         <div className="card">
           <div className="mb-4">
-            <h2 className="label mb-1">타로 질문 입력</h2>
-            <p className="text-xs text-[#8A7E78]">한 가지 질문을 구체적으로 적을수록 리딩이 선명해집니다.</p>
+            <h2 className="label mb-1">??�?�?문 ??력</h2>
+            <p className="text-xs text-[#8A7E78]">??�?�? �?문??구체?��?��??��???록 리�?�???��??��???�?�.</p>
           </div>
 
           <div className="mb-4 flex flex-wrap gap-2">
@@ -337,7 +333,7 @@ export default function TarotPage() {
                 onClick={() => setTopic(item)}
                 className={`rounded-full border px-3 py-1.5 text-xs font-bold transition ${
                   topic === item
-                    ? 'border-[#8B6F47] bg-[#2F282B] text-white'
+                    ? 'border-[#8B6F47] bg-[#7B7355] text-white'
                     : 'border-[#D9C8C0] bg-white text-[#5A4E48] hover:bg-[#FAF8F5]'
                 }`}
               >
@@ -347,7 +343,7 @@ export default function TarotPage() {
           </div>
 
           <div className="mb-4">
-            <p className="mb-2 text-xs font-bold text-[#8B6F47]">시간축</p>
+            <p className="mb-2 text-xs font-bold text-[#8B6F47]">??�?�?/p>
             <div className="flex flex-wrap gap-2">
               {TIME_HORIZONS.map((item) => (
                 <button
@@ -364,9 +360,9 @@ export default function TarotPage() {
                 </button>
               ))}
             </div>
-            {timeHorizon !== '지금' && (
+            {timeHorizon !== '�?�? && (
               <p className="mt-2 text-xs leading-relaxed text-[#6B5E58]">
-                {timeHorizon}를 선택하면 카드 위치가 미래 예언 스프레드로 바뀌고, 수호신이 비추는 풍경처럼 서사적으로 풀어드립니다.
+                {timeHorizon}�??��?�??면 카�?? ??�?�? 미�?? ??�?� ?��????�??�?�?�??고, ??�?�?�이 �?�????�경�?�?� ??�?�?��?��????��??립�????
               </p>
             )}
           </div>
@@ -374,7 +370,7 @@ export default function TarotPage() {
           <textarea
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
-            placeholder="예: 지금 이 사람과 관계를 더 이어가도 괜찮을까요?"
+            placeholder="?? �?�????��??�?�?�?�? ???��?��???�?찮??�???"
             className="min-h-[150px] w-full resize-none rounded-2xl border-2 border-[#D9C8C0] bg-white px-4 py-3 text-base text-[#2F282B] outline-none focus:border-[#8B6F47]"
           />
 
@@ -382,9 +378,9 @@ export default function TarotPage() {
             <div className="mb-3 flex items-center justify-between">
               <div>
                 <p className="text-xs tracking-[0.12em] text-[#8B6F47]">CARD PICKING</p>
-                <p className="text-sm font-bold text-[#2F282B]">질문을 떠올리고 카드를 섞어주세요</p>
+                <p className="text-sm font-bold text-[#2F282B]">�?문???��?�리고 카�??�???�?�주�?�??/p>
               </div>
-              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-bold text-[#8B6F47]">78장 덱</span>
+              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-bold text-[#8B6F47]">78????/span>
             </div>
             <div className="grid grid-cols-3 gap-2">
               {[0, 1, 2].map((item) => (
@@ -394,15 +390,14 @@ export default function TarotPage() {
                   style={{ transform: `rotate(${item === 0 ? -2 : item === 1 ? 1 : 2}deg)` }}
                 >
                   <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[#F4E7D6]/45 text-xl font-bold text-[#F4E7D6]">
-                    命
-                  </div>
+                    ??                  </div>
                 </div>
               ))}
             </div>
             <p className="mt-3 text-xs leading-relaxed text-[#6B5E58]">
-              {timeHorizon === '지금'
-                ? '버튼을 누르면 전체 78장 중 세 장이 섞여 뽑히고, 현재 상황 · 다가오는 흐름 · 조언으로 펼쳐집니다.'
-                : `버튼을 누르면 ${timeHorizon} 예언 스프레드로 세 장이 펼쳐집니다.`}
+              {timeHorizon === '�?�?
+                ? '�?�?�????르�???체 78??�????�이 ??�?� �?�??�? ??�?� ?��?� · ?��??��?? ?��? · 조�?�?��? ?�쳐�?�????'
+                : `�?�?�????르�?${timeHorizon} ??�?� ?��????�??�????�이 ?�쳐�?�????`}
             </p>
           </div>
 
@@ -416,17 +411,16 @@ export default function TarotPage() {
             type="button"
             onClick={handleSubmit}
             disabled={loading}
-            className="mt-5 w-full rounded-2xl bg-[#2F282B] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#2F282B]/15 transition hover:-translate-y-0.5 disabled:opacity-50"
+            className="mt-5 w-full rounded-2xl bg-[#7B7355] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#7B7355]/15 transition hover:-translate-y-0.5 disabled:opacity-50"
           >
-            {loading ? '카드를 섞고 뽑는 중...' : '카드 섞고 3장 뽑기'}
+            {loading ? '카�??�???고 �?�?? �?..' : '카�?? ??고 3??�?기'}
           </button>
         </div>
 
         <aside className="self-start rounded-[24px] border border-[#E2D7D0] bg-[#FAF8F5] p-5 shadow-[0_10px_30px_rgba(61,51,56,0.06)]">
-          <p className="mb-2 text-xs tracking-[0.12em] text-[#8B6F47]">질문 가이드</p>
+          <p className="mb-2 text-xs tracking-[0.12em] text-[#8B6F47]">�?문 �??��??</p>
           <h2 className="mb-3 text-xl text-[#2F282B]" style={{ fontFamily: 'Jua, sans-serif' }}>
-            질문이 좋아야 리딩이 선명합니다
-          </h2>
+            �?문??�?�????리�?�???��??��????          </h2>
           <div className="mb-4 space-y-2">
             {QUESTION_GUIDE.map((guide) => (
               <p key={guide} className="rounded-2xl border border-[#E2D7D0] bg-white px-3 py-2.5 text-xs leading-relaxed text-[#4A403B]">
@@ -434,7 +428,7 @@ export default function TarotPage() {
               </p>
             ))}
           </div>
-          <p className="mb-2 text-xs tracking-[0.12em] text-[#8B6F47]">질문 예시</p>
+          <p className="mb-2 text-xs tracking-[0.12em] text-[#8B6F47]">�?문 ??�??</p>
           <div className="space-y-2">
             {SAMPLE_QUESTIONS.map((sample) => (
               <button
@@ -451,7 +445,7 @@ export default function TarotPage() {
             ))}
           </div>
           <p className="mt-4 text-xs leading-relaxed text-[#6B5E58]">
-            타로는 결정 대신 선택 기준을 정리하는 도구입니다. 중요한 결정은 현실 정보와 함께 판단해주세요.
+            ??�?�?? 결�? ?????��?� 기�?????리??�?? ??구??�???? �?�????결�??? ??�?� ??보?? ?��? ?��?�?�주?��??.
           </p>
         </aside>
       </section>
@@ -461,11 +455,11 @@ export default function TarotPage() {
           <div className="mb-4 flex flex-wrap items-center gap-2">
             <div>
               <p className="text-xs tracking-[0.12em] text-[#8B6F47]">THREE CARD SPREAD</p>
-              <h2 className="label mt-1">뽑힌 카드</h2>
+              <h2 className="label mt-1">�?�?? 카�??</h2>
             </div>
-            {timeHorizon !== '지금' && (
+            {timeHorizon !== '�?�? && (
               <span className="rounded-full border border-[#C49A4A]/30 bg-[#FFF8EE] px-2.5 py-1 text-[10px] font-bold text-[#8B6F47]">
-                {timeHorizon} 예언
+                {timeHorizon} ??�?�
               </span>
             )}
           </div>
@@ -489,7 +483,7 @@ export default function TarotPage() {
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-xs tracking-[0.12em] text-[#8B6F47]">TAROT INTERPRETATION</p>
-              <h2 className="label mt-1">운명비서 타로 리딩</h2>
+              <h2 className="label mt-1">?��?�?�?? ??�?리�?�</h2>
             </div>
             <button
               type="button"
@@ -500,7 +494,7 @@ export default function TarotPage() {
                   : 'border-[#E2D7D0] bg-white text-[#6B5E58] hover:bg-[#FFFDF9]'
               }`}
             >
-              {isFavorite ? '즐겨찾기 해제' : '즐겨찾기 저장'}
+              {isFavorite ? '즐겨찾기 ?��?' : '즐겨찾기 ????}
             </button>
           </div>
           <div className="rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4">

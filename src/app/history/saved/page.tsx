@@ -41,7 +41,7 @@ export default function HistorySavedPage() {
           <p className="text-sm leading-relaxed text-[#6B5E58]">{SAVED_SENTENCES_COPY.empty}</p>
           <Link
             href="/today"
-            className="mt-4 inline-flex rounded-2xl bg-[#2F282B] px-4 py-2.5 text-sm font-bold text-white"
+            className="mt-4 inline-flex rounded-2xl bg-[#7B7355] px-4 py-2.5 text-sm font-bold text-white"
           >
             {SAVED_SENTENCES_COPY.pageEmptyCta}
           </Link>

@@ -37,7 +37,7 @@ function CompareRows({ rows }: { rows: LandingPersonaCopy["hook"]["compare"] }) 
           <span
             className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[17px] ${
               row.variant === "brand"
-                ? "bg-[#2F282B] font-[family-name:var(--font-jua)] text-[#F5F1EB]"
+                ? "bg-[#7B7355] font-[family-name:var(--font-jua)] text-[#F5F1EB]"
                 : "bg-[#EAE2D5] font-serif text-[#9a8c76]"
             }`}
             style={row.variant === "brand" ? { fontFamily: "Jua, sans-serif" } : undefined}
@@ -61,8 +61,7 @@ function ReportPreview({ report }: { report: LandingPersonaCopy["report"] }) {
         className="pointer-events-none absolute -bottom-7 -right-3 select-none font-serif text-[130px] leading-none text-[#8B6F47] opacity-[0.05]"
         aria-hidden
       >
-        命
-      </span>
+        ??      </span>
       <p className="text-[11px] tracking-wide text-[#a89c8d]">{report.date}</p>
       <p className="mt-1 text-base text-[#8B6F47]" style={{ fontFamily: "Jua, sans-serif" }}>
         {report.flow}
@@ -74,7 +73,7 @@ function ReportPreview({ report }: { report: LandingPersonaCopy["report"] }) {
       </p>
       <div className="mt-4 flex items-end gap-1.5">
         <span className="text-4xl font-bold text-[#2F282B]">{report.score}</span>
-        <span className="pb-1 text-sm text-[#8A7E78]">/ 100 · 종합</span>
+        <span className="pb-1 text-sm text-[#8A7E78]">/ 100 · �?�?�</span>
       </div>
       <div className="mt-4 space-y-2">
         {report.bars.map((bar) => (
@@ -106,8 +105,7 @@ export default function PersonaLanding({ copy }: { copy: LandingPersonaCopy }) {
           className="pointer-events-none absolute bottom-[15%] right-[8%] z-0 select-none font-serif text-[min(140px,28vw)] font-semibold leading-[0.8] text-[#8B6F47] opacity-[0.08]"
           aria-hidden
         >
-          命
-        </span>
+          ??        </span>
         <div className="relative z-10">
           <span className="inline-block rounded-full border border-[rgba(139,111,71,0.4)] bg-[rgba(251,248,243,0.7)] px-4 py-1.5 text-xs tracking-[0.2em] text-[#8B6F47]">
             {copy.heroTag}
@@ -118,7 +116,7 @@ export default function PersonaLanding({ copy }: { copy: LandingPersonaCopy }) {
           <p className="mt-4 max-w-lg text-base leading-[1.8] text-[#6B6159]">{copy.heroLead}</p>
           <Link
             href={copy.capture.ctaHref}
-            className="mt-7 inline-flex min-h-12 items-center justify-center rounded-2xl bg-[#2F282B] px-8 py-3.5 text-sm font-bold text-[#F5F1EB] shadow-[0_14px_32px_rgba(47,40,43,0.22)] transition hover:brightness-110"
+            className="mt-7 inline-flex min-h-12 items-center justify-center rounded-2xl bg-[#7B7355] px-8 py-3.5 text-sm font-bold text-[#F5F1EB] shadow-[0_14px_32px_rgba(47,40,43,0.22)] transition hover:brightness-110"
             style={{ fontFamily: "Jua, sans-serif" }}
           >
             {copy.capture.ctaLabel}
@@ -171,11 +169,10 @@ export default function PersonaLanding({ copy }: { copy: LandingPersonaCopy }) {
       <section className="px-6 py-14 pb-20 lg:px-20" id="signup">
         <div className="relative mx-auto max-w-lg overflow-hidden rounded-[28px] border border-[rgba(47,40,43,0.1)] bg-[#FBF8F3] px-6 py-10 text-center shadow-[0_20px_48px_-16px_rgba(47,40,43,0.2)]">
           <span
-            className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#2F282B] font-serif text-lg text-[#F5F1EB]"
+            className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#7B7355] font-serif text-lg text-[#F5F1EB]"
             aria-hidden
           >
-            命
-          </span>
+            ??          </span>
           <h2
             className="mt-4 whitespace-pre-line text-2xl leading-snug text-[#2F282B]"
             style={{ fontFamily: "Jua, sans-serif" }}
@@ -187,14 +184,13 @@ export default function PersonaLanding({ copy }: { copy: LandingPersonaCopy }) {
           </p>
           <Link
             href={copy.capture.ctaHref}
-            className="mt-8 flex min-h-12 w-full items-center justify-center rounded-2xl bg-[#2F282B] px-6 py-3.5 text-base font-bold text-[#F5F1EB] transition hover:brightness-110"
+            className="mt-8 flex min-h-12 w-full items-center justify-center rounded-2xl bg-[#7B7355] px-6 py-3.5 text-base font-bold text-[#F5F1EB] transition hover:brightness-110"
             style={{ fontFamily: "Jua, sans-serif" }}
           >
             {copy.capture.ctaLabel}
           </Link>
           <Link href="/" className="mt-4 inline-block text-xs text-[#8A7E78] underline-offset-2 hover:underline">
-            운명비서 홈으로
-          </Link>
+            ?��?�?�?? ??�?��?          </Link>
         </div>
       </section>
     </div>

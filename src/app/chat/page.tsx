@@ -337,7 +337,7 @@ export default function ChatPage() {
               <button
                 onClick={saveBirthData}
                 className="flex-1 py-2 rounded-xl text-white text-sm font-bold"
-                style={{ fontFamily: 'Jua, sans-serif', backgroundColor: '#2F282B' }}
+                style={{ fontFamily: 'Jua, sans-serif', backgroundColor: '#7B7355' }}
               >
                 저장하고 상담 시작
               </button>
@@ -432,7 +432,7 @@ export default function ChatPage() {
               onClick={() => sendMessage()}
               disabled={loading || !input.trim()}
               className="px-5 py-3 rounded-2xl text-white text-base disabled:opacity-50 transition-all active:scale-95"
-              style={{ fontFamily: 'Jua, sans-serif', backgroundColor: '#2F282B' }}
+              style={{ fontFamily: 'Jua, sans-serif', backgroundColor: '#7B7355' }}
             >
               {loading ? '...' : '전송'}
             </button>

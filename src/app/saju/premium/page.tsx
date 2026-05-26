@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -14,7 +14,7 @@ export default function PremiumPage() {
   useEffect(() => {
     const stored = localStorage.getItem("premiumSajuData");
     if (!stored) {
-      setError("사주 데이터가 없습니다. 먼저 사주 분석을 진행해주세요.");
+      setError("���� �����Ͱ� �����ϴ�. ���� ���� �м��� �������ּ���.");
       setLoading(false);
       return;
     }
@@ -23,7 +23,7 @@ export default function PremiumPage() {
     try {
       sajuData = JSON.parse(stored);
     } catch {
-      setError("데이터 파싱 오류가 발생했습니다.");
+      setError("������ �Ľ� ������ �߻��߽��ϴ�.");
       setLoading(false);
       return;
     }
@@ -38,7 +38,7 @@ export default function PremiumPage() {
     fetch("/api/saju/premium", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sajuData, name: sajuData.userName || sajuData.name || localStorage.getItem("sajuUserName") || "회원" }),
+      body: JSON.stringify({ sajuData, name: sajuData.userName || sajuData.name || localStorage.getItem("sajuUserName") || "ȸ��" }),
     })
       .then((res) => res.json())
       .then((data) => {
@@ -47,13 +47,13 @@ export default function PremiumPage() {
         if (data.success) {
           setReport(data.report);
         } else {
-          setError(data.error || "리포트 생성에 실패했습니다.");
+          setError(data.error || "����Ʈ ������ �����߽��ϴ�.");
         }
         setLoading(false);
       })
       .catch(() => {
         clearInterval(progressInterval);
-        setError("서버 연결에 실패했습니다.");
+        setError("���� ���ῡ �����߽��ϴ�.");
         setLoading(false);
       });
 
@@ -77,7 +77,7 @@ export default function PremiumPage() {
       } else if (line.startsWith("- ")) {
         elements.push(
           <div key={i} className="flex items-start gap-2 ml-2 my-1">
-            <span className="text-[#8B6F47] mt-1">•</span>
+            <span className="text-[#8B6F47] mt-1">?</span>
             <span className="text-sm text-[#5A4E48] leading-relaxed">{renderInline(line.replace("- ", ""))}</span>
           </div>
         );
@@ -106,17 +106,17 @@ export default function PremiumPage() {
     return (
       <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center p-4">
         <div className="bg-white border border-[#E2D7D0] rounded-2xl shadow-[0_14px_40px_rgba(61,51,56,0.08)] p-8 max-w-md w-full text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 animate-pulse items-center justify-center rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] text-2xl text-[#8B6F47]">命</div>
+          <div className="mx-auto mb-4 flex h-14 w-14 animate-pulse items-center justify-center rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] text-2xl text-[#8B6F47]">٤</div>
           <h2 className="text-xl font-bold mb-2" style={{ fontFamily: "Jua, sans-serif", color: "#3D3338" }}>
-            프리미엄 사주 리포트 생성 중...
+            �����̾� ���� ����Ʈ ���� ��...
           </h2>
-          <p className="text-sm text-[#8A7E78] mb-6">AI가 당신의 사주를 깊이 분석하고 있습니다</p>
+          <p className="text-sm text-[#8A7E78] mb-6">AI�� ����� ���ָ� ���� �м��ϰ� �ֽ��ϴ�</p>
           <div className="w-full bg-[#EDE4DC] rounded-full h-3 mb-4 overflow-hidden">
             <div className="h-3 rounded-full transition-all duration-500 bg-[#8B6F47]" style={{ width: `${Math.min(progress, 100)}%` }} />
           </div>
-          <p className="text-xs text-[#8A7E78]">{Math.round(Math.min(progress, 99))}% 완료</p>
+          <p className="text-xs text-[#8A7E78]">{Math.round(Math.min(progress, 99))}% �Ϸ�</p>
           <div className="mt-6 text-xs text-[#8A7E78]">
-            <p>{progress < 20 ? "사주 원국 분석 중..." : progress < 40 ? "오행·십성 심화 분석 중..." : progress < 60 ? "2026년 운세 계산 중..." : progress < 80 ? "대운 흐름 해석 중..." : "맞춤형 리포트 작성 중..."}</p>
+            <p>{progress < 20 ? "���� ���� �м� ��..." : progress < 40 ? "���ࡤ�ʼ� ��ȭ �м� ��..." : progress < 60 ? "2026�� � ��� ��..." : progress < 80 ? "��� �帧 �ؼ� ��..." : "������ ����Ʈ �ۼ� ��..."}</p>
           </div>
         </div>
       </div>
@@ -128,10 +128,10 @@ export default function PremiumPage() {
       <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center p-4">
         <div className="bg-white border border-[#E2D7D0] rounded-2xl shadow-[0_14px_40px_rgba(61,51,56,0.08)] p-8 max-w-md w-full text-center">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-[#E6CCC3] bg-[#FFF8F5] text-2xl text-[#8A4A3D]">!</div>
-          <h2 className="text-lg font-bold mb-2 text-[#8A4A3D]">오류 발생</h2>
+          <h2 className="text-lg font-bold mb-2 text-[#8A4A3D]">���� �߻�</h2>
           <p className="text-sm text-[#5A4E48] mb-6">{error}</p>
-          <button onClick={() => router.push("/saju")} className="bg-[#2F282B] text-white px-6 py-2 rounded-xl font-bold hover:bg-[#463A40] transition">
-            사주 분석으로 돌아가기
+          <button onClick={() => router.push("/saju")} className="bg-[#7B7355] text-white px-6 py-2 rounded-xl font-bold hover:bg-[#6A6349] transition">
+            ���� �м����� ���ư���
           </button>
         </div>
       </div>
@@ -141,18 +141,18 @@ export default function PremiumPage() {
   return (
     <div className="min-h-screen bg-[#FAF8F5]">
       <div className="border-b border-[#E2D7D0] bg-white text-center py-6 px-4">
-        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] text-xl text-[#8B6F47]">命</div>
-        <h1 className="text-2xl font-bold text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>프리미엄 사주 리포트</h1>
-        <p className="text-[#8A7E78] text-xs mt-1">AI 명리학 전문가의 심층 분석</p>
+        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] text-xl text-[#8B6F47]">٤</div>
+        <h1 className="text-2xl font-bold text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>�����̾� ���� ����Ʈ</h1>
+        <p className="text-[#8A7E78] text-xs mt-1">AI ������ �������� ���� �м�</p>
       </div>
       <div className="max-w-2xl mx-auto p-4">
         <div className="bg-white border border-[#E2D7D0] rounded-2xl shadow-[0_10px_30px_rgba(61,51,56,0.05)] p-6 mb-6">
           {renderMarkdown(report)}
         </div>
         <div className="text-center mb-8">
-          <p className="text-xs text-[#8A7E78] mb-4">본 리포트는 AI 명리학 분석을 기반으로 작성되었으며, 참고용으로 활용해주세요.</p>
-          <button onClick={() => router.push("/saju")} className="bg-[#2F282B] text-white px-8 py-3 rounded-xl font-bold shadow-[0_10px_24px_rgba(47,40,43,0.12)] hover:bg-[#463A40] transition" style={{ fontFamily: "Jua, sans-serif" }}>
-            새로운 사주 분석하기
+          <p className="text-xs text-[#8A7E78] mb-4">�� ����Ʈ�� AI ������ �м��� ������� �ۼ��Ǿ�����, ���������� Ȱ�����ּ���.</p>
+          <button onClick={() => router.push("/saju")} className="bg-[#7B7355] text-white px-8 py-3 rounded-xl font-bold shadow-[0_10px_24px_rgba(47,40,43,0.12)] hover:bg-[#6A6349] transition" style={{ fontFamily: "Jua, sans-serif" }}>
+            ���ο� ���� �м��ϱ�
           </button>
         </div>
       </div>

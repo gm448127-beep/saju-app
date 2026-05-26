@@ -33,75 +33,75 @@ type FeatureSlide = {
 const FEATURE_SLIDES: FeatureSlide[] = [
   {
     href: "/saju",
-    headline: "타고난 흐름을 깊이 읽습니다",
-    subcopy: "사주에 담긴 기질과 방향을\n차분한 리포트로 정리합니다",
+    headline: "?????? ????????? ??????????",
+    subcopy: "???????? ???????????n??????????? ??????????,
     badge: "01",
-    motif: "命",
+    motif: "??,
     bg: "linear-gradient(135deg, #FFFDF9 0%, #F5EDE3 56%, #E8D7C4 100%)",
     accent: "#8B6F47",
   },
   {
     href: "/today",
-    headline: "오늘의 결을 깊이 읽습니다",
-    subcopy: "하루의 흐름과 움직임을\n한 장의 리포트로 정리합니다",
+    headline: "?????????? ??? ??????????",
+    subcopy: "???????????????????n?????? ?????? ??????????,
     badge: "02",
-    motif: "運",
+    motif: "??,
     bg: "linear-gradient(135deg, #FFFDF8 0%, #F3E8D5 56%, #E6CF9F 100%)",
     accent: "#B89968",
   },
   {
     href: "/tojeong",
-    headline: "한 해의 흐름을 깊이 읽습니다",
-    subcopy: "올해에 담긴 결과 방향을\n차분한 리포트로 정리합니다",
+    headline: "?????? ????????? ??????????",
+    subcopy: "?????????? ?? ??????n??????????? ??????????,
     badge: "03",
-    motif: "年",
+    motif: "??,
     bg: "linear-gradient(135deg, #FCFBF7 0%, #EEE7DC 58%, #D9C8B6 100%)",
     accent: "#6B5E58",
   },
   {
     href: "/compatibility",
-    headline: "두 사람의 흐름을 읽습니다",
-    subcopy: "관계의 온도와 결을\n차분한 리포트로 정리합니다",
+    headline: "?????????????????????????",
+    subcopy: "?????? ?????? ???\n??????????? ??????????,
     badge: "04",
-    motif: "緣",
+    motif: "??,
     bg: "linear-gradient(135deg, #FFF9F6 0%, #F1E0DA 58%, #E3C8BE 100%)",
     accent: "#9A685B",
   },
   {
     href: "/tarot",
-    headline: "마음의 결을 깊이 읽습니다",
-    subcopy: "카드가 비추는 흐름을\n짧은 리포트로 정리합니다",
+    headline: "????????? ??? ??????????",
+    subcopy: "?????? ????????????n??? ?????? ??????????,
     badge: "05",
-    motif: "兆",
+    motif: "??,
     bg: "linear-gradient(135deg, #FBFAFF 0%, #EDE6F4 58%, #D8C8E6 100%)",
     accent: "#7F6A8E",
   },
 ];
 
-/** 저장된 사주가 있을 때 홈 히어로 캐러셀 카피 개인화 */
+/** ?????? ????? ???? ????????????????? ???? ?????*/
 function buildFeatureSlides(displayName: string | null, year = new Date().getFullYear()): FeatureSlide[] {
-  if (!displayName || displayName === "나") return FEATURE_SLIDES;
+  if (!displayName || displayName === "??) return FEATURE_SLIDES;
 
   const personalizedCopy: Record<string, { headline: string; subcopy: string }> = {
     "/saju": {
-      headline: `${displayName}의 타고난 흐름을 정리해 두었습니다`,
-      subcopy: "입력하신 사주 기준으로\n기질과 방향을 차분한 리포트로 읽습니다",
+      headline: `${displayName}???????? ???????????????????????,
+      subcopy: "???????? ??? ???????\n?????????????????????? ??????????",
     },
     "/today": {
-      headline: `${displayName}의 오늘의 결을 읽어보세요`,
-      subcopy: "오늘 일진과 맞춘 흐름·점수를\n한 장의 리포트로 정리합니다",
+      headline: `${displayName}???????????? ???????????,
+      subcopy: "????? ?????????? ????�???????n?????? ?????? ??????????,
     },
     "/tojeong": {
-      headline: `${displayName}의 ${year}년 흐름을 정리해 두었습니다`,
-      subcopy: `${year}년에 담긴 결과와 조심할 시기를\n차분한 리포트로 읽습니다`,
+      headline: `${displayName}??${year}?????????????????????????,
+      subcopy: `${year}????? ??? ???? ???????????n??????????? ??????????`,
     },
     "/compatibility": {
-      headline: `${displayName}의 인연 흐름을 읽어보세요`,
-      subcopy: "두 사람의 온도와 결을\n입력 기준에 맞춰 정리합니다",
+      headline: `${displayName}??????? ?????????????????,
+      subcopy: "??????????????? ???\n??? ???????? ??????????,
     },
     "/tarot": {
-      headline: `${displayName}, 마음의 결을 짧게 읽어보세요`,
-      subcopy: "지금 걸리는 마음을\n카드 리포트로 가볍게 정리합니다",
+      headline: `${displayName}, ????????? ??? ???????????,
+      subcopy: "??????????????n???? ?????? ????? ??????????,
     },
   };
 
@@ -119,35 +119,35 @@ function buildLiveCards(
 ) {
   return [
   {
-    title: "오늘의 한 줄",
+    title: "???????????,
     eyebrow: "TODAY",
     text: dailyContent.sentence,
-    cta: "자세히 보기",
+    cta: "?????????",
     cardClass: "border-[#E8D7C4] bg-[#FFF8EE]",
     href: "/today",
   },
   {
-    title: "이번 주의 흐름",
+    title: "???? ??? ????",
     eyebrow: "WEEKLY",
     text: weeklyCard.text,
     trend: weeklyCard.trend,
     highlightIndex: weeklyCard.highlightIndex,
-    cta: "주간 보기",
+    cta: "??? ??",
     cardClass: "border-[#E2D7D0] bg-white",
     graphClass: "bg-[#C49A4A]",
     href: weeklyCard.href,
   },
   {
-    title: "나의 패턴",
+    title: "???? ?????",
     eyebrow: "PATTERN",
     patternPreview: patternCard,
     href: "/history",
   },
   {
-    title: "오늘의 추천",
+    title: "???????????",
     eyebrow: "PICK",
-    text: "걸리는 마음이 남는다면\nAI상담으로 더 깊게 읽어보세요",
-    cta: "상담 열기",
+    text: "??????????????????\nAI????????? ?????? ???????????,
+    cta: "????? ???",
     cardClass: "border-[#C49A4A] bg-white",
     href: dailyContent.recommendation.href,
   },
@@ -368,10 +368,10 @@ export default function HomePage() {
               </p>
               <Link
                 href={selectedSlide.href}
-                className="relative z-10 mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#2F282B] px-5 py-3 text-sm font-bold text-white shadow-[0_12px_28px_rgba(47,40,43,0.18)] transition hover:-translate-y-0.5"
+                className="relative z-10 mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#7B7355] px-5 py-3 text-sm font-bold text-white shadow-[0_12px_28px_rgba(123,115,85,0.22)] transition hover:-translate-y-0.5"
               >
-                리포트 보기
-                <span className="text-lg leading-none">›</span>
+                ??????
+                <span className="text-lg leading-none">??/span>
               </Link>
             </div>
           </div>
@@ -385,20 +385,18 @@ export default function HomePage() {
 
           <button
             type="button"
-            aria-label="이전 메뉴"
+            aria-label="???? ?????"
             onClick={() => goToSlide(activeSlide - 1)}
             className="absolute left-4 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/70 bg-white/55 text-[#2F282B] backdrop-blur transition hover:bg-white sm:flex"
           >
-            ‹
-          </button>
+            ??          </button>
           <button
             type="button"
-            aria-label="다음 메뉴"
+            aria-label="???? ?????"
             onClick={() => goToSlide(activeSlide + 1)}
             className="absolute right-4 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/70 bg-white/55 text-[#2F282B] backdrop-blur transition hover:bg-white sm:flex"
           >
-            ›
-          </button>
+            ??          </button>
         </div>
 
         <div className="mt-3 flex items-center justify-center gap-1">
@@ -406,7 +404,7 @@ export default function HomePage() {
             <button
               key={slide.href}
               type="button"
-              aria-label={`${slide.badge}번 리포트 선택`}
+              aria-label={`${slide.badge}???????????`}
               aria-current={activeSlide === index ? "true" : undefined}
               onClick={() => goToSlide(index)}
               className="touch-target flex items-center justify-center rounded-full transition"
@@ -423,21 +421,19 @@ export default function HomePage() {
 
       {profile && (
         <p className="rounded-2xl border border-[#E8D7C4] bg-[#FFF8EE] px-4 py-3 text-center text-sm font-semibold text-[#5A4E48]">
-          <span className="text-[#8B6F47]">{displayName}의 오늘</span>
-          {" · "}홈·오늘운세·사주·상담이 같은 사주 기준으로 연결됩니다
-        </p>
+          <span className="text-[#8B6F47]">{displayName}???????</span>
+          {" � "}??�??????????�????�?????? ???? ??? ??????? ??????????        </p>
       )}
 
       {profile && (previewLoading || !dailyContent) ? (
         <section
-          aria-label="맞춤 오늘 흐름 로딩"
+          aria-label="??? ????? ???? ?????"
           className="overflow-hidden rounded-[30px] border border-[#E8D7C4] bg-[#FFFDF8] p-8 text-center shadow-[0_18px_48px_rgba(61,51,56,0.07)]"
         >
           <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">MY TODAY</p>
           <p className="mt-2 text-lg font-semibold text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-            {displayName}의 오늘을 맞추는 중…
-          </p>
-          <p className="mt-2 text-sm text-[#8A7E78]">입력하신 사주 기준으로 점수와 한 줄을 계산하고 있습니다.</p>
+            {displayName}????????????????????          </p>
+          <p className="mt-2 text-sm text-[#8A7E78]">???????? ??? ??????? ??????? ?????? ???????? ??????????.</p>
         </section>
       ) : (
         <HomeResultPreview
@@ -454,7 +450,7 @@ export default function HomePage() {
       <MobileSnapRow
         desktopClassName="lg:grid lg:grid-cols-4 lg:gap-3"
         className="gap-3"
-        aria-label="바로가기 카드"
+        aria-label="????????????"
       >
         {liveCards.map((card) =>
           "patternPreview" in card && card.patternPreview ? (
@@ -483,7 +479,7 @@ export default function HomePage() {
                       className={`w-full rounded-t-full ${card.graphClass}`}
                       style={{ height: `${Math.max(value / 3, 10)}px`, opacity: 0.45 + index * 0.06 }}
                     />
-                    <span className="text-[9px] text-[#A09488]">{"월화수목금토일"[index]}</span>
+                    <span className="text-[9px] text-[#A09488]">{"???????????????[index]}</span>
                   </div>
                 ))}
                 </div>
@@ -504,7 +500,7 @@ export default function HomePage() {
               </p>
             ) : null}
             {"cta" in card && card.cta ? (
-              <p className="mt-auto pt-3 text-xs font-bold text-[#8B6F47]">{card.cta} ›</p>
+              <p className="mt-auto pt-3 text-xs font-bold text-[#8B6F47]">{card.cta} ??/p>
             ) : null}
           </Link>
           </MobileSnapCard>
@@ -521,29 +517,28 @@ export default function HomePage() {
         <div className="relative flex flex-col gap-6 px-6 py-8 sm:flex-row sm:items-end sm:justify-between sm:gap-8 sm:px-10 sm:py-10">
           <div className="max-w-2xl min-w-0 flex-1">
             <h2 className="text-2xl leading-tight text-[#2F282B] sm:text-3xl lg:text-4xl" style={{ fontFamily: "Jua, sans-serif" }}>
-              오늘의 흐름을
-              <br />
-              먼저 정리해두었습니다
+              ?????????????              <br />
+              ??? ??????????????????
             </h2>
             <p className="mt-3 text-base leading-relaxed text-[#4A403B] sm:mt-4 sm:text-lg" style={{ fontFamily: "Jua, sans-serif" }}>
               {PRIMARY_TAGLINE}
             </p>
             <p className="mt-2 text-sm leading-relaxed text-[#6B5E58]">
-              사주·오늘의 흐름·토정·궁합·AI 상담까지 한곳에서 이어집니다.
+              ???�???????????�????�????�AI ????????? ???????? ????????????
             </p>
 
             <div className="mt-5 flex flex-col gap-2 sm:mt-6 sm:flex-row">
               <Link
                 href="/today"
-                className="inline-flex items-center justify-center rounded-2xl bg-[#2F282B] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#2F282B]/15 transition hover:-translate-y-0.5"
+                className="inline-flex items-center justify-center rounded-2xl bg-[#7B7355] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#7B7355]/15 transition hover:-translate-y-0.5"
               >
-                오늘 읽기
+                ????? ???
               </Link>
               <Link
                 href="/chat"
                 className="inline-flex items-center justify-center rounded-2xl border border-[#D9C8C0] bg-white px-5 py-3 text-sm font-bold text-[#2F282B] transition hover:bg-[#FAF8F5]"
               >
-                AI 상담
+                AI ?????
               </Link>
             </div>
           </div>
@@ -556,10 +551,10 @@ export default function HomePage() {
       <section className="rounded-[30px] border border-[#E2D7D0] bg-white px-5 py-6 shadow-[0_18px_48px_rgba(61,51,56,0.06)] sm:px-7">
         <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">WHY UNMYEONG SECRETARY</p>
         <h2 className="mt-2 text-2xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-          운명비서가 흐름을 읽는 방식
+          ??????????? ??????????? ????
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-[#6B5E58]">
-          명리 계산 → 매일 리포트 → 필요할 때 AI 상담까지, 한 사주 기준으로 이어집니다.
+          ??? ????? ???? ???????????????AI ?????????, ????? ??????? ????????????
         </p>
         <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
           {HOME_READING_WAY_CARDS.map((card) => (
@@ -575,17 +570,17 @@ export default function HomePage() {
       </section>
 
       <footer className="text-center py-10 text-sm text-[#A09488]">
-        <p>운명비서는 재미와 참고용입니다.</p>
-        <p className="mt-1">중요한 결정은 전문가와 상담하세요.</p>
+        <p>????????????????? ????????????.</p>
+        <p className="mt-1">???????????? ??????? ????????????</p>
         <p className="mt-3">
           <a
-            href="mailto:unmyeong.team@gmail.com?subject=운명비서 피드백"
+            href="mailto:unmyeong.team@gmail.com?subject=????????? ???????
             className="text-[#8B6F47] underline-offset-2 transition hover:text-[#6F5435] hover:underline"
           >
-            피드백 보내기 · unmyeong.team@gmail.com
+            ?????????????� unmyeong.team@gmail.com
           </a>
         </p>
-        <p className="mt-3 text-xs">v1.1 · 2026.05 · 운명비서팀</p>
+        <p className="mt-3 text-xs">v1.1 � 2026.05 � ???????????</p>
       </footer>
     </div>
   );

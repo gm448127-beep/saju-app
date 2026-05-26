@@ -121,6 +121,11 @@ p, li, td, th {
 }
 
 /* ===== 버튼 ===== */
+:root {
+  --btn-primary: #7B7355;
+  --btn-primary-hover: #6A6349;
+}
+
 button, .btn, [role="button"] {
   font-weight: 600;
 }
