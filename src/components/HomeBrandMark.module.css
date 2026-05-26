@@ -1,0 +1,38 @@
+/* 히어로 일러스트 — 원형 PNG */
+
+.heroFigure {
+  position: relative;
+  flex-shrink: 0;
+  width: min(74%, 13.75rem);
+  margin: 0.5rem auto 0;
+  aspect-ratio: 1 / 1;
+}
+
+.heroFrame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #fffdf9;
+  box-shadow:
+    0 10px 32px rgba(51, 51, 51, 0.1),
+    0 0 0 1px rgba(232, 228, 222, 0.9);
+}
+
+/* 원 가장자리만 은은하게 카드 배경과 블렌드 */
+.heroFrame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: inset 0 0 12px 8px rgba(255, 255, 255, 0.35);
+}
+
+.heroImg {
+  object-fit: cover;
+  object-position: center 42%;
+  transform: scale(1.02);
+}

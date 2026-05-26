@@ -5,7 +5,7 @@
 
 /** 대표 슬로건 (포지셔닝) */
 export const PRIMARY_TAGLINE =
-  "매일 아침, 내 사주 기준으로 오늘의 흐름을 1분 안에 읽어드립니다";
+  "매일 아침, 내 사주 기준으로\n오늘의 흐름을 1분 안에 읽어드립니다";
 
 /** 시(時) 차별화 — 「유일」 단정 없이 사실 기반 */
 export const BIRTH_TIME_MARKETING = {

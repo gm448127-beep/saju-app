@@ -43,7 +43,7 @@ export default function Header() {
       WebkitBackdropFilter: 'blur(20px)',
       borderBottom: '1px solid rgba(217, 200, 192, 0.55)'
     }}>
-      <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+      <div className="flex h-14 w-full items-center justify-between px-4">
         <Link href="/" className="group flex items-center gap-2.5">
           <span className="relative flex h-9 w-9 items-center justify-center rounded-2xl bg-[#2F282B] text-lg font-bold text-[#F4E7D6] shadow-[0_8px_18px_rgba(47,40,43,0.18)] transition-all group-hover:-translate-y-0.5 group-hover:bg-[#8B6F47]">
             <span className="absolute inset-1 rounded-[14px] border border-[#F4E7D6]/25" />
@@ -58,21 +58,21 @@ export default function Header() {
             >
               운명비서
             </span>
-            <span className="mt-1 hidden text-[10px] font-semibold tracking-[0.16em] text-[#B8A78D] sm:block">
+            <span className="mt-1 hidden text-[10px] font-semibold tracking-[0.16em] text-[#B8A78D] @sm:block">
               AI SAJU REPORT
             </span>
           </span>
         </Link>
 
         {/* 데스크탑 네비게이션 */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden @md:flex items-center gap-1">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-2.5 py-1.5 rounded-full text-xs transition-all lg:px-3 lg:text-sm ${
+                className={`px-2.5 py-1.5 rounded-full text-xs transition-all @lg:px-3 @lg:text-sm ${
                   isActive
                     ? "bg-white shadow-sm font-bold"
                     : "text-[#8A7E78] hover:bg-[#F8F3EE]"
@@ -91,7 +91,7 @@ export default function Header() {
 
         <div className="flex items-center gap-1.5">
           {profileLabel && (
-            <span className="hidden rounded-full border border-[#E8D7C4] bg-[#FFF8EE] px-2.5 py-1 text-[10px] font-bold text-[#8B6F47] sm:inline">
+            <span className="hidden rounded-full border border-[#E8D7C4] bg-[#FFF8EE] px-2.5 py-1 text-[10px] font-bold text-[#8B6F47] @sm:inline">
               {profileLabel}
             </span>
           )}
@@ -108,13 +108,13 @@ export default function Header() {
               <path d="M5 5.5A2.5 2.5 0 0 1 7.5 3h9A2.5 2.5 0 0 1 19 5.5v15l-7-3-7 3v-15Z" />
               <path d="M8.5 8h7M8.5 12h5" />
             </svg>
-            <span className="hidden lg:inline">나의 패턴</span>
+            <span className="hidden @lg:inline">나의 패턴</span>
           </Link>
 
           {/* 모바일 햄버거 */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden text-[#8A7E78] hover:text-[#3D3338] p-2"
+            className="@md:hidden text-[#8A7E78] hover:text-[#3D3338] p-2"
           >
             {menuOpen ? (
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -131,7 +131,7 @@ export default function Header() {
 
       {/* 모바일 메뉴 */}
       {menuOpen && (
-        <div className="md:hidden px-4 py-3" style={{
+        <div className="@md:hidden px-4 py-3" style={{
           background: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(16px)',
           borderTop: '1px solid rgba(204, 182, 176, 0.3)'

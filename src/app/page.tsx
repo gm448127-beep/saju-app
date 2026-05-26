@@ -1,10 +1,11 @@
 "use client";
 
+import "./home-gyeol.css";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import HomeBrandMark from "@/components/HomeBrandMark";
 import HomePatternCard from "@/components/HomePatternCard";
 import HomeResultPreview from "@/components/HomeResultPreview";
-import MiinAvatar from "@/components/MiinAvatar";
 import MobileSnapRow, { MobileSnapCard } from "@/components/MobileSnapRow";
 import { useUserProfile } from "@/components/UserProfileProvider";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
@@ -124,7 +125,7 @@ function buildLiveCards(
     eyebrow: "TODAY",
     text: dailyContent.sentence,
     cta: "자세히 보기",
-    cardClass: "border-[#E8D7C4] bg-[#FFF8EE]",
+    cardClass: "",
     href: "/today",
   },
   {
@@ -134,8 +135,8 @@ function buildLiveCards(
     trend: weeklyCard.trend,
     highlightIndex: weeklyCard.highlightIndex,
     cta: "주간 보기",
-    cardClass: "border-[#E2D7D0] bg-white",
-    graphClass: "bg-[#C49A4A]",
+    cardClass: "",
+    graphClass: "gyeol-graph-bar",
     href: weeklyCard.href,
   },
   {
@@ -151,7 +152,7 @@ function buildLiveCards(
       ? "걸리는 마음이 남는다면\nAI상담으로 더 깊게 읽어보세요"
       : "오늘의 흐름이 걸리면\n한 번 더 깊게 읽어보세요",
     cta: AI_CHAT_ENABLED ? "상담 열기" : "오늘 보기",
-    cardClass: "border-[#C49A4A] bg-white",
+    cardClass: "",
     href: AI_CHAT_ENABLED ? dailyContent.recommendation.href : "/today",
   },
   ];
@@ -326,63 +327,78 @@ export default function HomePage() {
     setTouchStartX(null);
   };
 
-  return (
-    <div className="space-y-5">
-      <p
-        className="rounded-2xl border border-[#E2D7D0] bg-[#FFF8EE] px-4 py-3 text-center text-base leading-snug text-[#2F282B] sm:text-lg"
-        style={{ fontFamily: "Jua, sans-serif" }}
-      >
-        {PRIMARY_TAGLINE}
-      </p>
-      <p className="whitespace-pre-line rounded-2xl border border-[#E2D7D0]/80 bg-white px-4 py-3 text-center text-sm leading-relaxed text-[#5A4E48]">
-        {BIRTH_TIME_MARKETING.subcopy}
-      </p>
+  const todayLabel = useMemo(() => {
+    const now = new Date();
+    const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
+    return `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, "0")}.${String(now.getDate()).padStart(2, "0")} ${weekdays[now.getDay()]}`;
+  }, []);
 
-      <section className="overflow-hidden rounded-[30px] border border-[#E2D7D0] bg-white p-3 shadow-[0_18px_48px_rgba(61,51,56,0.07)] sm:p-4">
+  return (
+    <div className="home-gyeol">
+      <div className="home-gyeol__inner">
+      <header className="gyeol-top">
+        <div className="gyeol-brand">
+          <span className="gyeol-brand-hanja" aria-hidden>
+            命
+          </span>
+          <div>
+            <p className="gyeol-brand-name">운명비서</p>
+            <p className="gyeol-brand-tag">Daily Self-Report</p>
+          </div>
+        </div>
+        <time className="gyeol-date-pill" dateTime={todayLabel.replace(/\s/g, "")}>
+          {todayLabel}
+        </time>
+      </header>
+
+      {/* 히어로 */}
+      <section className="gyeol-card gyeol-hero" aria-labelledby="home-hero-title">
+        <div className="gyeol-hero-stack">
+          <div className="gyeol-hero-copy">
+            <p className="gyeol-eyebrow">오늘의 결</p>
+            <h1 id="home-hero-title" className="gyeol-hero-title">
+              {PRIMARY_TAGLINE}
+            </h1>
+            <div className="gyeol-hero-desc">
+              {BIRTH_TIME_MARKETING.subcopy.split("\n").map((line) => (
+                <p key={line}>{line}</p>
+              ))}
+            </div>
+          </div>
+          <HomeBrandMark variant="hero" priority />
+        </div>
+      </section>
+
+      {/* 기능 캐러셀 */}
+      <section className="gyeol-card gyeol-carousel">
         <div
-          className="relative min-h-[200px] overflow-hidden rounded-[26px] border border-[#E2D7D0] px-5 py-5 text-[#2F282B] sm:min-h-[260px] sm:px-8 sm:py-6"
-          style={{ background: selectedSlide.bg }}
+          className="gyeol-carousel-panel"
           onTouchStart={(event) => setTouchStartX(event.touches[0].clientX)}
           onTouchEnd={(event) => handleTouchEnd(event.changedTouches[0].clientX)}
         >
-          <div className="absolute inset-0 opacity-70">
-            <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full border border-white/70" />
-            <div className="absolute bottom-6 right-8 h-20 w-20 rounded-full bg-white/35" />
-            <div className="absolute -bottom-16 left-8 h-40 w-40 rounded-full bg-white/35" />
-            <div className="absolute right-16 top-16 h-12 w-12 rounded-full" style={{ backgroundColor: `${selectedSlide.accent}22` }} />
-          </div>
-
-          <div className="relative flex min-h-[160px] w-full min-w-0 flex-col justify-between sm:min-h-[200px]">
-            <div className="flex items-center justify-between sm:px-10">
-              <span className="rounded-full border border-white/70 bg-white/55 px-3 py-1 text-xs font-semibold text-[#8B6F47] backdrop-blur">
+          <div className="relative flex min-h-[160px] w-full min-w-0 flex-col justify-between">
+            <div className="flex items-center justify-between">
+              <span className="gyeol-carousel-badge">
                 {profile ? "MY REPORT" : "DAILY REPORT"} {selectedSlide.badge}
               </span>
-              <span className="text-xs font-semibold tracking-[0.18em] text-[#8B6F47]">
+              <span className="gyeol-faint text-xs font-semibold tracking-[0.18em]">
                 {String(activeSlide + 1).padStart(2, "0")} / {String(featureSlides.length).padStart(2, "0")}
               </span>
             </div>
 
-            <div className="relative w-full min-w-0 sm:px-10 sm:pr-32">
-              <h2 className="w-full text-[2rem] leading-tight text-[#2F282B] sm:text-5xl" style={{ fontFamily: "Jua, sans-serif" }}>
-                {selectedSlide.headline}
-              </h2>
-              <p className="mt-2 w-full whitespace-pre-line text-sm leading-relaxed text-[#6B5E58] sm:text-base">
+            <div className="relative w-full min-w-0">
+              <h2 className="gyeol-carousel-headline">{selectedSlide.headline}</h2>
+              <p className="gyeol-muted mt-2 whitespace-pre-line text-sm">
                 {selectedSlide.subcopy}
               </p>
-              <Link
-                href={selectedSlide.href}
-                className="relative z-10 mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-[#2F282B] px-5 py-3 text-sm font-bold text-white shadow-[0_12px_28px_rgba(47,40,43,0.18)] transition hover:-translate-y-0.5"
-              >
+              <Link href={selectedSlide.href} className="gyeol-btn-primary relative z-10 mt-5 min-h-11">
                 리포트 보기
                 <span className="text-lg leading-none">›</span>
               </Link>
             </div>
           </div>
 
-          <div
-            className="pointer-events-none absolute -bottom-2 right-6 z-0 hidden h-32 w-32 items-center justify-center rounded-[34px] border border-white/55 bg-white/45 text-6xl font-semibold text-[#6F5435] shadow-[inset_0_2px_16px_rgba(255,255,255,0.45)] sm:flex"
-            style={{ fontFamily: "'Noto Serif KR', serif" }}
-          >
+          <div className="gyeol-carousel-motif" aria-hidden>
             {selectedSlide.motif}
           </div>
 
@@ -390,7 +406,7 @@ export default function HomePage() {
             type="button"
             aria-label="이전 메뉴"
             onClick={() => goToSlide(activeSlide - 1)}
-            className="absolute left-4 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/70 bg-white/55 text-[#2F282B] backdrop-blur transition hover:bg-white sm:flex"
+            className="gyeol-carousel-nav gyeol-carousel-nav--prev"
           >
             ‹
           </button>
@@ -398,7 +414,7 @@ export default function HomePage() {
             type="button"
             aria-label="다음 메뉴"
             onClick={() => goToSlide(activeSlide + 1)}
-            className="absolute right-4 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/70 bg-white/55 text-[#2F282B] backdrop-blur transition hover:bg-white sm:flex"
+            className="gyeol-carousel-nav gyeol-carousel-nav--next"
           >
             ›
           </button>
@@ -414,35 +430,27 @@ export default function HomePage() {
               onClick={() => goToSlide(index)}
               className="touch-target flex items-center justify-center rounded-full transition"
             >
-              <span
-                className={`block h-2.5 rounded-full transition-all ${
-                  activeSlide === index ? "w-9 bg-[#8B6F47]" : "w-2.5 bg-[#D8D5D4]"
-                }`}
-              />
+              <span className={activeSlide === index ? "gyeol-dot gyeol-dot--active" : "gyeol-dot"} />
             </button>
           ))}
         </div>
       </section>
 
       {profile && (
-        <p className="rounded-2xl border border-[#E8D7C4] bg-[#FFF8EE] px-4 py-3 text-center text-sm font-semibold text-[#5A4E48]">
-          <span className="text-[#8B6F47]">{displayName}의 오늘</span>
+        <p className="gyeol-card gyeol-profile-banner">
+          <span className="gyeol-accent">{displayName}의 오늘</span>
           {" · "}홈·오늘운세·사주·상담이 같은 사주 기준으로 연결됩니다
         </p>
       )}
 
       {profile && (previewLoading || !dailyContent) ? (
-        <section
-          aria-label="맞춤 오늘 흐름 로딩"
-          className="overflow-hidden rounded-[30px] border border-[#E8D7C4] bg-[#FFFDF8] p-8 text-center shadow-[0_18px_48px_rgba(61,51,56,0.07)]"
-        >
-          <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">MY TODAY</p>
-          <p className="mt-2 text-lg font-semibold text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-            {displayName}의 오늘을 맞추는 중…
-          </p>
-          <p className="mt-2 text-sm text-[#8A7E78]">입력하신 사주 기준으로 점수와 한 줄을 계산하고 있습니다.</p>
+        <section aria-label="맞춤 오늘 흐름 로딩" className="gyeol-card gyeol-loading">
+          <p className="gyeol-eyebrow">MY TODAY</p>
+          <p className="gyeol-serif mt-2 text-lg">{displayName}의 오늘을 맞추는 중…</p>
+          <p className="gyeol-faint mt-2 text-sm">입력하신 사주 기준으로 점수와 한 줄을 계산하고 있습니다.</p>
         </section>
       ) : (
+        <div className="home-gyeol-preview">
         <HomeResultPreview
           content={dailyContent ?? buildDailyFortuneContent()}
           displayName={displayName}
@@ -452,41 +460,33 @@ export default function HomePage() {
           apiOverall={personalizedOverall}
           birthKey={profile ? profileToBirthKey(profile) : null}
         />
+        </div>
       )}
 
-      <MobileSnapRow
-        desktopClassName="lg:grid lg:grid-cols-4 lg:gap-3"
-        className="gap-3"
-        aria-label="바로가기 카드"
-      >
+      <MobileSnapRow className="gap-3" aria-label="바로가기 카드">
         {liveCards.map((card) =>
           "patternPreview" in card && card.patternPreview ? (
-            <MobileSnapCard key={card.title} className="h-full lg:w-auto">
+            <MobileSnapCard key={card.title} className="h-full">
               <HomePatternCard data={card.patternPreview} />
             </MobileSnapCard>
           ) : (
-          <MobileSnapCard key={card.title} className="h-full lg:w-auto">
-          <Link
-            href={card.href}
-            className={`flex h-full min-h-[11rem] flex-col rounded-[24px] border px-4 py-4 shadow-[0_10px_26px_rgba(61,51,56,0.05)] transition hover:-translate-y-0.5 hover:bg-[#FFFDF9] ${"cardClass" in card ? card.cardClass : ""}`}
-          >
-            <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">{card.eyebrow}</p>
-            <h2 className="mt-2 text-xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-              {card.title}
-            </h2>
+          <MobileSnapCard key={card.title} className="h-full">
+          <Link href={card.href} className="gyeol-card-link">
+            <p className="gyeol-eyebrow">{card.eyebrow}</p>
+            <h2 className="mt-2 text-xl font-bold">{card.title}</h2>
             {card.trend && (
               <div className="mt-3">
                 <div className="flex h-8 items-end gap-1.5">
                 {card.trend.map((value, index) => (
                   <div key={index} className="relative flex flex-1 flex-col items-center gap-0.5">
                     {index === ("highlightIndex" in card ? card.highlightIndex : undefined) && (
-                      <span className="absolute -top-2.5 h-1.5 w-1.5 rounded-full bg-[#2F282B] ring-2 ring-[#F3E8D5]" />
+                      <span className="absolute -top-2.5 h-1.5 w-1.5 rounded-full bg-[#333333] ring-2 ring-[#f5f2ed]" />
                     )}
                     <div
                       className={`w-full rounded-t-full ${card.graphClass}`}
                       style={{ height: `${Math.max(value / 3, 10)}px`, opacity: 0.45 + index * 0.06 }}
                     />
-                    <span className="text-[9px] text-[#A09488]">{"월화수목금토일"[index]}</span>
+                    <span className="gyeol-faint text-[9px]">{"월화수목금토일"[index]}</span>
                   </div>
                 ))}
                 </div>
@@ -495,19 +495,19 @@ export default function HomePage() {
             {card.stats && (
               <div className="mt-3 grid grid-cols-2 gap-2">
                 {card.stats.map((stat) => (
-                  <span key={stat} className="rounded-xl border border-[#E2D7D0] bg-white px-2 py-2 text-center text-[11px] font-semibold text-[#6B5E58]">
+                  <span key={stat} className="gyeol-stat-pill">
                     {stat}
                   </span>
                 ))}
               </div>
             )}
             {"text" in card && card.text ? (
-              <p className={`mt-2 whitespace-pre-line leading-relaxed text-[#2F282B] ${card.trend ? "text-sm font-medium" : "text-sm text-[#4A403B]"}`}>
+              <p className={`gyeol-muted mt-2 whitespace-pre-line ${card.trend ? "text-sm font-medium" : "text-sm"}`}>
                 {card.text}
               </p>
             ) : null}
             {"cta" in card && card.cta ? (
-              <p className="mt-auto pt-3 text-xs font-bold text-[#8B6F47]">{card.cta} ›</p>
+              <p className="gyeol-accent mt-auto pt-3 text-xs">{card.cta} ›</p>
             ) : null}
           </Link>
           </MobileSnapCard>
@@ -515,87 +515,81 @@ export default function HomePage() {
         )}
       </MobileSnapRow>
 
-      <section className="relative overflow-hidden rounded-[30px] border border-[#E2D7D0] bg-white shadow-[0_18px_48px_rgba(61,51,56,0.07)]">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[#F1E7DE]" />
-          <div className="absolute -bottom-28 left-8 h-80 w-80 rounded-full bg-[#F8F3EE]" />
+      <section className="gyeol-card relative overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-50">
+          <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[#ebe5d9]" />
+          <div className="absolute -bottom-20 left-4 h-64 w-64 rounded-full border border-[#ddd5c6]" />
         </div>
 
-        <div className="relative flex flex-col gap-6 px-6 py-8 sm:flex-row sm:items-end sm:justify-between sm:gap-8 sm:px-10 sm:py-10">
-          <div className="max-w-2xl min-w-0 flex-1">
-            <h2 className="text-2xl leading-tight text-[#2F282B] sm:text-3xl lg:text-4xl" style={{ fontFamily: "Jua, sans-serif" }}>
+        <div className="relative flex flex-col gap-6">
+          <div className="min-w-0 flex-1">
+            <p className="gyeol-eyebrow">TODAY FIRST</p>
+            <h2 className="mt-2 text-2xl leading-tight">
               오늘의 흐름을
               <br />
               먼저 정리해두었습니다
             </h2>
-            <p className="mt-3 text-base leading-relaxed text-[#4A403B] sm:mt-4 sm:text-lg" style={{ fontFamily: "Jua, sans-serif" }}>
+            <p className="gyeol-muted mt-3 text-base">
               {PRIMARY_TAGLINE}
             </p>
-            <p className="mt-2 text-sm leading-relaxed text-[#6B5E58]">
+            <p className="gyeol-muted mt-2 text-sm">
               {AI_CHAT_ENABLED
                 ? "사주·오늘의 흐름·토정·궁합·AI 상담까지 한곳에서 이어집니다."
                 : "사주·오늘의 흐름·토정·궁합까지 한곳에서 이어집니다."}
             </p>
 
-            <div className="mt-5 flex flex-col gap-2 sm:mt-6 sm:flex-row">
-              <Link
-                href="/today"
-                className="inline-flex items-center justify-center rounded-2xl bg-[#2F282B] px-5 py-3 text-sm font-bold text-white shadow-lg shadow-[#2F282B]/15 transition hover:-translate-y-0.5"
-              >
+            <div className="mt-5 flex flex-col gap-2">
+              <Link href="/today" className="gyeol-btn-primary">
                 오늘 읽기
               </Link>
               {AI_CHAT_ENABLED && (
-                <Link
-                  href="/chat"
-                  className="inline-flex items-center justify-center rounded-2xl border border-[#D9C8C0] bg-white px-5 py-3 text-sm font-bold text-[#2F282B] transition hover:bg-[#FAF8F5]"
-                >
+                <Link href="/chat" className="gyeol-btn-secondary">
                   AI 상담
                 </Link>
               )}
             </div>
           </div>
-          <div className="flex shrink-0 justify-end sm:justify-end">
-            <MiinAvatar size={144} className="ring-4 ring-[#F5EDE3] ring-offset-2 ring-offset-white" priority />
+          <div className="flex shrink-0 items-center justify-center">
+            <div className="gyeol-today-myeong" aria-hidden>
+              命
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="rounded-[30px] border border-[#E2D7D0] bg-white px-5 py-6 shadow-[0_18px_48px_rgba(61,51,56,0.06)] sm:px-7">
-        <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">WHY UNMYEONG SECRETARY</p>
-        <h2 className="mt-2 text-2xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-          운명비서가 흐름을 읽는 방식
-        </h2>
-        <p className="mt-2 text-sm leading-relaxed text-[#6B5E58]">
+      <section className="gyeol-card">
+        <p className="gyeol-eyebrow">WHY UNMYEONG SECRETARY</p>
+        <h2 className="mt-2 text-2xl">운명비서가 흐름을 읽는 방식</h2>
+        <p className="gyeol-muted mt-2 text-sm">
           {AI_CHAT_ENABLED
             ? "명리 계산 → 매일 리포트 → 필요할 때 AI 상담까지, 한 사주 기준으로 이어집니다."
             : "명리 계산 → 매일 리포트까지, 한 사주 기준으로 이어집니다."}
         </p>
-        <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="mt-5 grid grid-cols-1 gap-3">
           {HOME_READING_WAY_CARDS.map((card) => (
-            <div key={card.num} className="rounded-2xl border border-[#E8D7C4] bg-[#FAF5ED] px-4 py-4">
-              <p className="text-xs font-bold text-[#8B6F47]">{card.num}</p>
-              <p className="mt-1 text-base text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-                {card.title}
-              </p>
-              <p className="mt-2 text-sm leading-relaxed text-[#5A4E48]">{card.description}</p>
+            <div key={card.num} className="gyeol-way-card">
+              <p className="gyeol-eyebrow">{card.num}</p>
+              <p className="mt-2 text-base font-semibold">{card.title}</p>
+              <p className="gyeol-muted mt-2 text-sm">{card.description}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <footer className="text-center py-10 text-sm text-[#A09488]">
+      <footer className="gyeol-faint py-10 text-center text-sm">
         <p>운명비서는 재미와 참고용입니다.</p>
         <p className="mt-1">중요한 결정은 전문가와 상담하세요.</p>
         <p className="mt-3">
           <a
             href="mailto:unmyeong.team@gmail.com?subject=운명비서 피드백"
-            className="text-[#8B6F47] underline-offset-2 transition hover:text-[#6F5435] hover:underline"
+            className="gyeol-accent underline-offset-2 transition hover:text-[#1c1a17] hover:underline"
           >
             피드백 보내기 · unmyeong.team@gmail.com
           </a>
         </p>
         <p className="mt-3 text-xs">v1.1 · 2026.05 · 운명비서팀</p>
       </footer>
+      </div>
     </div>
   );
 }

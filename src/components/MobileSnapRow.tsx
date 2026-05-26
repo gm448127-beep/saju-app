@@ -20,7 +20,7 @@ export default function MobileSnapRow({
 }: MobileSnapRowProps) {
   return (
     <div
-      className={`flex gap-3 overflow-x-auto overscroll-x-contain pb-2 snap-x snap-mandatory [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:overflow-visible lg:pb-0 ${desktopClassName} ${className}`}
+      className={`flex gap-3 overflow-x-auto overscroll-x-contain pb-2 snap-x snap-mandatory [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden @lg:overflow-visible @lg:pb-0 ${desktopClassName} ${className}`}
       aria-label={ariaLabel}
       role={ariaLabel ? "list" : undefined}
     >
@@ -39,7 +39,7 @@ export function MobileSnapCard({
 }) {
   return (
     <div
-      className={`w-[min(82vw,20rem)] shrink-0 snap-start lg:w-auto lg:shrink lg:snap-align-none ${className}`}
+      className={`w-[min(82vw,20rem)] shrink-0 snap-start @lg:w-auto @lg:shrink @lg:snap-align-none ${className}`}
       role="listitem"
     >
       {children}
