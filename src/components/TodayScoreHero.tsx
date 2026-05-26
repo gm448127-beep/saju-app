@@ -28,7 +28,7 @@ type TodayScoreHeroProps = {
   compareOpen: boolean;
 };
 
-/** 모�?????�?� ?????��??·?��? �???�? ????면??모�? ??�?��?*/
+/** 모바일 요약 탭 — 점수·어제 변화를 한 화면에 모은 히어로 */
 export default function TodayScoreHero({
   overall,
   status,
@@ -55,7 +55,7 @@ export default function TodayScoreHero({
         <ToneDecisionChip label={toneChipLabel} tooltip={toneChipTooltip} variant="warm" />
         {grade && (
           <span className="rounded-full border border-[#E2D7D0] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#8A7E78]">
-            ?��? {grade}
+            등급 {grade}
           </span>
         )}
         {dateLabel && <span className="ml-auto text-[10px] font-semibold text-[#8A7E78]">{dateLabel}</span>}
@@ -72,7 +72,7 @@ export default function TodayScoreHero({
 
       <div className="mt-4 flex items-end justify-between gap-3 rounded-2xl border border-[#E2D7D0]/80 bg-white/90 px-4 py-3">
         <div>
-          <p className="text-[10px] font-bold text-[#8B6F47]">�?�?�</p>
+          <p className="text-[10px] font-bold text-[#8B6F47]">종합</p>
           <div className="mt-1 flex items-end gap-2">
             <p className="text-5xl font-bold leading-none text-[#2F282B]">{overall}</p>
             <OverallScoreDelta comparison={overallComparison} size="md" />
@@ -81,9 +81,9 @@ export default function TodayScoreHero({
         </div>
         {overallComparison && (
           <div className="text-right">
-            <p className="text-[10px] text-[#8A7E78]">?��?</p>
+            <p className="text-[10px] text-[#8A7E78]">어제</p>
             <p className="text-xl font-bold text-[#A09488]">{overallComparison.previousOverall}</p>
-            <p className="text-[10px] text-[#8A7E78]">???��?? {overall}</p>
+            <p className="text-[10px] text-[#8A7E78]">→ 오늘 {overall}</p>
           </div>
         )}
       </div>
@@ -114,7 +114,7 @@ export default function TodayScoreHero({
             >
               {item.label}
               <span className={isUp ? "text-[#8B6F47]" : "text-[#7A4A3D]"}>
-                {isUp ? "?? : "??}
+                {isUp ? "▲" : "▼"}
                 {Math.abs(item.delta)}
               </span>
             </span>
@@ -127,10 +127,10 @@ export default function TodayScoreHero({
           type="button"
           onClick={onSave}
           className={`min-h-11 rounded-xl px-3 py-2.5 text-xs font-bold ${
-            saved ? "border border-[#E8D7C4] bg-[#FFF8EE] text-[#8B6F47]" : "bg-[#7B7355] text-white"
+            saved ? "border border-[#E8D7C4] bg-[#FFF8EE] text-[#8B6F47]" : "bg-[#2F282B] text-white"
           }`}
         >
-          {saved ? "???�됨 ?? : "????}
+          {saved ? "저장됨 ✓" : "저장"}
         </button>
         <button
           type="button"
@@ -141,7 +141,7 @@ export default function TodayScoreHero({
               : "border-[#D9C8C0] bg-white text-[#2F282B]"
           }`}
         >
-          ?��? �?교
+          어제 비교
         </button>
       </div>
 
@@ -151,9 +151,9 @@ export default function TodayScoreHero({
         className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#C49A4A]/50 bg-[#FFF8EE] px-4 py-3 text-sm font-bold text-[#8B6F47]"
         aria-expanded={detailExpanded}
       >
-        {detailExpanded ? "?��?? ??면?��? ??기" : "5??리포??· ?��?� ?��? ?��?�?}
+        {detailExpanded ? "점수 화면으로 접기" : "5장 리포트 · 상세 흐름 펼치기"}
         <span className="text-base leading-none" aria-hidden>
-          {detailExpanded ? "?? : "??}
+          {detailExpanded ? "▲" : "▼"}
         </span>
       </button>
     </div>

@@ -6,18 +6,18 @@ import BirthDateNumberInputs, { isValidBirthDate } from "@/components/BirthDateN
 import type { UserBirthProfile } from "@/lib/user-profile-storage";
 
 const TIME_SLOTS = [
-  { value: 23, label: "?��??" },
-  { value: 1, label: "�?�??" },
-  { value: 3, label: "?��??" },
-  { value: 5, label: "�?�??" },
-  { value: 7, label: "�?�??" },
-  { value: 9, label: "?��??" },
-  { value: 11, label: "?��??" },
-  { value: 13, label: "미�??" },
-  { value: 15, label: "?��??" },
-  { value: 17, label: "?��??" },
-  { value: 19, label: "?��??" },
-  { value: 21, label: "?��??" },
+  { value: 23, label: "자시" },
+  { value: 1, label: "축시" },
+  { value: 3, label: "인시" },
+  { value: 5, label: "묘시" },
+  { value: 7, label: "진시" },
+  { value: 9, label: "사시" },
+  { value: 11, label: "오시" },
+  { value: 13, label: "미시" },
+  { value: 15, label: "신시" },
+  { value: 17, label: "유시" },
+  { value: 19, label: "술시" },
+  { value: 21, label: "해시" },
 ];
 
 interface OnboardingModalProps {
@@ -32,7 +32,7 @@ export default function OnboardingModal({ open, onComplete, onClose }: Onboardin
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
   const [day, setDay] = useState("");
-  const [gender, setGender] = useState<"?? | "??>("??);
+  const [gender, setGender] = useState<"남" | "여">("여");
   const [timeMode, setTimeMode] = useState<"none" | "slot" | "exact">("slot");
   const [slotHour, setSlotHour] = useState(9);
   const [exactHour, setExactHour] = useState(9);
@@ -45,7 +45,7 @@ export default function OnboardingModal({ open, onComplete, onClose }: Onboardin
     e.preventDefault();
     setError("");
     if (!isValidBirthDate(year, month, day)) {
-      setError("?��????일???��?��???�??????력?�주?��??.");
+      setError("생년월일을 숫자로 정확히 입력해주세요.");
       return;
     }
 
@@ -73,27 +73,27 @@ export default function OnboardingModal({ open, onComplete, onClose }: Onboardin
         className="flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-t-[28px] border border-[#E2D7D0] bg-[#FFFDF8] shadow-[0_24px_64px_rgba(47,40,43,0.28)] sm:rounded-[28px]"
       >
         <div className="border-b border-[#E8D7C4] px-5 py-5 sm:px-6">
-          <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">STEP 1 · ??�?�?</p>
+          <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">STEP 1 · 한 번만</p>
           <h2
             id="onboarding-title"
             className="mt-2 text-2xl text-[#2F282B] sm:text-3xl"
             style={{ fontFamily: "Jua, sans-serif" }}
           >
-            ??결�? ??�????기
+            내 결로 시작하기
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-[#5A4E48]">
-            ?��????일·??�?????�?�? ??력??면 ??·�?�??�?�?�·�?�주·�?�?�이 모�?� �?춤?��? ?��?��?�????
+            생년월일·시간을 한 번만 입력하면 홈·오늘운세·사주·상담이 모두 맞춤으로 이어집니다.
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex-1 space-y-4 overflow-y-auto px-5 py-5 sm:px-6">
           <div>
-            <label className="mb-1 block text-xs font-semibold text-[#8B6F47]">?��? (?��?�)</label>
+            <label className="mb-1 block text-xs font-semibold text-[#8B6F47]">이름 (선택)</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="?�길??
+              placeholder="홍길동"
               className="w-full rounded-2xl border-2 border-[#E2D7D0] bg-white px-4 py-3 text-sm text-[#3D3338] outline-none focus:border-[#8B6F47]"
             />
           </div>
@@ -108,13 +108,13 @@ export default function OnboardingModal({ open, onComplete, onClose }: Onboardin
           />
 
           <div>
-            <label className="mb-2 block text-xs font-semibold text-[#8B6F47]">�?�?�??�?</label>
+            <label className="mb-2 block text-xs font-semibold text-[#8B6F47]">출생시간</label>
             <div className="grid grid-cols-3 gap-2">
               {(
                 [
-                  ["slot", "??�??? ?��?�"],
-                  ["exact", "??·�? ??력"],
-                  ["none", "??�? 모�?"],
+                  ["slot", "시간대 선택"],
+                  ["exact", "시·분 입력"],
+                  ["none", "시간 모름"],
                 ] as const
               ).map(([mode, label]) => (
                 <button
@@ -153,7 +153,8 @@ export default function OnboardingModal({ open, onComplete, onClose }: Onboardin
                 >
                   {Array.from({ length: 24 }, (_, h) => (
                     <option key={h} value={h}>
-                      {String(h).padStart(2, "0")}??                    </option>
+                      {String(h).padStart(2, "0")}시
+                    </option>
                   ))}
                 </select>
                 <select
@@ -163,7 +164,8 @@ export default function OnboardingModal({ open, onComplete, onClose }: Onboardin
                 >
                   {Array.from({ length: 12 }, (_, i) => i * 5).map((m) => (
                     <option key={m} value={m}>
-                      {String(m).padStart(2, "0")}�?                    </option>
+                      {String(m).padStart(2, "0")}분
+                    </option>
                   ))}
                 </select>
               </div>
@@ -171,9 +173,9 @@ export default function OnboardingModal({ open, onComplete, onClose }: Onboardin
           </div>
 
           <div>
-            <label className="mb-2 block text-xs font-semibold text-[#8B6F47]">?��?</label>
+            <label className="mb-2 block text-xs font-semibold text-[#8B6F47]">성별</label>
             <div className="grid grid-cols-2 gap-2">
-              {(["??, "??] as const).map((value) => (
+              {(["남", "여"] as const).map((value) => (
                 <button
                   key={value}
                   type="button"
@@ -198,17 +200,17 @@ export default function OnboardingModal({ open, onComplete, onClose }: Onboardin
 
           <button
             type="submit"
-            className="w-full rounded-2xl bg-[#7B7355] py-4 text-lg font-bold text-white transition hover:brightness-110"
+            className="w-full rounded-2xl bg-[#2F282B] py-4 text-lg font-bold text-white transition hover:brightness-110"
             style={{ fontFamily: "Jua, sans-serif" }}
           >
-            ??결�? ??�????기
+            내 결로 시작하기
           </button>
           <button
             type="button"
             onClick={onClose}
             className="w-full py-2 text-center text-xs text-[#8A7E78] underline"
           >
-            ??�?????력??기
+            나중에 입력하기
           </button>
         </form>
       </div>
