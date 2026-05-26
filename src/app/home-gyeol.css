@@ -500,14 +500,63 @@
   text-align: center;
 }
 
-/* TODAY FIRST 카드 — 命 */
-.gyeol-today-myeong {
+/* TODAY FIRST — 命 워터마크 + 컴팩트 카드 */
+.gyeol-today-first {
+  padding: 1.15rem 1.25rem 1.2rem;
+}
+
+.gyeol-today-myeong-watermark {
+  position: absolute;
+  right: -0.25rem;
+  top: -1.75rem;
+  z-index: 0;
   font-family: var(--gyeol-font-serif) !important;
-  font-size: clamp(5.5rem, 22vw, 8.5rem);
+  font-size: clamp(6.5rem, 28vw, 8.75rem);
   font-weight: 400;
   line-height: 1;
   color: var(--gyeol-terracotta);
+  opacity: 0.1;
+  filter: blur(0.6px);
+  pointer-events: none;
   user-select: none;
+}
+
+.gyeol-today-first__body {
+  position: relative;
+  z-index: 1;
+  max-width: 92%;
+}
+
+.gyeol-today-first__title {
+  margin-top: 0.35rem;
+  font-size: 1.375rem;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.gyeol-today-first__lead {
+  margin-top: 0.65rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.gyeol-today-first__sub {
+  margin-top: 0.35rem;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+}
+
+.gyeol-today-first__actions {
+  margin-top: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.gyeol-today-first__actions .gyeol-btn-primary,
+.gyeol-today-first__actions .gyeol-btn-secondary {
+  padding-top: 0.7rem;
+  padding-bottom: 0.7rem;
 }
 
 /* 오늘 미리보기 — 화이트 카드·테라코타 포인트 */

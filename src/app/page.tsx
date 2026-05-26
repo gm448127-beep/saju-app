@@ -515,44 +515,34 @@ export default function HomePage() {
         )}
       </MobileSnapRow>
 
-      <section className="gyeol-card relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-50">
-          <div className="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[#ebe5d9]" />
-          <div className="absolute -bottom-20 left-4 h-64 w-64 rounded-full border border-[#ddd5c6]" />
+      <section className="gyeol-card gyeol-today-first relative overflow-hidden">
+        <div className="gyeol-today-myeong-watermark" aria-hidden>
+          命
         </div>
 
-        <div className="relative flex flex-col gap-6">
-          <div className="min-w-0 flex-1">
-            <p className="gyeol-eyebrow">TODAY FIRST</p>
-            <h2 className="mt-2 text-2xl leading-tight">
-              오늘의 흐름을
-              <br />
-              먼저 정리해두었습니다
-            </h2>
-            <p className="gyeol-muted mt-3 text-base">
-              {PRIMARY_TAGLINE}
-            </p>
-            <p className="gyeol-muted mt-2 text-sm">
-              {AI_CHAT_ENABLED
-                ? "사주·오늘의 흐름·토정·궁합·AI 상담까지 한곳에서 이어집니다."
-                : "사주·오늘의 흐름·토정·궁합까지 한곳에서 이어집니다."}
-            </p>
+        <div className="gyeol-today-first__body">
+          <p className="gyeol-eyebrow">TODAY FIRST</p>
+          <h2 className="gyeol-today-first__title">
+            오늘의 흐름을
+            <br />
+            먼저 정리해두었습니다
+          </h2>
+          <p className="gyeol-muted gyeol-today-first__lead">{PRIMARY_TAGLINE}</p>
+          <p className="gyeol-muted gyeol-today-first__sub">
+            {AI_CHAT_ENABLED
+              ? "사주·오늘의 흐름·토정·궁합·AI 상담까지 한곳에서 이어집니다."
+              : "사주·오늘의 흐름·토정·궁합까지 한곳에서 이어집니다."}
+          </p>
 
-            <div className="mt-5 flex flex-col gap-2">
-              <Link href="/today" className="gyeol-btn-primary">
-                오늘 읽기
+          <div className="gyeol-today-first__actions">
+            <Link href="/today" className="gyeol-btn-primary">
+              오늘 읽기
+            </Link>
+            {AI_CHAT_ENABLED && (
+              <Link href="/chat" className="gyeol-btn-secondary">
+                AI 상담
               </Link>
-              {AI_CHAT_ENABLED && (
-                <Link href="/chat" className="gyeol-btn-secondary">
-                  AI 상담
-                </Link>
-              )}
-            </div>
-          </div>
-          <div className="flex shrink-0 items-center justify-center">
-            <div className="gyeol-today-myeong" aria-hidden>
-              命
-            </div>
+            )}
           </div>
         </div>
       </section>
