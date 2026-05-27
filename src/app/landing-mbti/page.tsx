@@ -42,7 +42,7 @@ export default function LandingMbtiPage() {
       </section>
 
       <div className="landing-mbti-page__visual">
-        <img src="/landing/landing-hero-moon.png" alt="" width={600} height={600} loading="eager" />
+        <img src="/landing/landing-hero.png" alt="" width={280} height={350} loading="eager" />
       </div>
 
       <section

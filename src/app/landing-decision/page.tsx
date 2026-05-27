@@ -44,7 +44,7 @@ export default function LandingDecisionPage() {
       </section>
 
       <div className="landing-decision-page__visual">
-        <img src="/landing/landing-hero-cat.png" alt="" width={600} height={600} loading="eager" />
+        <img src="/landing/landing-hero.png" alt="" width={280} height={350} loading="eager" />
       </div>
 
       <section

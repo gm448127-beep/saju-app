@@ -36,7 +36,7 @@ export default function LandingDecisionPage() {
       </section>
 
       <div className="landing__visual">
-        <img src="/landing-hero.png" alt="" width={600} height={600} loading="eager" />
+        <img src="/landing-hero.png" alt="" width={280} height={350} loading="eager" />
       </div>
 
       <section id="launch-form" className="landing__form-card" aria-labelledby="form-heading">
