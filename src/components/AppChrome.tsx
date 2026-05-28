@@ -5,7 +5,12 @@ import type { ReactNode } from "react";
 import Header from "@/components/Header";
 
 /** 랜딩 전용 경로 — 글로벌 헤더·기본 main 패딩 없음 */
-const MINIMAL_CHROME_PREFIXES = ["/landing-mbti", "/landing-restart", "/landing-decision"];
+const MINIMAL_CHROME_PREFIXES = [
+  "/landing-mbti",
+  "/landing-restart",
+  "/landing-decision",
+  "/landing-assets",
+];
 
 function isMinimalChrome(pathname: string | null) {
   if (!pathname) return false;

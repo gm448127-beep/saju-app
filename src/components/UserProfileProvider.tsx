@@ -74,8 +74,19 @@ export default function UserProfileProvider({ children }: { children: ReactNode 
     return () => window.removeEventListener(PROFILE_UPDATED_EVENT, onUpdate);
   }, [refreshProfile]);
 
+  const isLandingPath =
+    pathname === "/landing-mbti" ||
+    pathname === "/landing-restart" ||
+    pathname === "/landing-decision" ||
+    pathname?.startsWith("/landing-");
+
   useEffect(() => {
     if (!isReady) return;
+    if (isLandingPath) {
+      setShowIntro(false);
+      setShowOnboarding(false);
+      return;
+    }
     if (!isIntroOnboarded()) {
       setShowIntro(true);
       setShowOnboarding(false);
@@ -89,7 +100,7 @@ export default function UserProfileProvider({ children }: { children: ReactNode 
     } else {
       setShowOnboarding(false);
     }
-  }, [isReady, profile, onboardingDismissed, pathname]);
+  }, [isReady, profile, onboardingDismissed, pathname, isLandingPath]);
 
   const finishIntro = useCallback(() => {
     setIntroOnboarded();

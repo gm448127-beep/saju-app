@@ -1,0 +1,127 @@
+.landing-assets {
+  --paper: #f5f2ea;
+  --ink: #333333;
+  --ink-muted: #706b67;
+  --line: #e8e4de;
+  --accent: #b5562e;
+  --font-serif: "Gowun Batang", "Noto Serif KR", serif;
+  --font-sans: "IBM Plex Sans KR", "Noto Sans KR", sans-serif;
+
+  max-width: 32rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+  font-family: var(--font-sans);
+  color: var(--ink);
+  background: var(--paper);
+  min-height: 100dvh;
+}
+
+.landing-assets__brand {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+}
+
+.landing-assets__title {
+  margin: 0.5rem 0 0;
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.landing-assets__lead {
+  margin: 0.75rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--ink-muted);
+}
+
+.landing-assets__list {
+  margin: 1.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.landing-assets__card {
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.landing-assets__preview-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 1.25rem;
+  background: var(--paper);
+}
+
+.landing-assets__preview {
+  width: min(220px, 70vw);
+  height: min(220px, 70vw);
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 18%;
+  box-shadow: 0 8px 24px rgba(51, 51, 51, 0.1);
+}
+
+.landing-assets__meta {
+  padding: 1rem 1.1rem 1.15rem;
+}
+
+.landing-assets__card-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.landing-assets__card-desc {
+  margin: 0.4rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--ink-muted);
+}
+
+.landing-assets__download {
+  display: inline-flex;
+  margin-top: 0.85rem;
+  padding: 0.65rem 1.1rem;
+  border-radius: 9999px;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.landing-assets__download:hover {
+  filter: brightness(1.05);
+}
+
+.landing-assets__direct {
+  margin: 0.65rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--ink-muted);
+  word-break: break-all;
+}
+
+.landing-assets__direct a {
+  color: var(--accent);
+}
+
+.landing-assets__note {
+  margin: 2rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: var(--ink-muted);
+}
+
+.landing-assets__note code {
+  font-size: 0.7rem;
+}

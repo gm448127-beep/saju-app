@@ -1,76 +1,67 @@
 "use client";
 
-const GOOGLE_FORM_EMBED_URL =
-  process.env.NEXT_PUBLIC_GOOGLE_FORM_EMBED_URL_RESTART ??
-  process.env.NEXT_PUBLIC_GOOGLE_FORM_EMBED_URL ??
-  "";
-
-const HAS_FORM =
-  GOOGLE_FORM_EMBED_URL.length > 0 && !GOOGLE_FORM_EMBED_URL.includes("PLACEHOLDER");
+import { LandingBirthPreview } from "../components/LandingBirthPreview";
+import { LandingCanvasHero } from "../components/LandingCanvasHero";
+import { LandingSignupForm } from "../components/LandingSignupForm";
 
 export default function LandingRestartPage() {
-  const scrollToForm = () => {
-    document.getElementById("launch-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
   return (
     <main className="landing">
-      <header className="landing__brand">
-        <span className="landing__hanja" aria-hidden>
-          命
-        </span>
-        <span className="landing__logo">운명비서</span>
-      </header>
-
-      <section className="landing__hero" aria-labelledby="landing-headline">
-        <p className="landing__persona">재시작 · 30~40대</p>
-        <h1 id="landing-headline" className="landing__headline">
-          다시 시작하는 당신을 위한
-          <br />
-          사주 매거진
-        </h1>
-        <p className="landing__sub">
-          끌리는 사람과 맞는 사람은 다릅니다. 운명비서는 차분한 매거진 톤으로, 두 번째 인연을 위한
-          인사이트를 드립니다.
-        </p>
-      </section>
-
-      <div className="landing__visual">
-        <img src="/landing-hero.png" alt="" width={280} height={350} loading="eager" />
-      </div>
-
-      <section id="launch-form" className="landing__form-card" aria-labelledby="form-heading">
-        <p id="form-heading" className="landing__form-label">
-          출시 알림 신청
-        </p>
-        {HAS_FORM ? (
-          <iframe
-            title="운명비서 출시 알림 신청"
-            src={GOOGLE_FORM_EMBED_URL}
-            className="landing__form-frame"
-            loading="lazy"
-          />
-        ) : (
-          <div className="landing__form-placeholder" role="status">
-            Google Form URL을 연결하면 이곳에 신청 폼이 표시됩니다.
+      <LandingCanvasHero
+        headline={
+          <>
+            다시 시작하는
             <br />
-            <br />
-            <code style={{ fontSize: "0.75rem" }}>NEXT_PUBLIC_GOOGLE_FORM_EMBED_URL_RESTART</code>
-          </div>
-        )}
-      </section>
+            당신의 두 번째 챕터
+          </>
+        }
+        tagline="새 출발을 위한 사주 인사이트"
+        imageSrc="/landing-hero-moon.png"
+      />
 
-      <div className="landing__cta-wrap">
-        <button type="button" className="landing__cta" onClick={scrollToForm}>
-          출시 알림 받기
-        </button>
+      <div className="landing-page__body">
+        <LandingBirthPreview />
+
+        <section className="landing__info" aria-label="서비스 설명">
+          <article className="landing__info-block">
+            <h2 className="landing__info-title">운명비서가 뭔가요?</h2>
+            <p className="landing__info-text">
+              사주는 패턴을 봅니다.
+              <br />
+              끌리는 사람과 맞는 사람이 왜 다른지,
+              <br />
+              그 패턴을 차분하게 읽어드립니다.
+            </p>
+          </article>
+
+          <article className="landing__info-block">
+            <h2 className="landing__info-title">이런 분들을 위해 만들었어요</h2>
+            <ul className="landing__info-list">
+              <li>• 새로운 인연을 시작하기 전에 나를 먼저 알고 싶은 분</li>
+              <li>• 같은 실수를 반복하고 싶지 않으신 분</li>
+              <li>• 두 번째 챕터를 차분하게 시작하고 싶으신 분</li>
+            </ul>
+          </article>
+
+          <article className="landing__info-block">
+            <h2 className="landing__info-title">매일 아침 이런 걸 받아보세요</h2>
+            <ul className="landing__info-list">
+              <li>• 오늘의 관계 흐름</li>
+              <li>• 나와 맞는 사람의 패턴</li>
+              <li>• 지금 이 시기에 집중할 것</li>
+              <li>• 나를 지키는 방법</li>
+            </ul>
+          </article>
+        </section>
+
+        <LandingSignupForm />
+
+        <footer className="landing__footer">
+          <p>
+            <strong>운명비서</strong> · 당신의 매일을 차분히 정리해 드립니다
+          </p>
+        </footer>
       </div>
-
-      <footer className="landing__footer">
-        <p>
-          <strong>운명비서</strong> · 당신의 매일을 차분히 정리해 드립니다
-        </p>
-      </footer>
     </main>
   );
 }

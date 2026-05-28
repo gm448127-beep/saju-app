@@ -1,0 +1,96 @@
+/* 캔버스형 히어로 — 베이지 풀블리드, 세리프 헤드라인, 우하단 원형 일러스트 */
+
+.landing-canvas {
+  --canvas-paper: #f5f2ea;
+  --canvas-ink: #1a1a1a;
+  --canvas-muted: #a68b7c;
+
+  position: relative;
+  margin: -2.5rem -1.25rem 0;
+  min-height: min(82dvh, 560px);
+  padding: 1.35rem 1.25rem 0;
+  background: var(--canvas-paper);
+  overflow: hidden;
+}
+
+.landing-canvas__brand {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  color: var(--canvas-muted);
+}
+
+.landing-canvas__hanja {
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--canvas-muted);
+}
+
+.landing-canvas__logo {
+  font-size: inherit;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  color: inherit;
+}
+
+.landing-canvas__headline {
+  position: relative;
+  z-index: 2;
+  margin: clamp(3.5rem, 18vh, 6.5rem) auto 0;
+  max-width: 15.5rem;
+  text-align: center;
+  font-family: var(--font-serif);
+  font-size: clamp(1.85rem, 8.8vw, 2.35rem);
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.04em;
+  color: var(--canvas-ink);
+}
+
+.landing-canvas__tagline {
+  position: absolute;
+  left: 1.25rem;
+  bottom: clamp(1.25rem, 8vh, 2rem);
+  z-index: 2;
+  max-width: 11.5rem;
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  line-height: 1.48;
+  letter-spacing: -0.02em;
+  color: var(--canvas-muted);
+}
+
+.landing-canvas__art {
+  position: absolute;
+  right: -14%;
+  bottom: -10%;
+  z-index: 1;
+  width: min(64vw, 300px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.landing-canvas__art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 18%;
+}
+
+.landing-page__body {
+  padding-top: 0.25rem;
+}

@@ -1,3 +1,7 @@
+@import "../styles/landing-signup.css";
+@import "../styles/landing-canvas.css";
+@import "../styles/landing-preview.css";
+
 /* 브랜드 OS — paper / ink / accent */
 :root {
   --paper: #f5f2ed;
@@ -6,8 +10,8 @@
   --ink-body: #706b67;
   --ink-muted: #9a9490;
   --line: #e8e4de;
-  --accent: #a65d43;
-  --accent-hover: #8f4f3a;
+  --accent: #b5562e;
+  --accent-hover: #9f4c29;
   --accent-soft: #f0e4de;
   --font-serif: "Gowun Batang", "Noto Serif KR", serif;
   --font-sans: "IBM Plex Sans KR", "Noto Sans KR", -apple-system, sans-serif;
@@ -62,77 +66,45 @@ body::before {
   flex-direction: column;
 }
 
-.landing__brand {
+.landing__info {
+  margin-top: 2rem;
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-.landing__hanja {
-  font-family: var(--font-serif);
-  font-size: 1.5rem;
-  color: var(--accent);
-  line-height: 1;
+.landing__info-block {
+  padding: 1.1rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.9rem;
+  background: rgba(255, 255, 255, 0.75);
 }
 
-.landing__logo {
-  font-family: var(--font-sans);
-  font-size: 0.875rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-}
-
-.landing__hero {
-  flex: 1;
-}
-
-.landing__headline {
+.landing__info-title {
   margin: 0;
-  font-family: var(--font-serif);
-  font-size: clamp(1.625rem, 6.5vw, 1.875rem);
-  font-weight: 700;
-  line-height: 1.42;
-  letter-spacing: -0.03em;
-  color: var(--ink);
-}
-
-.landing__sub {
-  margin: 1.25rem 0 0;
-  font-size: 0.9375rem;
-  line-height: 1.72;
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--ink-body);
 }
 
-.landing__persona {
-  display: inline-block;
-  margin-top: 1rem;
-  padding: 0.35rem 0.75rem;
-  border-radius: 9999px;
-  background: var(--accent-soft);
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--accent);
+.landing__info-text {
+  margin: 0.6rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  color: var(--ink);
 }
 
-.landing__visual {
-  margin: 1rem auto 0;
-  width: 100%;
-  max-width: 280px;
-  border-radius: 16px;
-  overflow: hidden;
-  background: transparent;
-  box-shadow: 0 8px 24px rgba(51, 51, 51, 0.08);
-}
-
-.landing__visual img {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-  background: transparent;
+.landing__info-list {
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--ink);
 }
 
 .landing__form-card {
@@ -193,6 +165,7 @@ body::before {
   font-size: 0.9375rem;
   font-weight: 600;
   letter-spacing: -0.02em;
+  text-decoration: none;
   cursor: pointer;
   transition: background 0.2s ease, transform 0.15s ease;
   box-shadow: 0 6px 20px rgba(166, 93, 67, 0.28);
@@ -220,4 +193,10 @@ body::before {
 .landing__footer strong {
   font-weight: 600;
   color: var(--ink-body);
+}
+
+@media (min-width: 480px) {
+  .landing {
+    padding: 3rem 1.5rem 2.5rem;
+  }
 }

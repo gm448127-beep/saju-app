@@ -1,0 +1,102 @@
+/* 출시 알림 폼 — 랜딩 공통 */
+
+.landing-signup__card {
+  margin-top: 2rem;
+  padding: 1.25rem;
+  border-radius: 1.25rem;
+  border: 1px solid var(--line);
+  background: #ffffff;
+  box-shadow: var(--shadow-card);
+}
+
+.landing-signup__label {
+  margin: 0 0 0.85rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.landing-signup__form {
+  margin: 0;
+}
+
+.landing-signup__input {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--ink);
+  border-radius: 0.5rem;
+  background: #ffffff;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+.landing-signup__input::placeholder {
+  color: var(--ink-muted);
+}
+
+.landing-signup__input:focus {
+  outline: 2px solid var(--accent-soft);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+
+.landing-signup__input:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.landing-signup__message {
+  margin: 0.85rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--ink-body);
+}
+
+.landing-signup__message--error {
+  color: #b42318;
+}
+
+.landing-signup__cta-wrap {
+  margin-top: 1rem;
+}
+
+.landing-signup__cta {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  min-height: 3rem;
+  padding: 0.85rem 1.5rem;
+  border: none;
+  border-radius: 9999px;
+  background: var(--accent);
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease, opacity 0.2s ease;
+  box-shadow: 0 6px 20px rgba(181, 86, 46, 0.28);
+}
+
+.landing-signup__cta:hover:not(:disabled) {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+}
+
+.landing-signup__cta:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.landing-signup__cta:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}

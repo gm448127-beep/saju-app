@@ -1,6 +1,7 @@
 // src/app/api/today/route.ts
 
 import { NextRequest, NextResponse } from "next/server";
+import { getLandingCorsHeaders } from "@/lib/api-cors";
 import { calculateSaju, type SajuInput } from "ssaju";
 import { matchCharacter } from "@/data/matchCharacter";
 import { HOURLY_FLOW_INTRO, SCORE_LABEL_DESC, SIJIN_META } from "@/data/sijinDict";
@@ -1006,13 +1007,25 @@ function buildMyeongsikReport(params: {
 /* ═══════════════════════════════════════
    메인 핸들러
    ═══════════════════════════════════════ */
+export async function OPTIONS(request: NextRequest) {
+  return new NextResponse(null, {
+    status: 204,
+    headers: getLandingCorsHeaders(request),
+  });
+}
+
 export async function POST(request: NextRequest) {
+  const corsHeaders = getLandingCorsHeaders(request);
+
   try {
     const body = await request.json();
     const { year, month, day, hour, minute, isLunar, gender } = body;
 
     if (!year || !month || !day) {
-      return NextResponse.json({ error: "생년월일을 입력해주세요." }, { status: 400 });
+      return NextResponse.json(
+        { error: "생년월일을 입력해주세요." },
+        { status: 400, headers: corsHeaders },
+      );
     }
 
     const now = new Date();
@@ -1288,13 +1301,13 @@ export async function POST(request: NextRequest) {
       hourlyCaution,
     };
 
-    return NextResponse.json(response);
+    return NextResponse.json(response, { headers: corsHeaders });
 
   } catch (error: any) {
     console.error("오늘의 운세 오류:", error);
     return NextResponse.json(
       { error: "운세 계산 중 오류가 발생했습니다: " + (error?.message || "알 수 없는 오류") },
-      { status: 500 }
+      { status: 500, headers: corsHeaders },
     );
   }
 }

@@ -7,6 +7,15 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  async redirects() {
+    return [
+      {
+        source: "/landing-assets",
+        destination: "/landing-download/",
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
