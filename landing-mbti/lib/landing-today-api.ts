@@ -46,7 +46,7 @@ export async function fetchTodayOneLiner(payload: {
   gender: "남" | "여";
 }): Promise<TodayOneLiner> {
   const origin = getLandingApiOrigin();
-  const res = await fetch(`${origin}/api/today/preview`, {
+  const res = await fetch(`${origin}/api/landing-preview`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
