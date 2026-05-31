@@ -55,38 +55,51 @@ function CompareRows({ rows }: { rows: LandingPersonaCopy["hook"]["compare"] }) 
 }
 
 function ReportPreview({ report }: { report: LandingPersonaCopy["report"] }) {
+  const items = [
+    {
+      title: "오늘의 운세",
+      body: report.line.split("\n")[0] ?? report.line,
+      subLabel: report.line.split("\n").slice(1).join(" ") || report.flow,
+    },
+    {
+      title: "오늘 가장 좋은 시간",
+      body: "오전 10:00 ~ 11:30",
+      subLabel: "추천 행동",
+      bullets: ["제안하기", "연락하기", "결정 내리기"],
+    },
+    {
+      title: "오늘 피해야 할 행동",
+      body: "상대의 말만 믿고 결정하기",
+      subLabel: "오늘은 좋은 조건보다 누가 그 조건을 가져왔는지가 더 중요해요.",
+    },
+  ];
+
   return (
-    <div className="relative mt-7 overflow-hidden rounded-[22px] border border-[rgba(47,40,43,0.1)] bg-[#FBF8F3] p-5 shadow-[0_16px_36px_-14px_rgba(47,40,43,0.22)]">
-      <span
-        className="pointer-events-none absolute -bottom-7 -right-3 select-none font-serif text-[130px] leading-none text-[#8B6F47] opacity-[0.05]"
-        aria-hidden
-      >
-        命
-      </span>
+    <div className="relative mt-7">
       <p className="text-[11px] tracking-wide text-[#a89c8d]">{report.date}</p>
       <p className="mt-1 text-base text-[#8B6F47]" style={{ fontFamily: "Jua, sans-serif" }}>
         {report.flow}
       </p>
-      <p
-        className="mt-3 whitespace-pre-line font-serif text-[15.5px] font-medium leading-relaxed text-[#2F282B]"
-      >
-        {report.line}
-      </p>
-      <div className="mt-4 flex items-end gap-1.5">
-        <span className="text-4xl font-bold text-[#2F282B]">{report.score}</span>
-        <span className="pb-1 text-sm text-[#8A7E78]">/ 100 · 종합</span>
-      </div>
-      <div className="mt-4 space-y-2">
-        {report.bars.map((bar) => (
-          <div key={bar.label} className="flex items-center gap-2 text-xs">
-            <span className="w-10 shrink-0 text-[#6B6159]">{bar.label}</span>
-            <div className="h-2 flex-1 overflow-hidden rounded-full bg-[#EDE6DB]">
-              <div
-                className="h-full rounded-full bg-[#8B6F47]"
-                style={{ width: `${bar.value}%` }}
-              />
-            </div>
-            <span className="w-6 text-right font-semibold text-[#2F282B]">{bar.value}</span>
+      <div className="mt-4 space-y-3">
+        {items.map((item, index) => (
+          <div
+            key={item.title}
+            className="rounded-2xl border border-[rgba(47,40,43,0.08)] bg-[#FBF8F3] px-4 py-4"
+          >
+            <p className="text-xs font-bold text-[#8B6F47]">
+              {index + 1}. {item.title}
+            </p>
+            <p className="mt-2 text-[15px] font-medium leading-relaxed text-[#2F282B]">{item.body}</p>
+            {item.subLabel ? (
+              <p className="mt-2 text-sm leading-relaxed text-[#6B6159]">{item.subLabel}</p>
+            ) : null}
+            {item.bullets ? (
+              <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-[#6B6159]">
+                {item.bullets.map((bullet) => (
+                  <li key={bullet}>{bullet}</li>
+                ))}
+              </ul>
+            ) : null}
           </div>
         ))}
       </div>

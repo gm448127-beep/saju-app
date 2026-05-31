@@ -1,0 +1,439 @@
+/* 랜딩 — 오늘의 운세 한 장 리포트 */
+
+.landing-sheet-wrap {
+  margin-top: 1.5rem;
+}
+
+/* 랜딩 — 목업형 2단 리포트 미리보기 */
+
+.landing-report {
+  overflow: hidden;
+  border-radius: 1.25rem;
+  border: 1px solid var(--line);
+  background: #ffffff;
+  padding: 1rem 0.9rem 0.35rem;
+  box-shadow: var(--shadow-card);
+}
+
+.landing-report__header {
+  margin-bottom: 0.35rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.landing-report__brand {
+  margin: 0;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--ink-muted);
+}
+
+.landing-report__date {
+  margin: 0.35rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+}
+
+.landing-report__tone {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* legacy selectors — unused after 3-block 개편, kept for safety */
+.landing-report__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.45rem;
+}
+
+.landing-report__badge {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid rgba(139, 111, 71, 0.35);
+  background: #fff8ee;
+  padding: 0.18rem 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.landing-report__badge--muted {
+  border-color: #d9c8c0;
+  color: #6b5e58;
+}
+
+.landing-report__badge--inline {
+  padding: 0.15rem 0.45rem;
+  font-size: 0.5625rem;
+}
+
+.landing-report__title {
+  margin: 0.45rem 0 0;
+  font-family: "Jua", sans-serif;
+  font-size: 1.25rem;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.landing-report__lead {
+  margin: 0.45rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--ink-muted);
+}
+
+.landing-report__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+}
+
+.landing-report__actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.45rem;
+  margin-top: 0.55rem;
+}
+
+.landing-report__action-card,
+.landing-report__time-card {
+  border-radius: 0.85rem;
+  border: 1px solid var(--line);
+  background: #faf8f5;
+  padding: 0.55rem 0.65rem;
+}
+
+.landing-report__action-label,
+.landing-report__time-label {
+  margin: 0;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.landing-report__action-text,
+.landing-report__time-keyword {
+  margin: 0.25rem 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.55;
+  color: #4a403b;
+  word-break: keep-all;
+  white-space: normal;
+  writing-mode: horizontal-tb;
+}
+
+.landing-report__time-keyword {
+  margin-top: 0.15rem;
+  font-family: "Jua", sans-serif;
+  font-size: 0.8125rem;
+  color: var(--ink);
+}
+
+.landing-report__times {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin-top: 0.45rem;
+}
+
+@media (min-width: 480px) {
+  .landing-report__actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* 태블릿·PC — 2단 리포트 + 가로 텍스트 카드 */
+@media (min-width: 768px) {
+  .landing-report__grid {
+    grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
+    gap: 1rem;
+  }
+
+  .landing-report__actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.5rem;
+  }
+
+  .landing-report__action-label,
+  .landing-report__time-label {
+    font-size: 0.6875rem;
+  }
+
+  .landing-report__action-text {
+    font-size: 0.75rem;
+  }
+
+  .landing-report__times {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .landing-report__sentence {
+    font-size: 1.125rem;
+  }
+}
+
+.landing-report__panel {
+  min-width: 0;
+  border-radius: 1.35rem;
+  border: 1px solid var(--line);
+  padding: 0.75rem 0.65rem 0.8rem;
+  box-shadow: 0 12px 32px rgba(61, 51, 56, 0.05);
+}
+
+.landing-report__panel--warm {
+  background: #fff8ee;
+  border-color: #e8d7c4;
+}
+
+.landing-report__panel--plain {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+}
+
+.landing-report__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.35rem;
+}
+
+.landing-report__tone-chip {
+  max-width: 100%;
+}
+
+.landing-report__date {
+  width: 100%;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+
+.landing-report__divider {
+  height: 1px;
+  margin: 0.55rem 0 0.65rem;
+  background: rgba(217, 200, 192, 0.8);
+}
+
+.landing-report__label {
+  margin: 0;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.landing-report__subcopy {
+  margin: 0.2rem 0 0;
+  font-size: 0.625rem;
+  line-height: 1.45;
+  color: var(--ink-muted);
+}
+
+.landing-report__sentence {
+  margin: 0.35rem 0 0;
+  font-family: "Jua", sans-serif;
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.landing-report__score-wrap {
+  margin-top: 0.7rem;
+}
+
+.landing-report__score-panel {
+  margin-top: 0.35rem;
+  padding: 0.55rem 0.5rem !important;
+}
+
+.landing-report__score-panel .text-3xl {
+  font-size: 1.65rem !important;
+}
+
+.landing-report__score-panel .grid-cols-2 {
+  gap: 0.35rem !important;
+}
+
+.landing-report__score-panel .rounded-xl {
+  padding: 0.35rem 0.4rem !important;
+}
+
+.landing-report__status {
+  margin: 0.35rem 0 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.landing-report__flow {
+  margin-top: 0.65rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.72);
+  padding: 0.55rem 0.6rem;
+}
+
+.landing-report__flow-text {
+  margin: 0.35rem 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.55;
+  color: #4a403b;
+}
+
+.landing-report__emotion {
+  margin-top: 0.55rem;
+  border-radius: 0.85rem;
+  border: 1px solid var(--line);
+  background: #fffdf9;
+  padding: 0.55rem 0.6rem;
+}
+
+.landing-report__emotion-text {
+  margin: 0.35rem 0 0;
+  font-size: 0.625rem;
+  line-height: 1.5;
+  color: #5a4e48;
+}
+
+.landing-sheet {
+  margin-top: 1.5rem;
+  padding: 1.25rem 1.1rem 1.35rem;
+  border-radius: 1.25rem;
+  border: 1px solid var(--line);
+  background: #ffffff;
+  box-shadow: var(--shadow-card);
+}
+
+.landing-sheet__eyebrow {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.landing-sheet__date {
+  margin: 0.35rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+}
+
+.landing-sheet__tone {
+  display: inline-block;
+  margin-top: 0.75rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 9999px;
+  background: var(--accent-soft);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.landing-sheet__headline {
+  margin: 0.85rem 0 0;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.landing-sheet__score-box {
+  margin-top: 1.1rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+
+.landing-sheet__score-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.landing-sheet__score-label {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+
+.landing-sheet__score-value {
+  margin: 0.15rem 0 0;
+  font-family: var(--font-serif);
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.landing-sheet__score-status {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.landing-sheet__axes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.landing-sheet__axis {
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.landing-sheet__axis-label {
+  margin: 0;
+  font-size: 0.6875rem;
+  color: var(--ink-muted);
+}
+
+.landing-sheet__axis-value {
+  margin: 0.15rem 0 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.landing-sheet__guide {
+  margin: 1rem 0 0;
+  padding: 0.85rem 0.9rem;
+  border-radius: 0.75rem;
+  background: var(--accent-soft);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--ink-body);
+}
+
+.landing-sheet__guide strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.landing-sheet__footer {
+  margin: 0.85rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.55;
+  text-align: center;
+  color: var(--ink-muted);
+}
+
+.landing-sheet__loading {
+  margin-top: 1.25rem;
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--ink-muted);
+}

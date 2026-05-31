@@ -1,0 +1,114 @@
+/* 랜딩 — 오늘 리포트 3블록 예시 */
+
+.landing-report-cards {
+  margin-top: 0;
+  padding: 1rem 1rem 1.1rem;
+  border-radius: 1.25rem;
+  border: 1px solid var(--line);
+  background: var(--paper-elevated, #ffffff);
+  box-shadow: var(--shadow-card);
+}
+
+.landing-report-cards--personal {
+  margin-top: 0;
+  border-color: rgba(139, 111, 71, 0.28);
+  background: #fffdf9;
+}
+
+.landing-report .landing-report-cards--personal {
+  margin-top: 0.5rem;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.landing-report-cards__title {
+  margin: 0 0 0.85rem;
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.landing-report-cards__tone {
+  margin: -0.35rem 0 0.75rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--accent, #b5562e);
+}
+
+.landing-report-cards__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.landing-report-cards__item {
+  display: flex;
+  gap: 0.65rem;
+  padding: 0.8rem 0.75rem;
+  border-radius: 1rem;
+  background: var(--paper, #f5f0e8);
+  border: 1px solid rgba(232, 228, 222, 0.9);
+}
+
+.landing-report-cards__item-num {
+  flex-shrink: 0;
+  margin: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--accent-soft, #f0e4de);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent, #b5562e);
+}
+
+.landing-report-cards__item-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.landing-report-cards__item-title {
+  margin: 0 0 0.45rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--accent, #b5562e);
+  letter-spacing: -0.01em;
+}
+
+.landing-report-cards__text {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+.landing-report-cards__sub-label {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--ink-body);
+}
+
+.landing-report-cards__bullets {
+  margin: 0.55rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--ink-body);
+}
+
+.landing-report-cards__bullets li + li {
+  margin-top: 0.25rem;
+}

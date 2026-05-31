@@ -1,0 +1,120 @@
+/* 메타 광고 소재형 히어로 — 좌측 정렬 (모바일 가독성) */
+
+.landing-promo-card {
+  position: relative;
+  margin: 0 0 1rem;
+  padding: 1rem 1rem 0.75rem;
+  min-height: 14.5rem;
+  border-radius: 1rem;
+  background: #f5f1e9;
+}
+
+.landing-promo-card__brand {
+  margin: 0 0 1rem;
+  text-align: right;
+  font-family: var(--font-serif);
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+}
+
+.landing-promo-card__brand span {
+  margin-right: 0.15rem;
+}
+
+.landing-promo-card__body {
+  position: relative;
+  z-index: 1;
+  max-width: calc(100% - 6.75rem);
+  text-align: left;
+}
+
+.landing-promo-card__headline {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.landing-promo-card__lead {
+  margin: 0.5rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--ink-body);
+}
+
+.landing-promo-card__list {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--ink-body);
+}
+
+.landing-promo-card__list li {
+  padding-left: 0.1rem;
+}
+
+.landing-promo-card__list li::before {
+  content: "• ";
+  color: var(--ink-body);
+}
+
+.landing-promo-card__closing {
+  margin: 0.75rem 0 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink-body);
+}
+
+.landing-promo-card__footer {
+  position: relative;
+  z-index: 1;
+  margin: 1rem 0 0;
+  max-width: calc(100% - 6.75rem);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--ink-muted);
+}
+
+.landing-promo-card__art {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 6.75rem;
+  margin: 0;
+  line-height: 0;
+  pointer-events: none;
+}
+
+.landing-promo-card__art img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (min-width: 768px) {
+  .landing-promo-card {
+    min-height: 15.5rem;
+  }
+
+  .landing-promo-card__body,
+  .landing-promo-card__footer {
+    max-width: calc(100% - 8rem);
+  }
+
+  .landing-promo-card__headline {
+    font-size: 1.55rem;
+  }
+
+  .landing-promo-card__art {
+    width: 8rem;
+  }
+}

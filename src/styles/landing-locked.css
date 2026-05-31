@@ -1,0 +1,149 @@
+/* 랜딩 — 결과(공개) 운세 카드 */
+
+.landing-unlocked {
+  overflow: hidden;
+  border-radius: 1.25rem;
+  border: 1px solid var(--line);
+  background: #ffffff;
+  padding: 1rem;
+  box-shadow: var(--shadow-card);
+}
+
+.landing-unlocked__header {
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.landing-unlocked__brand {
+  margin: 0;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--ink-muted);
+}
+
+.landing-unlocked__hook {
+  margin: 0.35rem 0 0;
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.35;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.landing-unlocked__date {
+  margin: 0.35rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+}
+
+.landing-unlocked__title {
+  margin: 0 0 0.85rem;
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.landing-unlocked__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.landing-unlocked__item {
+  display: flex;
+  gap: 0.65rem;
+  padding: 0.8rem 0.75rem;
+  border-radius: 0.75rem;
+  background: var(--paper, #f5f0e8);
+  border: 1px solid rgba(232, 228, 222, 0.9);
+}
+
+.landing-unlocked__item-num {
+  flex-shrink: 0;
+  margin: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--accent-soft, #f0e4de);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--accent, #b5562e);
+}
+
+.landing-unlocked__item-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.landing-unlocked__item-label {
+  margin: 0 0 0.4rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--accent, #b5562e);
+}
+
+.landing-unlocked__item--quote {
+  border-color: rgba(181, 86, 46, 0.22);
+  background: rgba(255, 252, 247, 0.95);
+}
+
+.landing-unlocked__fortune--quote {
+  font-size: 1.125rem;
+  color: var(--accent, #b5562e);
+}
+
+.landing-unlocked__fortune {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  line-height: 1.65;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.landing-unlocked__insight {
+  margin: 0.5rem 0 0;
+  padding-top: 0.5rem;
+  border-top: 1px dashed rgba(232, 228, 222, 0.9);
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--ink-body);
+}
+
+.landing-unlocked__body {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.65;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.landing-unlocked__note {
+  margin: 0.45rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--ink-body);
+}
+
+.landing-unlocked__share {
+  margin: 0.85rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--line);
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  text-align: center;
+  color: var(--ink-muted);
+}

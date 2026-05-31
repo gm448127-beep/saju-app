@@ -1,5 +1,67 @@
 /* 출시 알림 폼 — 랜딩 공통 */
 
+.landing-signup {
+  margin-top: 0;
+  padding: 1rem 1rem 1.1rem;
+  border-radius: 1.25rem;
+  border: 1px solid var(--line);
+  background: var(--paper-elevated, #ffffff);
+  box-shadow: var(--shadow-card);
+}
+
+.landing-signup__field-label {
+  display: block;
+  margin: 0.85rem 0 0.45rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink-body);
+}
+
+.landing-signup__intro {
+  margin-bottom: 1.15rem;
+}
+
+.landing-signup__pitch {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.landing-signup__pitch-sub {
+  margin: 0.55rem 0 0;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: var(--ink-body);
+}
+
+.landing-signup .landing-preview {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.landing-signup .landing-conversion-headline {
+  padding: 0 0 0.5rem;
+}
+
+.landing-preview--form .landing-preview__label {
+  margin-bottom: 0.5rem;
+}
+
+.landing-preview__gender-label {
+  margin: 0.75rem 0 0.4rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink-body);
+}
+
 .landing-signup__card {
   margin-top: 2rem;
   padding: 1.25rem;
@@ -14,6 +76,13 @@
   font-size: 0.9375rem;
   font-weight: 600;
   color: var(--ink);
+}
+
+.landing-signup__hint {
+  margin: -0.45rem 0 0.85rem;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--ink-muted);
 }
 
 .landing-signup__form {
@@ -48,6 +117,63 @@
 .landing-signup__input:disabled {
   opacity: 0.65;
   cursor: not-allowed;
+}
+
+.landing-signup__hint-below {
+  margin: 0.55rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--ink-muted);
+}
+
+.landing-curiosity {
+  margin: 0.85rem 0 0;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 252, 247, 0.92);
+}
+
+.landing-curiosity__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 0.9375rem;
+  font-weight: 700;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.landing-curiosity__list {
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.landing-curiosity__item {
+  position: relative;
+  padding-left: 0.85rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--ink-body);
+}
+
+.landing-curiosity__item::before {
+  content: "·";
+  position: absolute;
+  left: 0;
+  color: var(--accent, #b5562e);
+  font-weight: 700;
+}
+
+.landing-curiosity__note {
+  margin: 0.75rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--ink-muted);
 }
 
 .landing-signup__message {

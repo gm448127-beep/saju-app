@@ -1,9 +1,20 @@
 /** 랜딩 미리보기 — 오늘의 한 줄 API */
 
+import type { DailyFortuneContent } from "@/lib/today-content-engine";
+import { storedBirthToApiPayload } from "@/lib/landing-birth-payload";
+import type { StoredLandingBirth } from "@/lib/landing-preview-storage";
+import {
+  buildSheetFromApi,
+  landingBirthKeyFromStored,
+  type LandingTodaySheetData,
+} from "@/lib/landing-today-sheet";
+
 export type TodayOneLiner = {
   sentence: string;
   toneLabel: string;
 };
+
+export type { LandingTodaySheetData };
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -39,23 +50,13 @@ export function getLandingApiOrigin() {
   return "";
 }
 
-export async function fetchTodayOneLiner(payload: {
-  year: number;
-  month: number;
-  day: number;
-  gender: "남" | "여";
-}): Promise<TodayOneLiner> {
+export async function fetchTodayOneLiner(birth: StoredLandingBirth): Promise<TodayOneLiner> {
+  const payload = storedBirthToApiPayload(birth);
   const origin = getLandingApiOrigin();
   const res = await fetch(`${origin}/api/landing-preview`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      year: payload.year,
-      month: payload.month,
-      day: payload.day,
-      isLunar: false,
-      gender: payload.gender,
-    }),
+    body: JSON.stringify(payload),
   });
 
   const json = (await res.json()) as {
@@ -77,4 +78,28 @@ export async function fetchTodayOneLiner(payload: {
     sentence,
     toneLabel: json.toneLabel?.trim() || "오늘의 결",
   };
+}
+
+/** 이메일 등록 후 — 오늘의 운세 한 장 리포트 */
+export async function fetchTodayReport(birth: StoredLandingBirth): Promise<LandingTodaySheetData> {
+  const payload = storedBirthToApiPayload(birth);
+  const origin = getLandingApiOrigin();
+  const res = await fetch(`${origin}/api/today`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  const json = (await res.json()) as {
+    error?: string;
+    date?: string;
+    scores?: { overall?: number };
+    dailyReport?: DailyFortuneContent;
+  } & Record<string, unknown>;
+
+  if (!res.ok) {
+    throw new Error(json.error || "오늘의 리포트를 불러오지 못했어요.");
+  }
+
+  return buildSheetFromApi(json, landingBirthKeyFromStored(birth));
 }

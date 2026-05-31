@@ -14,6 +14,7 @@ import {
   kstDateAnchor,
 } from "@/lib/kst-date";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
+import { resolveTodaySecretaryCopy } from "@/lib/today-secretary-copy-engine";
 import { computeOhaengCountFromPillars } from "@/lib/today-tone-engine";
 
 /* ─── 상수 정의 ─── */
@@ -259,7 +260,7 @@ function buildSajuInput(
   year: number,
   month: number,
   day: number,
-  opts: { gender?: string; isLunar?: boolean; hour?: number; minute?: number }
+  opts: { gender?: string; isLunar?: boolean; leap?: boolean; hour?: number; minute?: number }
 ): SajuInput {
   const input: SajuInput = {
     year,
@@ -267,6 +268,7 @@ function buildSajuInput(
     day,
     gender: opts.gender === "여" ? "여" : "남",
     calendar: opts.isLunar ? "lunar" : "solar",
+    ...(opts.leap ? { leap: true } : {}),
     timezone: "Asia/Seoul",
     applyLocalMeanTime: true,
     longitude: 126.9784,
@@ -1019,7 +1021,8 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { year, month, day, hour, minute, isLunar, gender } = body;
+    const { year, month, day, hour, minute, isLunar, leap, calendarType, gender } = body;
+    const isLeapMonth = !!leap || calendarType === "lunarLeap";
 
     if (!year || !month || !day) {
       return NextResponse.json(
@@ -1054,7 +1057,8 @@ export async function POST(request: NextRequest) {
     const myCalc = calculateSaju(
       buildSajuInput(+year, +month, +day, {
         gender: gender || "남",
-        isLunar: !!isLunar,
+        isLunar: !!isLunar || isLeapMonth,
+        leap: isLeapMonth,
         hour: hasHour ? +hour : undefined,
         minute: hasHour && hasMinute ? +minute : undefined,
       })
@@ -1246,6 +1250,23 @@ export async function POST(request: NextRequest) {
       ohaengCount,
     });
 
+    const secretaryCopy = await resolveTodaySecretaryCopy(
+      {
+        scores,
+        todaySipsin,
+        todayJiSipsin,
+        relationDetail: SIPSIN_DETAIL[todaySipsin],
+        summary,
+        warning: WARNINGS[todaySipsin],
+        tip: TIPS[todaySipsin],
+        briefing,
+        sajuTriggers,
+        gearAnalysis,
+        todayDosDetailed: actionGuides.dos,
+      },
+      dailyReport,
+    );
+
     const response = {
       date: dateStr,
       calcDateKey,
@@ -1299,6 +1320,8 @@ export async function POST(request: NextRequest) {
       hourlyFlow,
       hourlyPeak,
       hourlyCaution,
+      secretaryCopy,
+      ohaengCount,
     };
 
     return NextResponse.json(response, { headers: corsHeaders });

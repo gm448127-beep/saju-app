@@ -1,45 +1,90 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { BIRTH_TIME_SLOTS } from "@/lib/birth-time-slots";
 import {
   fetchTodayOneLiner,
   isValidLandingBirthDate,
   type TodayOneLiner,
 } from "@/lib/landing-today-api";
 import {
-  getStoredLandingPreview,
+  getStoredLandingBirth,
   hasUsedLandingPreview,
+  normalizeStoredLandingBirth,
+  saveStoredLandingBirth,
   saveStoredLandingPreview,
+  type StoredLandingBirth,
 } from "@/lib/landing-preview-storage";
+import type { BirthTimeMode, CalendarType } from "@/lib/user-profile-storage";
+import {
+  getUserProfile,
+  landingPreviewToProfile,
+  saveUserProfile,
+} from "@/lib/user-profile-storage";
 
 function onlyDigits(value: string, maxLength: number) {
   return value.replace(/\D/g, "").slice(0, maxLength);
 }
 
-export function LandingBirthPreview() {
+const CALENDAR_OPTIONS = [
+  ["solar", "양력"],
+  ["lunar", "음력"],
+  ["lunarLeap", "윤달"],
+] as const satisfies ReadonlyArray<readonly [CalendarType, string]>;
+
+function birthSnapshot(
+  year: string,
+  month: string,
+  day: string,
+  gender: "남" | "여",
+  calendarType: CalendarType,
+  timeMode: BirthTimeMode,
+  slotHour: number,
+): StoredLandingBirth {
+  return normalizeStoredLandingBirth({ year, month, day, gender, calendarType, timeMode, slotHour });
+}
+
+type LandingBirthPreviewProps = {
+  /** form: 입력만 저장 · preview: 한 줄 미리보기 API */
+  mode?: "form" | "preview";
+};
+
+export function LandingBirthPreview({ mode = "form" }: LandingBirthPreviewProps) {
   const hintId = useId();
-  const storedOnMount = useRef(getStoredLandingPreview());
-  const [year, setYear] = useState(storedOnMount.current?.year ?? "");
-  const [month, setMonth] = useState(storedOnMount.current?.month ?? "");
-  const [day, setDay] = useState(storedOnMount.current?.day ?? "");
-  const [gender, setGender] = useState<"남" | "여">(storedOnMount.current?.gender ?? "여");
-  const [locked, setLocked] = useState(() => hasUsedLandingPreview());
+  const isFormMode = mode === "form";
+  const storedOnMount = useRef(normalizeStoredLandingBirth(getStoredLandingBirth() ?? {}));
+  const [year, setYear] = useState(storedOnMount.current.year ?? "");
+  const [month, setMonth] = useState(storedOnMount.current.month ?? "");
+  const [day, setDay] = useState(storedOnMount.current.day ?? "");
+  const [gender, setGender] = useState<"남" | "여">(storedOnMount.current.gender ?? "여");
+  const [calendarType, setCalendarType] = useState<CalendarType>(
+    storedOnMount.current.calendarType ?? "solar",
+  );
+  const [timeMode, setTimeMode] = useState<BirthTimeMode>(storedOnMount.current.timeMode ?? "slot");
+  const [slotHour, setSlotHour] = useState(storedOnMount.current.slotHour ?? 9);
+  const [locked, setLocked] = useState(() => !isFormMode && hasUsedLandingPreview());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [result, setResult] = useState<TodayOneLiner | null>(() =>
-    storedOnMount.current
-      ? {
-          sentence: storedOnMount.current.sentence,
-          toneLabel: storedOnMount.current.toneLabel,
-        }
-      : null,
-  );
+  const [result, setResult] = useState<TodayOneLiner | null>(() => {
+    if (isFormMode) return null;
+    const stored = storedOnMount.current;
+    if (!stored?.sentence) return null;
+    return {
+      sentence: stored.sentence,
+      toneLabel: stored.toneLabel || "오늘의 결",
+    };
+  });
   const requestId = useRef(0);
 
   const birthValid = isValidLandingBirthDate(year, month, day);
 
   useEffect(() => {
-    if (locked) return;
+    if (!birthValid) return;
+    saveStoredLandingBirth(birthSnapshot(year, month, day, gender, calendarType, timeMode, slotHour));
+  }, [birthValid, year, month, day, gender, calendarType, timeMode, slotHour]);
+
+  useEffect(() => {
+    if (isFormMode || locked) return;
 
     if (!birthValid) {
       setResult(null);
@@ -47,28 +92,26 @@ export function LandingBirthPreview() {
       return;
     }
 
+    const birth = birthSnapshot(year, month, day, gender, calendarType, timeMode, slotHour);
+
     const timer = window.setTimeout(async () => {
       const currentId = ++requestId.current;
       setLoading(true);
       setError("");
 
       try {
-        const next = await fetchTodayOneLiner({
-          year: Number(year),
-          month: Number(month),
-          day: Number(day),
-          gender,
-        });
+        const next = await fetchTodayOneLiner(birth);
         if (currentId !== requestId.current) return;
 
         saveStoredLandingPreview({
-          year,
-          month,
-          day,
-          gender,
+          ...birth,
           sentence: next.sentence,
           toneLabel: next.toneLabel,
         });
+        const existing = getUserProfile();
+        if (!existing) {
+          saveUserProfile(landingPreviewToProfile(birth));
+        }
         setResult(next);
         setLocked(true);
       } catch (err) {
@@ -81,24 +124,31 @@ export function LandingBirthPreview() {
     }, 450);
 
     return () => window.clearTimeout(timer);
-  }, [locked, birthValid, year, month, day, gender]);
+  }, [isFormMode, locked, birthValid, year, month, day, gender, calendarType, timeMode, slotHour]);
 
-  const scrollToEmailForm = () => {
-    document.getElementById("launch-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
-  const inputsDisabled = locked || loading;
+  const inputsDisabled = !isFormMode && (locked || loading);
 
   return (
-    <section className="landing-preview" aria-labelledby={hintId}>
+    <section
+      className={`landing-preview${isFormMode ? " landing-preview--form" : ""}`}
+      id="landing-birth-preview"
+      aria-labelledby={hintId}
+    >
       <p id={hintId} className="landing-preview__label">
-        생년월일로 오늘의 한 줄 보기
+        {isFormMode ? "생년월일 · 달력 · 태어난 시간" : "내 사주로 받으려면"}
       </p>
-      <p className="landing-preview__hint">
-        {locked
-          ? "미리보기 1회를 사용했어요 · 매일 받으려면 아래에서 이메일을 남겨주세요"
-          : "양력 기준 · 세션당 1회만 미리볼 수 있어요"}
-      </p>
+      {!isFormMode ? (
+        <p className="landing-preview__hint">
+          {locked
+            ? "입력하신 정보로 리포트를 맞춰 드려요 · 이메일만 남기면 돼요"
+            : "양력·음력·윤달 중 맞는 달력을 고른 뒤 생년월일과 태어난 시간을 입력해 주세요"}
+        </p>
+      ) : (
+        <p className="landing-preview__hint landing-preview__hint--form">
+          신분증·가족관계증명서에 적힌 달력(양력·음력·윤달)을 선택해 주세요. 태어난 시(時)도 알면
+          꼭 골라 주세요.
+        </p>
+      )}
 
       <div className="landing-preview__grid">
         <div className="landing-preview__field">
@@ -148,6 +198,66 @@ export function LandingBirthPreview() {
         </div>
       </div>
 
+      <p className="landing-preview__calendar-label">달력</p>
+      <div className="landing-preview__calendar" role="group" aria-label="달력">
+        {CALENDAR_OPTIONS.map(([type, label]) => (
+          <button
+            key={type}
+            type="button"
+            className={`landing-preview__calendar-btn${
+              calendarType === type ? " landing-preview__calendar-btn--active" : ""
+            }`}
+            disabled={inputsDisabled}
+            onClick={() => setCalendarType(type)}
+            aria-pressed={calendarType === type}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <p className="landing-preview__time-label">태어난 시간</p>
+      <div className="landing-preview__time-modes" role="group" aria-label="태어난 시간">
+        <button
+          type="button"
+          className={`landing-preview__time-mode${timeMode === "slot" ? " landing-preview__time-mode--active" : ""}`}
+          disabled={inputsDisabled}
+          onClick={() => setTimeMode("slot")}
+          aria-pressed={timeMode === "slot"}
+        >
+          시간대 선택
+        </button>
+        <button
+          type="button"
+          className={`landing-preview__time-mode${timeMode === "none" ? " landing-preview__time-mode--active" : ""}`}
+          disabled={inputsDisabled}
+          onClick={() => setTimeMode("none")}
+          aria-pressed={timeMode === "none"}
+        >
+          시간 모름
+        </button>
+      </div>
+
+      {timeMode === "slot" ? (
+        <select
+          id={`${hintId}-slot`}
+          className="landing-preview__time-select"
+          value={slotHour}
+          disabled={inputsDisabled}
+          onChange={(event) => setSlotHour(Number(event.target.value))}
+          aria-label="출생 시간대"
+        >
+          {BIRTH_TIME_SLOTS.map((slot) => (
+            <option key={slot.value} value={slot.value}>
+              {slot.label}
+            </option>
+          ))}
+        </select>
+      ) : (
+        <p className="landing-preview__time-note">시간을 모르면 생년월일 기준으로 읽어 드립니다.</p>
+      )}
+
+      <p className="landing-preview__gender-label">성별</p>
       <div className="landing-preview__gender" role="group" aria-label="성별">
         {(["여", "남"] as const).map((value) => (
           <button
@@ -165,7 +275,7 @@ export function LandingBirthPreview() {
         ))}
       </div>
 
-      {loading ? (
+      {!isFormMode && loading ? (
         <p className="landing-preview__status" role="status">
           오늘의 흐름을 읽는 중…
         </p>
@@ -177,13 +287,10 @@ export function LandingBirthPreview() {
         </p>
       ) : null}
 
-      {result && !loading ? (
-        <div className="landing-preview__result" role="status">
+      {!isFormMode && result && !loading ? (
+        <div className="landing-preview__result landing-preview__result--compact" role="status">
           <p className="landing-preview__tone">오늘의 결 · {result.toneLabel}</p>
           <p className="landing-preview__sentence">{result.sentence}</p>
-          <button type="button" className="landing-preview__email-link" onClick={scrollToEmailForm}>
-            매일 받아보려면 이메일 입력
-          </button>
         </div>
       ) : null}
     </section>

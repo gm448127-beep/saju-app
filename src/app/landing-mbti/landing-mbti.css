@@ -1,11 +1,16 @@
 @import "../../styles/landing-signup.css";
+@import "../../styles/landing-locked.css";
+@import "../../styles/landing-conversion.css";
+@import "../../styles/landing-promo-hero.css";
 @import "../../styles/landing-canvas.css";
 @import "../../styles/landing-preview.css";
+@import "../../styles/landing-today-sheet.css";
+@import "../../styles/tomorrow-preview.css";
 
 /* MBTI 자기이해 랜딩 — paper / ink / accent */
 
 .landing-mbti-page {
-  --paper: #f5f2ed;
+  --paper: #f5f0e8;
   --paper-elevated: #ffffff;
   --ink: #333333;
   --ink-body: #706b67;

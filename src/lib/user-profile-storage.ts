@@ -181,3 +181,105 @@ export function profileToChatBirthData(profile: UserBirthProfile) {
     exactMinute: String(profile.exactMinute),
   };
 }
+
+/** 생년월일 폼 state에 프로필 반영 */
+export type BirthFormSetters = {
+  setYear: (v: string) => void;
+  setMonth: (v: string) => void;
+  setDay: (v: string) => void;
+  setTimeMode: (v: BirthTimeMode) => void;
+  setSlotHour: (v: number) => void;
+  setExactHour: (v: number) => void;
+  setExactMinute: (v: number) => void;
+  setCalendarType: (v: CalendarType | string) => void;
+  setGender: (v: "남" | "여" | string) => void;
+  setName?: (v: string) => void;
+};
+
+export function applyProfileToBirthForm(profile: UserBirthProfile, setters: BirthFormSetters) {
+  setters.setYear(profile.year);
+  setters.setMonth(profile.month);
+  setters.setDay(profile.day);
+  setters.setTimeMode(profile.timeMode);
+  setters.setSlotHour(profile.slotHour);
+  setters.setExactHour(profile.exactHour);
+  setters.setExactMinute(profile.exactMinute);
+  setters.setCalendarType(profile.calendarType);
+  setters.setGender(profile.gender);
+  setters.setName?.(profile.name?.trim() || "");
+}
+
+/** 궁합 — 내 정보(person1)용 */
+export function profileToCompatibilityPerson(profile: UserBirthProfile) {
+  return {
+    name: profile.name?.trim() || "",
+    year: profile.year,
+    month: profile.month,
+    day: profile.day,
+    gender: profile.gender,
+    calendarType: profile.calendarType,
+    timeMode: profile.timeMode,
+    slotHour: profile.timeMode === "slot" ? profile.slotHour : ("" as const),
+    exactHour: profile.timeMode === "exact" ? profile.exactHour : ("" as const),
+    exactMinute: profile.timeMode === "exact" ? profile.exactMinute : ("" as const),
+  };
+}
+
+export function compatibilityPersonToProfile(person: {
+  name?: string;
+  year: string;
+  month: string;
+  day: string;
+  gender: string;
+  calendarType: string;
+  timeMode: BirthTimeMode;
+  slotHour: number | "";
+  exactHour: number | "";
+  exactMinute: number | "";
+}): Omit<UserBirthProfile, "savedAt"> {
+  return {
+    name: person.name?.trim() || undefined,
+    year: person.year,
+    month: person.month,
+    day: person.day,
+    gender: person.gender === "여" ? "여" : "남",
+    calendarType:
+      person.calendarType === "lunar"
+        ? "lunar"
+        : person.calendarType === "lunarLeap"
+          ? "lunarLeap"
+          : "solar",
+    timeMode: person.timeMode,
+    slotHour: typeof person.slotHour === "number" ? person.slotHour : 9,
+    exactHour: typeof person.exactHour === "number" ? person.exactHour : 9,
+    exactMinute: typeof person.exactMinute === "number" ? person.exactMinute : 0,
+  };
+}
+
+/** 랜딩 미리보기(생년월일·성별만) → 프로필 */
+export function landingPreviewToProfile(input: {
+  year: string;
+  month: string;
+  day: string;
+  gender: "남" | "여";
+  calendarType?: CalendarType;
+  timeMode?: BirthTimeMode;
+  slotHour?: number;
+  exactHour?: number;
+  exactMinute?: number;
+}): Omit<UserBirthProfile, "savedAt"> {
+  return {
+    year: input.year,
+    month: input.month,
+    day: input.day,
+    gender: input.gender,
+    calendarType:
+      input.calendarType === "lunar" || input.calendarType === "lunarLeap"
+        ? input.calendarType
+        : "solar",
+    timeMode: input.timeMode ?? "slot",
+    slotHour: input.slotHour ?? 9,
+    exactHour: input.exactHour ?? 9,
+    exactMinute: input.exactMinute ?? 0,
+  };
+}
