@@ -2,9 +2,9 @@ import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import type { ToneKey } from "@/lib/today-tone-types";
 
 /**
- * 랜딩 결과 4항목 — docs/content-constitution-1.0.md
- * 1~3: 운세 톤(흐름·타이밍·실수 장면) — 성격 낙인 금지
- * 4: 오늘 비서의 제안 — 행동 제안만 (명언·교훈 금지)
+ * 오늘의 운세 무료 4단 — docs/content-constitution-2.1.md §1
+ * 1 흐름 · 2 타이밍(무엇을 할 시간) · 3 실수 장면 · 4 비서 제안
+ * 금지: 성격 낙인, 교훈, 사건 예언 (헌법 §2·§3·§6)
  */
 export const LANDING_RESULT_LABELS = [
   "오늘의 흐름",

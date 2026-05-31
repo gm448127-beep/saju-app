@@ -1,5 +1,7 @@
 # 운명비서 콘텐츠 헌법 1.0
 
+> **구버전.** 현행은 [`content-constitution-2.1.md`](./content-constitution-2.1.md).
+
 랜딩 결과 카피 구현: `src/lib/landing-insight-copy.ts`
 
 ## 1. 운명비서의 정체성

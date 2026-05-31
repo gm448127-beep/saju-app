@@ -5,12 +5,14 @@ This version has breaking changes — APIs, conventions, and file structure may 
 <!-- END:nextjs-agent-rules -->
 
 <!-- BEGIN:content-constitution -->
-# 운명비서 콘텐츠
+# 운명비서 콘텐츠 (헌법 v2.1)
 
-랜딩·결과 문장 작성 시 `docs/content-constitution-1.0.md` 와 `src/lib/landing-insight-copy.ts` 를 따른다.
+카피·해석 작성 시 **`docs/content-constitution-2.1.md`** 를 따른다. 구현: `src/lib/landing-insight-copy.ts`, `src/components/UnmyeongFourCardInsights.tsx`
 
-- **4단 구조 유지 (§16)**: 운세(흐름) · 타이밍 · 위험 장면 · 비서 제안 — 역할·라벨 변경 금지
-- **절대 회귀 금지**: `당신은 ~한 사람입니다` (성격 낙인). 1~4항목 모두
-- 금지: 위로, 명언·교훈, 사건 예언(§15)
-- 1~3: 운세 톤(`오늘은 ~하기 쉽다` 등). 4: 구체적 행동 제안
+- **정체성**: 미래 맞추기 ❌ · 오늘 이해·선택 ⭕ · 「나 얘기 같은데?」 목표
+- **4단 고정**: 오늘의 흐름 · 행동하기 좋은 타이밍(무엇을 할 시간) · 실수 장면(따옴표) · 비서 제안(행동 1개)
+- **절대 금지**: `당신은 ~한 사람입니다` · 교훈(신중하세요 등) · 사건 예언 · 의미 없는 행운 나열
+- **5축**: 관계 · 일 · 돈 · 선택 · 감정
+- **행운**: 유지, 값+오늘 의미 한 줄
+- **재작성 대상**: 오늘의 운세 · 사주 · 궁합 · 타로 · 토정비결 (동일 철학)
 <!-- END:content-constitution -->
