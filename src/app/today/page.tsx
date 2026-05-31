@@ -5,17 +5,9 @@ import StoredProfileBar from "@/components/StoredProfileBar";
 import { useUserProfile } from "@/components/UserProfileProvider";
 import ShareButton from "@/components/ShareButton";
 import PdfButton from "@/components/PdfButton";
-import HourlyFlowSection from "@/components/HourlyFlowSection";
-import SajuTriggerSection from "@/components/SajuTriggerSection";
-import TodayStatsSection, { type TodayStatItem } from "@/components/TodayStatsSection";
-import TimeAdviceSection from "@/components/TimeAdviceSection";
-import TodayActionGuideSection from "@/components/TodayActionGuideSection";
-import TodayFiveCardReport from "@/components/TodayFiveCardReport";
 import TodayPageHeader from "@/components/today/TodayPageHeader";
-import TodayScoreBasisBar from "@/components/today/TodayScoreBasisBar";
-import TodayStoryShareButton from "@/components/TodayStoryShareButton";
 import TodayPersonalizeForm, { isValidBirthDate } from "@/components/TodayPersonalizeForm";
-import { TODAY_TAB_COPY } from "@/lib/today-page-copy";
+import TodaySecretaryReport from "@/components/today/TodaySecretaryReport";
 import { formatKstDateLabel } from "@/lib/kst-date";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import {
@@ -24,24 +16,15 @@ import {
 } from "@/lib/onboarding-storage";
 import {
   birthKeyFromTodayPayload,
-  clampFortuneScore,
-  serializeTodayPayload,
   type TodayFetchPayload,
 } from "@/lib/today-score-display";
 import {
+  applyProfileToBirthForm,
   profileBirthTimeSummary,
   profileToBirthKey,
   profileToTodayPayload,
   type UserBirthProfile,
 } from "@/lib/user-profile-storage";
-
-const TAB_ITEMS = [
-  TODAY_TAB_COPY.summary,
-  TODAY_TAB_COPY.detail,
-  TODAY_TAB_COPY.myeongsik,
-] as const;
-
-type TodayTab = (typeof TAB_ITEMS)[number]["key"];
 
 function formatTodayLabel(date = new Date()) {
   const label = formatKstDateLabel(date);
@@ -50,229 +33,11 @@ function formatTodayLabel(date = new Date()) {
   return `${m[1]}.${String(m[2]).padStart(2, "0")}.${String(m[3]).padStart(2, "0")} (${m[4]})`;
 }
 
-function SectionTitle({ title, caption }: { title: string; caption?: string }) {
-  return (
-    <div className="mb-4">
-      <h2 className="label mb-1">{title}</h2>
-      {caption && <p className="text-xs text-[#8A7E78]">{caption}</p>}
-    </div>
-  );
-}
-
-function TodayBriefingReport({ result }: { result: any }) {
-  const briefing = result.briefing;
-  if (!briefing) return null;
-
-  return (
-    <div className="space-y-4">
-      <div className="rounded-[28px] border border-[#E2D7D0] bg-white px-6 py-7 shadow-[0_14px_40px_rgba(61,51,56,0.06)]">
-        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-xs tracking-[0.18em] text-[#B8A78D]">{briefing.date}</p>
-            <h2 className="mt-3 text-2xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-              {briefing.title}
-            </h2>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-[#5A4E48]">{briefing.headline}</p>
-          </div>
-          <div className="rounded-3xl border border-[#E2D7D0] bg-[#FAF8F5] px-6 py-4 text-center">
-            <p className="text-xs text-[#8A7E78]">종합 점수</p>
-            <p className="mt-1 text-5xl font-bold text-[#2F282B]">{result.scores.overall}</p>
-            <p className="mt-1 text-sm text-[#8B6F47]">{briefing.scoreTone}</p>
-          </div>
-        </div>
-
-        <div className="mt-6 rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] px-5 py-4">
-          <p className="text-xs tracking-[0.12em] text-[#8B6F47]">핵심 한 줄</p>
-          <p className="mt-2 text-lg leading-relaxed text-[#3D3338]" style={{ fontFamily: "Jua, sans-serif" }}>
-            {briefing.oneLine}
-          </p>
-        </div>
-      </div>
-
-      <div className="card">
-        <SectionTitle title="오늘의 브리핑" caption="십성, 일진, 합충, 시간 흐름을 종합한 요약입니다." />
-        <div className="space-y-3">
-          {briefing.executiveSummary?.map((line: string, index: number) => (
-            <div key={index} className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
-              <p className="text-sm leading-relaxed text-[#5A4E48]">{line}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-2">
-          <div className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
-            <p className="text-xs font-semibold text-[#8B6F47]">오늘의 활용법</p>
-            <p className="mt-2 text-sm leading-relaxed text-[#5A4E48]">{briefing.focus}</p>
-          </div>
-          <div className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
-            <p className="text-xs font-semibold text-[#8B6F47]">오늘의 주의점</p>
-            <p className="mt-2 text-sm leading-relaxed text-[#5A4E48]">{briefing.caution}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function DomainScoreSummary({ domains }: { domains?: any[] }) {
-  if (!domains?.length) return null;
-
-  return (
-    <div className="card">
-      <SectionTitle title="영역별 점수 요약" caption="기존 운세 점수를 바탕으로 오늘 활용할 영역을 세분화했습니다." />
-      <div className="space-y-3">
-        {domains.map((domain) => (
-          <div key={domain.key} className="grid grid-cols-[72px_1fr_56px] items-center gap-3">
-            <div>
-              <p className="text-sm font-semibold text-[#3D3338]">{domain.label}</p>
-              <p className="text-[11px] text-[#8A7E78]">{domain.grade}</p>
-            </div>
-            <div className="h-2.5 overflow-hidden rounded-full bg-[#EDE4DC]">
-              <div
-                className="h-full rounded-full bg-[#8B6F47]"
-                style={{ width: `${Math.min(Math.max(domain.score, 0), 100)}%` }}
-              />
-            </div>
-            <p className="text-right text-lg font-bold text-[#2F282B]">{domain.score}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function DetailedFortuneReport({ items }: { items?: any[] }) {
-  if (!items?.length) return null;
-
-  return (
-    <div className="space-y-4">
-      {items.map((item) => (
-        <div key={item.key} className="card">
-          <div className="mb-4 flex items-start justify-between gap-4">
-            <div>
-              <p className="text-xs tracking-[0.12em] text-[#B8A78D]">DETAILED REPORT</p>
-              <h2 className="mt-1 text-2xl text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-                {item.label}
-              </h2>
-              <p className="mt-1 text-xs text-[#8A7E78]">{item.desc}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-4xl font-bold text-[#2F282B]">{item.score}</p>
-              <p className="text-xs text-[#8B6F47]">{item.grade}</p>
-            </div>
-          </div>
-
-          <div className="h-3 overflow-hidden rounded-full bg-[#EDE4DC]">
-            <div className="h-full rounded-full bg-[#8B6F47]" style={{ width: `${item.score}%` }} />
-          </div>
-
-          <div className="mt-5 space-y-4 text-sm leading-relaxed text-[#5A4E48]">
-            <p>{item.overview}</p>
-            <div>
-              <p className="mb-1 font-semibold text-[#3D5838]">긍정 요소</p>
-              <p>{item.positive}</p>
-            </div>
-            <div>
-              <p className="mb-1 font-semibold text-[#7A4A3D]">주의 요소</p>
-              <p>{item.cautionText}</p>
-            </div>
-            <div className="grid grid-cols-1 gap-3 border-t border-[#E2D7D0] pt-4 md:grid-cols-2">
-              <div className="rounded-2xl bg-[#FAF8F5] px-4 py-3">
-                <p className="text-xs font-semibold text-[#8B6F47]">오늘의 행동</p>
-                <p className="mt-1">{item.action}</p>
-              </div>
-              <div className="rounded-2xl bg-[#FAF8F5] px-4 py-3">
-                <p className="text-xs font-semibold text-[#8B6F47]">피하면 좋은 것</p>
-                <p className="mt-1">{item.avoid}</p>
-              </div>
-            </div>
-            <p className="border-t border-[#E2D7D0] pt-4 text-xs text-[#8A7E78]">{item.basis}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function MyeongsikReport({ report }: { report?: any }) {
-  if (!report) return null;
-
-  return (
-    <div className="space-y-4">
-      <div className="card">
-        <SectionTitle title={report.title} caption="오늘의 일진과 나의 원국을 함께 읽은 전문가용 요약입니다." />
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          {report.natal.pillars.map((pillar: any) => (
-            <div key={pillar.key} className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-4 text-center">
-              <p className="text-xs text-[#8A7E78]">{pillar.label}</p>
-              <p className="mt-2 text-lg text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
-                {pillar.value}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="card">
-        <SectionTitle title="오늘 일진" caption="오늘 들어온 천간과 지지가 나에게 어떤 십성으로 작용하는지 정리했습니다." />
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-          <div className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
-            <p className="text-xs text-[#8A7E78]">오늘 천간</p>
-            <p className="mt-1 text-base text-[#3D3338]">{report.today.gan}</p>
-          </div>
-          <div className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
-            <p className="text-xs text-[#8A7E78]">오늘 지지</p>
-            <p className="mt-1 text-base text-[#3D3338]">{report.today.ji}</p>
-          </div>
-          <div className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
-            <p className="text-xs text-[#8A7E78]">내 일간 기준</p>
-            <p className="mt-1 text-base text-[#3D3338]">
-              {report.today.sipsin} / {report.today.branchSipsin}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {(report.triggers?.length > 0 || report.legacyLines?.length > 0) && (
-        <div className="card">
-          <SectionTitle title="반영 요소" caption="점수와 해석에 반영된 합충, 십성, 오행 근거입니다." />
-          <div className="space-y-2">
-            {(report.triggers?.length ? report.triggers : report.legacyLines).map((item: any, index: number) => (
-              <div key={index} className="rounded-2xl border border-[#E2D7D0] bg-white px-4 py-3">
-                <p className="text-sm leading-relaxed text-[#5A4E48]">
-                  {typeof item === "string" ? item : `${item.label || item.title || "반영"} · ${item.desc || item.description || item.reason || ""}`}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
 function applyProfileToFormState(
   profile: UserBirthProfile,
-  setters: {
-    setYear: (v: string) => void;
-    setMonth: (v: string) => void;
-    setDay: (v: string) => void;
-    setTimeMode: (v: "none" | "slot" | "exact") => void;
-    setSlotHour: (v: number) => void;
-    setExactHour: (v: number) => void;
-    setExactMinute: (v: number) => void;
-    setCalendarType: (v: string) => void;
-    setGender: (v: string) => void;
-  },
+  setters: Parameters<typeof applyProfileToBirthForm>[1],
 ) {
-  setters.setYear(profile.year);
-  setters.setMonth(profile.month);
-  setters.setDay(profile.day);
-  setters.setTimeMode(profile.timeMode);
-  setters.setSlotHour(profile.slotHour);
-  setters.setExactHour(profile.exactHour);
-  setters.setExactMinute(profile.exactMinute);
-  setters.setCalendarType(profile.calendarType);
-  setters.setGender(profile.gender);
+  applyProfileToBirthForm(profile, setters);
 }
 
 export default function TodayPage() {
@@ -290,8 +55,6 @@ export default function TodayPage() {
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [activeTab, setActiveTab] = useState<TodayTab>("summary");
-  const [lastFetchedPayload, setLastFetchedPayload] = useState<TodayFetchPayload | null>(null);
   const resultRef = useRef<HTMLDivElement>(null);
 
   const formPayload = useMemo((): TodayFetchPayload => {
@@ -331,10 +94,6 @@ export default function TodayPage() {
     if (profile) return profileToBirthKey(profile);
     return birthKeyFromTodayPayload(formPayload);
   }, [profile, formPayload]);
-  const scoreStale =
-    Boolean(result?.scores?.overall) &&
-    lastFetchedPayload !== null &&
-    serializeTodayPayload(lastFetchedPayload) !== serializeTodayPayload(formPayload);
   const todayLabel = formatTodayLabel();
   const [highlightPersonalize, setHighlightPersonalize] = useState(false);
 
@@ -411,8 +170,6 @@ export default function TodayPage() {
         const json = await res.json();
         if (!res.ok) throw new Error(json.error || "분석 실패");
         setResult(json);
-        setLastFetchedPayload(payload);
-        setActiveTab("summary");
         if (scrollToResult) {
           window.setTimeout(() => {
             resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -464,26 +221,6 @@ export default function TodayPage() {
     await fetchTodayReport(formPayload);
   };
 
-  const recalculateFromForm = useCallback(async () => {
-    if (!isValidBirthDate(year, month, day)) {
-      setError("생년월일을 숫자로 정확히 입력해주세요.");
-      return;
-    }
-    setError("");
-    persistProfileFromForm();
-    await fetchTodayReport(formPayload);
-  }, [fetchTodayReport, formPayload, persistProfileFromForm, year, month, day]);
-
-  const statItems: Omit<TodayStatItem, "score">[] = result
-    ? [
-        { label: "재물운", key: "wealth", color: "#8B6F47", emoji: "" },
-        { label: "애정운", key: "love", color: "#8B6F47", emoji: "" },
-        { label: "직장운", key: "career", color: "#8B6F47", emoji: "" },
-        { label: "건강운", key: "health", color: "#8B6F47", emoji: "" },
-        { label: "행운", key: "luck", color: "#8B6F47", emoji: "" },
-      ]
-    : [];
-
   const personalizeForm = (
     <TodayPersonalizeForm
       year={year}
@@ -524,7 +261,7 @@ export default function TodayPage() {
             <div className="mb-3 shrink-0">
               <StoredProfileBar
                 profile={profile}
-                subtitle={`한국 시간 기준 오늘 · ${profileBirthTimeSummary(profile)} · PC·폰 프로필이 같으면 점수도 같습니다`}
+                subtitle={`한국 시간 기준 오늘 · ${profileBirthTimeSummary(profile)} · PC·폰 프로필이 같으면 결과도 같습니다`}
                 onEdit={scrollToPersonalizeForm}
               />
             </div>
@@ -540,145 +277,29 @@ export default function TodayPage() {
           {personalizedReport && (
             <div ref={resultRef} className="space-y-6">
               <section aria-label="나의 오늘의 흐름" className="space-y-6">
-            <TodayPageHeader
-              title={profile ? `${displayName}의 오늘` : "나의 오늘"}
-              dateLabel={todayLabel}
-              subtitle="한 줄 → 4축 점수 → 오늘의 흐름 → 행동 가이드 → 시간대별 운세 순으로 읽어보세요."
-            />
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" data-pdf-ignore>
-            <p className="text-sm text-[#5A4E48]">저장 · 공유 · PDF</p>
-            <div
-              id="today-share-actions"
-              className="flex w-full flex-col gap-2 sm:w-auto sm:min-w-[min(100%,420px)]"
-              data-pdf-ignore
-            >
-              <TodayStoryShareButton
-                report={personalizedReport}
-                dateLabel={todayLabel}
-                displayName={profile ? displayName : undefined}
-                fileName="today-story"
-              />
-              <div className="flex flex-nowrap gap-1 sm:gap-2">
-                <PdfButton targetRef={resultRef} fileName="today-fortune" />
-                <ShareButton targetRef={resultRef} fileName="today-fortune" />
-              </div>
-            </div>
-          </div>
-
-                <div
-                  className="rounded-xl border border-[#E2D7D0] bg-white/95 p-0.5 shadow-[0_6px_18px_rgba(61,51,56,0.05)] backdrop-blur sm:sticky sm:top-16 sm:z-10 sm:rounded-2xl sm:p-1"
-                  data-pdf-ignore
-                >
-            <div className="grid grid-cols-3 gap-0.5 sm:gap-1">
-              {TAB_ITEMS.map((tab) => (
-                <button
-                  key={tab.key}
-                  type="button"
-                  onClick={() => setActiveTab(tab.key)}
-                  className={`flex min-h-12 flex-col items-center justify-center rounded-lg px-1 py-2 transition sm:rounded-xl sm:px-2 ${
-                    activeTab === tab.key
-                      ? "bg-[#2F282B] text-white"
-                      : "text-[#8A7E78] hover:bg-[#FAF8F5] hover:text-[#3D3338]"
-                  }`}
-                >
-                  <span className="text-xs font-bold sm:text-sm">{tab.label}</span>
-                  <span
-                    className={`mt-0.5 text-[9px] sm:text-[10px] ${
-                      activeTab === tab.key ? "text-[#F5F1EB]/85" : "text-[#A09488]"
-                    }`}
+                <TodayPageHeader
+                  title={profile ? `${displayName}의 오늘` : "나의 오늘"}
+                  dateLabel={todayLabel}
+                  subtitle="흐름 → 타이밍 → 실수 장면 → 비서 제안까지 무료로 읽고, 아래에서 상세 리포트를 확인하세요."
+                />
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" data-pdf-ignore>
+                  <p className="text-sm text-[#5A4E48]">저장 · 공유 · PDF</p>
+                  <div
+                    id="today-share-actions"
+                    className="flex w-full flex-nowrap gap-1 sm:w-auto sm:gap-2"
+                    data-pdf-ignore
                   >
-                    {tab.hint}
-                  </span>
-                </button>
-              ))}
+                    <PdfButton targetRef={resultRef} fileName="today-fortune" />
+                    <ShareButton targetRef={resultRef} fileName="today-fortune" />
+                  </div>
                 </div>
-              </div>
 
-              {result?.scores?.overall != null && lastFetchedPayload && (
-          <TodayScoreBasisBar
-            overall={clampFortuneScore(result.scores.overall)}
-            calcDateKey={result.calcDateKey}
-            payload={lastFetchedPayload}
-            stale={scoreStale}
-            onRecalculate={() => void recalculateFromForm()}
-              />
-              )}
-
-              {activeTab === "summary" && (
-          <TodayFiveCardReport
-            report={personalizedReport}
-            mode="personalized"
-            result={result}
-            birthKey={birthKey}
-            dateLabel={todayLabel}
-            hourlyFlow={result.hourlyFlow}
-            hourlyFlowIntro={result.hourlyFlowIntro}
-            hourlyPeak={result.hourlyPeak}
-            hourlyCaution={result.hourlyCaution}
-            onOpenDetail={() => {
-              setActiveTab("detail");
-              window.setTimeout(() => {
-                document.getElementById("today-hourly-flow")?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                });
-              }, 80);
-            }}
-              />
-              )}
-
-              {activeTab === "detail" && (
-          <div className="space-y-6">
-            <p className="rounded-2xl border border-[#E8D7C4] bg-[#FAF5ED] px-4 py-3 text-sm text-[#5A4E48]">
-              <span className="font-bold text-[#8B6F47]">자세히</span> 탭 — 브리핑·5대운·상세 행동 가이드입니다. 12시진은
-              핵심만 탭 하단에서도 볼 수 있어요.
-            </p>
-            <TodayBriefingReport result={result} />
-            <DomainScoreSummary domains={result.domainScores} />
-            <TodayStatsSection
-              overall={result.scores.overall}
-              items={statItems.map((item) => ({
-                ...item,
-                score: result.scores[item.key],
-              }))}
-            />
-            <DetailedFortuneReport items={result.detailedFortunes} />
-            {result.hourlyFlow && (
-              <div id="today-hourly-flow" className="scroll-mt-24">
-              <HourlyFlowSection
-                hourlyFlow={result.hourlyFlow}
-                hourlyFlowIntro={result.hourlyFlowIntro}
-                hourlyPeak={result.hourlyPeak}
-                hourlyCaution={result.hourlyCaution}
-              />
-              </div>
-            )}
-            <TimeAdviceSection items={result.timeAdvice ?? []} />
-            <TodayActionGuideSection
-              dos={result.todayDos}
-              donts={result.todayDonts}
-              dosDetailed={result.todayDosDetailed}
-              dontsDetailed={result.todayDontsDetailed}
-              luckyItems={result.luckyItems}
-              tip={result.tip}
-              warning={result.warning}
-              sipsinTitle={result.sipsinTitle}
-            />
-              </div>
-              )}
-
-              {activeTab === "myeongsik" && (
-          <div className="space-y-6">
-            <MyeongsikReport report={result.myeongsikReport} />
-            {(result.sajuTriggers?.length > 0 || result.gearAnalysis?.length > 0) && (
-              <SajuTriggerSection
-                intro={result.sajuTriggerIntro}
-                triggers={result.sajuTriggers?.length ? result.sajuTriggers : []}
-                pillars={result.pillars}
-              />
-            )}
-              </div>
-              )}
+                <TodaySecretaryReport
+                  report={personalizedReport}
+                  result={result}
+                  birthKey={birthKey}
+                  dateLabel={todayLabel}
+                />
               </section>
             </div>
           )}

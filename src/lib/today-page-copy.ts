@@ -1,17 +1,30 @@
-/** `/today` 화면 정보 위계·탭·카드 라벨 */
+/** `/today` 화면 정보 위계·카드 라벨 — docs/content-constitution-1.0.md §6·§16 */
 
-export const TODAY_TAB_COPY = {
-  summary: { key: "summary" as const, label: "핵심만", hint: "한 줄·점수·흐름·행동" },
-  detail: { key: "detail" as const, label: "자세히", hint: "브리핑·12시진·상세 가이드" },
-  myeongsik: { key: "myeongsik" as const, label: "근거", hint: "명식·합충·트리거" },
-};
+/** 무료 ↔ 유료 전환 티저 (카피만 변경, 디자인 동일) */
+export const TODAY_DECISION_TEASER = {
+  title: "오늘, 선택 하나 앞에 서 있을 수 있어요.",
+  body: [
+    "4단까지 읽었다면",
+    "이제 사업·돈·관계·연애 중",
+    "오늘 가장 영향력이 큰 영역을",
+    "이어서 정리해 뒀어요.",
+    "",
+    "놓치고 있는 것,",
+    "지금 가장 위험한 선택,",
+    "밀어붙여도 되는 시점까지",
+    "한 번에 확인해 보세요.",
+  ],
+  cta: "상세 리포트 읽기",
+  hint: "사업, 돈, 인간관계, 연애 중\n오늘 가장 영향력이 큰 영역을 확인하세요.",
+} as const;
 
 export const TODAY_READING_STEPS = [
-  { id: "sentence", step: 1, title: "한 줄 요약", hint: "오늘의 결" },
-  { id: "scores", step: 2, title: "4축 점수", hint: "관계·결정·감정·균형" },
-  { id: "flow", step: 3, title: "오늘의 흐름", hint: "오전·오후·저녁·밤" },
-  { id: "action", step: 4, title: "행동 가이드", hint: "할 것 · 피할 것" },
-  { id: "hourly", step: 5, title: "시간대별 운세", hint: "12시진" },
+  { id: "flow", step: 1, title: "오늘의 흐름", hint: "오늘 어떤 흐름인가" },
+  { id: "timing", step: 2, title: "행동하기 좋은 타이밍", hint: "언제 움직일 것인가" },
+  { id: "mistake", step: 3, title: "실수할 가능성", hint: "어디서 실수하는가" },
+  { id: "suggestion", step: 4, title: "오늘 비서의 제안", hint: "오늘 뭘 하면 좋은가" },
+  { id: "premium", step: 5, title: "상세 리포트", hint: "분야별·결정 포인트" },
+  { id: "basis", step: 6, title: "전문가 근거", hint: "해석 신뢰" },
 ] as const;
 
 export type TodayCardPriority = "primary" | "secondary" | "optional";
@@ -20,11 +33,12 @@ export const TODAY_CARD_META: Record<
   string,
   { step?: number; title: string; priority: TodayCardPriority }
 > = {
-  sentence: { step: 1, title: "오늘의 한 줄", priority: "primary" },
-  scores: { step: 2, title: "4축 점수", priority: "primary" },
-  flow: { step: 3, title: "오늘의 흐름", priority: "primary" },
-  action: { step: 4, title: "행동 가이드", priority: "primary" },
-  hourly: { step: 5, title: "시간대별 운세", priority: "secondary" },
+  flow: { step: 1, title: "오늘의 흐름", priority: "primary" },
+  timing: { step: 2, title: "행동하기 좋은 타이밍", priority: "primary" },
+  mistake: { step: 3, title: "실수할 가능성이 높은 순간", priority: "primary" },
+  suggestion: { step: 4, title: "오늘 비서의 제안", priority: "primary" },
+  premium: { step: 5, title: "상세 리포트", priority: "secondary" },
+  basis: { step: 6, title: "전문가 근거", priority: "optional" },
 };
 
 /** 카드 공통 — 얇은 베이지 배경 */
