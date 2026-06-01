@@ -10,7 +10,7 @@ export const BRAND_COLORS = {
   paperInset: "#F7F2EC",
   paperSelected: "#F2EBE3",
   paperDesktop: "#EBE6DF",
-  ink: "#2F282B",
+  ink: "#1C1A17",
   inkBody: "#5A504B",
   inkMuted: "#726963",
   line: "#DCCFBE",

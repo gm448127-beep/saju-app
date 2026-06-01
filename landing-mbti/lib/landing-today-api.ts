@@ -1,9 +1,14 @@
-/** 랜딩 미리보기 — 오늘의 한 줄 API */
+﻿/** ?쒕뵫 誘몃━蹂닿린 ???ㅻ뒛????以?API */
+
+import type { DailyFortuneContent } from "../lib/today-content-engine";
+import { buildSheetFromApi, type LandingTodaySheetData } from "../lib/landing-today-sheet";
 
 export type TodayOneLiner = {
   sentence: string;
   toneLabel: string;
 };
+
+export type { LandingTodaySheetData };
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -43,7 +48,7 @@ export async function fetchTodayOneLiner(payload: {
   year: number;
   month: number;
   day: number;
-  gender: "남" | "여";
+  gender: "?? | "??;
 }): Promise<TodayOneLiner> {
   const origin = getLandingApiOrigin();
   const res = await fetch(`${origin}/api/landing-preview`, {
@@ -65,16 +70,51 @@ export async function fetchTodayOneLiner(payload: {
   };
 
   if (!res.ok) {
-    throw new Error(json.error || "오늘의 흐름을 불러오지 못했어요.");
+    throw new Error(json.error || "?ㅻ뒛???먮쫫??遺덈윭?ㅼ? 紐삵뻽?댁슂.");
   }
 
   const sentence = json.sentence?.trim();
   if (!sentence) {
-    throw new Error("결과를 만들지 못했어요.");
+    throw new Error("寃곌낵瑜?留뚮뱾吏 紐삵뻽?댁슂.");
   }
 
   return {
     sentence,
-    toneLabel: json.toneLabel?.trim() || "오늘의 결",
+    toneLabel: json.toneLabel?.trim() || "?ㅻ뒛??寃?,
   };
 }
+
+/** ?대찓???깅줉 ?????ㅻ뒛???댁꽭 ????由ы룷??*/
+export async function fetchTodayReport(payload: {
+  year: number;
+  month: number;
+  day: number;
+  gender: "?? | "??;
+}): Promise<LandingTodaySheetData> {
+  const origin = getLandingApiOrigin();
+  const res = await fetch(`${origin}/api/today`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      year: payload.year,
+      month: payload.month,
+      day: payload.day,
+      isLunar: false,
+      gender: payload.gender,
+    }),
+  });
+
+  const json = (await res.json()) as {
+    error?: string;
+    date?: string;
+    scores?: { overall?: number };
+    dailyReport?: DailyFortuneContent;
+  };
+
+  if (!res.ok) {
+    throw new Error(json.error || "?ㅻ뒛??由ы룷?몃? 遺덈윭?ㅼ? 紐삵뻽?댁슂.");
+  }
+
+  return buildSheetFromApi(json);
+}
+

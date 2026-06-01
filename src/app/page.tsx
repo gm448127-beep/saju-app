@@ -443,7 +443,7 @@ export default function HomePage() {
         </p>
       )}
 
-      {profile && (previewLoading || !dailyContent) ? (
+      {profile && previewLoading ? (
         <section aria-label="맞춤 오늘 흐름 로딩" className="gyeol-card gyeol-loading">
           <p className="gyeol-eyebrow">MY TODAY</p>
           <p className="gyeol-serif mt-2 text-lg">{displayName}의 오늘을 맞추는 중…</p>

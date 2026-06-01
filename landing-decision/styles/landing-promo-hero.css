@@ -1,0 +1,15 @@
+.landing-promo-hero {
+  margin: -2.5rem -1.25rem 0;
+  background: #f5f1e9;
+  line-height: 0;
+}
+
+.landing-promo-hero__img {
+  display: block;
+  width: 100%;
+  max-width: 32rem;
+  margin: 0 auto;
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+}

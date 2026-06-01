@@ -1,48 +1,58 @@
 /**
  * 운명비서 브랜드 컬러 — 단일 소스
- * 근거: docs/brand-color-audit.md (스크린샷 색채 심층 진단 PDF 반영)
+ * @see docs/brand-color-system.md · 디자인 시스템 v3.0 (색채 진단 반영)
  *
- * 골격 유지: 아이보리·크림·딥 브라운·골드 브라운
- * 보정: 마이크로카피·본문·CTA·인터랙티브 보더 대비 (WCAG)
+ * 골격: 아이보리·브라운·먹색 3축 — 새 색 추가 금지
  */
 
 :root {
-  /* ── 서피스 계층 (명도 차 의도적 확대) ── */
-  --paper: #f5f0e8;
+  /* ── 서피스 (v3: surface-*) ── */
+  --surface-base: #f5f0e8;
+  --surface-sub: #f7f2ec;
+  --surface-card: #fffdfc;
+  --surface-selected: #eadfcf;
+  --paper: var(--surface-base);
   --paper-subtle: #faf6ef;
-  --paper-elevated: #fffdfc;
-  --paper-inset: #f7f2ec;
+  --paper-elevated: var(--surface-card);
+  --paper-inset: var(--surface-sub);
   --paper-selected: #f2ebe3;
-  --paper-selected-strong: #eadfcf;
+  --paper-selected-strong: var(--surface-selected);
   --paper-desktop: #ebe6df;
 
-  /* ── 텍스트 (대비 AA/AAA) ── */
-  --ink: #2f282b;
-  --ink-body: #5a504b;
-  --ink-muted: #726963;
+  /* ── 텍스트 (v3: text-*) ── */
+  --text-primary: #1c1a17;
+  --text-body: #5a504b;
+  --text-muted: #726963;
+  --ink: var(--text-primary);
+  --ink-body: var(--text-body);
+  --ink-muted: var(--text-muted);
   --ink-on-dark: #ffffff;
   --ink-inverse: #f5f0e8;
 
-  /* ── 보더 2단계: 섹션 vs 인터랙티브 ── */
-  --line: #dccfbe;
-  --line-interactive: #917d63;
+  /* ── 보더 2단계 (v3) ── */
+  --border-section: #dccfbe;
+  --border-interactive: #917d63;
+  --line: var(--border-section);
+  --line-interactive: var(--border-interactive);
   --line-strong: var(--line-interactive);
 
-  /* ── 액션: 골드 CTA (브라운 혼용 금지) ── */
-  --accent: #7a5d35;
+  /* ── CTA (v3: 역할 분리) ── */
+  --cta-primary: #2f282b;
+  --cta-secondary: #7a5d35;
+  --accent: var(--cta-secondary);
   --accent-hover: #6b502e;
   --accent-soft: #f2ebe3;
   --accent-muted: #9a8265;
   --on-accent: #ffffff;
-
-  /* ── 다크 primary (헤딩·주요 다크 버튼) ── */
-  --primary-dark: #2f282b;
+  --primary-dark: var(--cta-primary);
   --primary-dark-hover: #463a40;
   --on-primary-dark: #ffffff;
 
-  /* ── 데이터·차트·점수 강조 (CTA와 분리) ── */
-  --data-accent: #c79a5a;
-  --data-accent-soft: #e8b682;
+  /* ── 데이터·차트·점수 (CTA와 분리) ── */
+  --accent-data: #c79a5a;
+  --accent-warm: #e8b682;
+  --data-accent: var(--accent-data);
+  --data-accent-soft: var(--accent-warm);
 
   /* ── 상태 ── */
   --sage-bg: #e8f0e5;

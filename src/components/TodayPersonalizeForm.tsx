@@ -71,7 +71,7 @@ export default function TodayPersonalizeForm(props: TodayPersonalizeFormProps) {
 
         {!isPersonalized ? (
           <div className="relative flex items-center gap-3 px-5 pt-5 sm:px-7">
-            <MiinAvatar size={48} priority />
+            <MiinAvatar size={56} priority />
             <p
               className="min-w-0 flex-1 text-sm leading-relaxed text-[#4A403B] sm:text-base"
               style={{ fontFamily: "Jua, sans-serif" }}
@@ -85,7 +85,7 @@ export default function TodayPersonalizeForm(props: TodayPersonalizeFormProps) {
               다른 사주로 다시 정렬
             </h2>
             <p className="mt-2 max-w-xl text-sm leading-relaxed text-[#6B5E58]">
-              생년월일을 바꾸면 같은 날의 흐름이 다른 결·점수로 다시 그려집니다.
+              생년월일을 바꾸면 같은 날의 흐름이 다른 결로 다시 그려집니다.
             </p>
           </div>
         )}

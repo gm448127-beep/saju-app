@@ -1,9 +1,16 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ShareButton from '@/components/ShareButton';
 import BirthDateNumberInputs, { isValidBirthDate } from '@/components/BirthDateNumberInputs';
+import StoredProfileBar from '@/components/StoredProfileBar';
 import TojeongResultSection from '@/components/TojeongResultSection';
+import { useUserProfile } from '@/components/UserProfileProvider';
+import {
+  applyProfileToBirthForm,
+  profileToSajuPayload,
+  type UserBirthProfile,
+} from '@/lib/user-profile-storage';
 
 const TIME_SLOTS = [
   { value: 23, label: '자시 (23:00~01:00)' },
@@ -22,6 +29,8 @@ const TIME_SLOTS = [
 
 export default function TojeongPage() {
   const resultRef = useRef<HTMLDivElement | null>(null);
+  const { profile, saveProfile, isReady: profileReady } = useUserProfile();
+  const autoLoadedRef = useRef<string | null>(null);
 
   const [year, setYear] = useState('1995');
   const [month, setMonth] = useState('1');
@@ -38,44 +47,90 @@ export default function TojeongPage() {
   const [error, setError] = useState('');
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const persistProfileFromForm = useCallback(() => {
+    const stored: Omit<UserBirthProfile, "savedAt"> = {
+      year,
+      month,
+      day,
+      gender: gender as "남" | "여",
+      calendarType: calendarType as UserBirthProfile["calendarType"],
+      timeMode,
+      slotHour,
+      exactHour,
+      exactMinute,
+    };
+    saveProfile(stored);
+  }, [year, month, day, gender, calendarType, timeMode, slotHour, exactHour, exactMinute, saveProfile]);
+
+  const fetchTojeongReport = useCallback(async (payload?: ReturnType<typeof profileToSajuPayload>, scrollToResult = true) => {
     setError('');
     setResult(null);
 
-    if (!isValidBirthDate(year, month, day)) {
+    const body = payload ?? {
+      year: Number(year),
+      month: Number(month),
+      day: Number(day),
+      hour: timeMode === 'exact' ? exactHour : timeMode === 'slot' ? slotHour : undefined,
+      minute: timeMode === 'exact' ? exactMinute : timeMode === 'slot' ? 0 : undefined,
+      isLunar: calendarType !== "solar",
+      gender,
+    };
+
+    if (!isValidBirthDate(String(body.year), String(body.month), String(body.day))) {
       setError('생년월일을 숫자로 정확히 입력해주세요.');
       return;
     }
 
     setLoading(true);
 
-    let hour: number | undefined;
-    let minute: number | undefined;
-
-    if (timeMode === 'exact') {
-      hour = exactHour;
-      minute = exactMinute;
-    } else if (timeMode === 'slot') {
-      hour = slotHour;
-      minute = 0;
-    }
-
     try {
       const res = await fetch('/api/tojeong', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ year: Number(year), month: Number(month), day: Number(day), hour, minute, isLunar: calendarType !== "solar", gender }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || '분석 실패');
       setResult(data);
       setSelectedMonth(null);
+      if (!payload) persistProfileFromForm();
+      if (scrollToResult) {
+        window.setTimeout(() => {
+          resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 80);
+      }
     } catch (err: any) {
       setError(err.message || '오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
+  }, [year, month, day, timeMode, exactHour, exactMinute, slotHour, calendarType, gender, persistProfileFromForm]);
+
+  useEffect(() => {
+    if (!profileReady || !profile) return;
+    applyProfileToBirthForm(profile, {
+      setYear,
+      setMonth,
+      setDay,
+      setTimeMode,
+      setSlotHour,
+      setExactHour,
+      setExactMinute,
+      setCalendarType,
+      setGender,
+    });
+  }, [profile, profileReady]);
+
+  useEffect(() => {
+    if (!profileReady || !profile) return;
+    if (autoLoadedRef.current === profile.savedAt) return;
+    autoLoadedRef.current = profile.savedAt;
+    fetchTojeongReport(profileToSajuPayload(profile), true);
+  }, [profile, profileReady, fetchTojeongReport]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await fetchTojeongReport(undefined, true);
   };
 
   function scoreColor(score: number) {
@@ -95,7 +150,14 @@ export default function TojeongPage() {
 
       {/* 입력 폼 */}
       <div className="card">
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {profile ? (
+          <StoredProfileBar
+            profile={profile}
+            subtitle="저장된 사주 기준으로 토정비결을 불러옵니다"
+            onEdit={() => document.getElementById("tojeong-birth-form")?.scrollIntoView({ behavior: "smooth" })}
+          />
+        ) : null}
+        <form id="tojeong-birth-form" onSubmit={handleSubmit} className="space-y-4">
           <BirthDateNumberInputs
             year={year}
             month={month}

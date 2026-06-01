@@ -1,23 +1,16 @@
 "use client";
 
 import { LandingBirthPreview } from "../components/LandingBirthPreview";
-import { LandingCanvasHero } from "../components/LandingCanvasHero";
+import { LandingPromoHeroImage } from "../components/LandingPromoHeroImage";
 import { LandingSignupForm } from "../components/LandingSignupForm";
+
+const DECISION_HERO_ALT =
+  "오늘의 운세 무료 확인. 생년월일만 입력하면 오늘의 운세, 오늘 운이 좋은 시간, 오늘 피해야 할 행동을 무료로 확인하세요. AI가 분석한 오늘의 운세 리포트.";
 
 export default function LandingDecisionPage() {
   return (
     <main className="landing">
-      <LandingCanvasHero
-        headline={
-          <>
-            매일의 작은 결정이
-            <br />
-            어려운 당신에게
-          </>
-        }
-        tagline="오늘이 결정의 날인지, 흐름을 따라가는 날인지"
-        imageSrc="/landing-hero-cat.png"
-      />
+      <LandingPromoHeroImage src="/landing-decision-promo.png" alt={DECISION_HERO_ALT} />
 
       <div className="landing-page__body">
         <LandingBirthPreview />

@@ -165,7 +165,7 @@ function HistoryPageContent() {
               alt="미인"
               width={48}
               height={48}
-              className="h-12 w-12 rounded-full border border-[#E8D7C4] bg-[#FFF8EE] object-cover object-center shadow-[0_4px_12px_rgba(139,111,71,0.12)]"
+              className="h-12 w-12 rounded-full border border-[#E8D7C4] bg-[#FFF8EE] object-cover object-[center_18%] shadow-[0_4px_12px_rgba(139,111,71,0.12)]"
             />
             {filterEnabled ? (
               <div className="relative">

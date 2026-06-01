@@ -10,7 +10,7 @@ function ScoreBlocks({ score, size = "md" }: { score: number; size?: "md" | "sm"
       {Array.from({ length: 8 }, (_, index) => (
         <span
           key={index}
-          className={`rounded-sm ${blockClass} ${index < filled ? "bg-[#8B6F47]" : "bg-[#EDE4DC]"}`}
+          className={`rounded-sm ${blockClass} ${index < filled ? "bg-score" : "bg-[#EDE4DC]"}`}
         />
       ))}
     </div>
@@ -50,7 +50,7 @@ export default function AxisScorePanel({
       <div className="border-b border-[#E2D7D0]/70 pb-3">
         <div className="flex items-end justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-[11px] font-bold text-[#8B6F47]">{overallLabel}</p>
+            <p className="text-[11px] font-bold text-score">{overallLabel}</p>
             <div className="mt-1 flex flex-wrap items-end gap-2">
               <p className="text-3xl font-bold leading-none text-[#2F282B]">{overall}</p>
               {showDelta && <OverallScoreDelta comparison={overallComparison} size="md" />}
@@ -67,7 +67,7 @@ export default function AxisScorePanel({
             className="rounded-xl border border-[#E2D7D0]/80 bg-white/90 px-2.5 py-2 lg:grid lg:grid-cols-[42px_28px_1fr] lg:items-center lg:gap-2 lg:rounded-none lg:border-0 lg:bg-transparent lg:px-0 lg:py-0"
           >
             <p className="text-[10px] font-semibold text-[#8A7E78] lg:text-xs lg:text-[#6B5E58]">{area.label}</p>
-            <p className="text-lg font-bold leading-none text-[#8B6F47] lg:text-xs">{area.score}</p>
+            <p className="text-lg font-bold leading-none text-score lg:text-xs">{area.score}</p>
             <div className="mt-1 lg:mt-0">
               <ScoreBlocks score={area.score} size="sm" />
             </div>

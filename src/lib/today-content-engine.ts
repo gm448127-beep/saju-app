@@ -2,6 +2,7 @@ import { AI_CHAT_ENABLED } from "@/lib/feature-flags";
 import { TONE_DEFINITIONS } from "@/lib/today-tone-data";
 import { generateTodayToneReport, hashSeed as toneHashSeed } from "@/lib/today-tone-engine";
 import type { ToneKey, ToneStatus, UserSajuProfile } from "@/lib/today-tone-types";
+import { applySecretaryVoice } from "@/lib/today-secretary-voice";
 
 type DailyProfile = UserSajuProfile;
 
@@ -113,17 +114,17 @@ export function buildDailyFortuneContent(
       emotion: toneReport.scores.emotion,
       balance: toneReport.scores.balance,
     },
-    sentence: toneReport.oneLiner,
-    flow: toneReport.flowText,
+    sentence: applySecretaryVoice(toneReport.oneLiner),
+    flow: applySecretaryVoice(toneReport.flowText),
     actionGuide: {
-      dos: toneReport.guides.do,
-      donts: toneReport.guides.dont,
-      relationTip: toneReport.guides.relation,
-      workMoneyTip: toneReport.guides.money,
+      dos: applySecretaryVoice(toneReport.guides.do),
+      donts: applySecretaryVoice(toneReport.guides.dont),
+      relationTip: applySecretaryVoice(toneReport.guides.relation),
+      workMoneyTip: applySecretaryVoice(toneReport.guides.money),
     },
     emotionPoint: {
-      description: toneReport.guides.emotion,
-      tips: [pickTip(4), pickTip(5)],
+      description: applySecretaryVoice(toneReport.guides.emotion),
+      tips: [applySecretaryVoice(pickTip(4)), applySecretaryVoice(pickTip(5))],
     },
     timeSlots: [
       { label: "오전", keyword: timeKeywords.morning, description: toneReport.timeFlow.morning },

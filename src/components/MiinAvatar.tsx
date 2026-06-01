@@ -19,12 +19,16 @@ export default function MiinAvatar({ size = 80, className = "", priority = false
       : size === 56
         ? "h-14 w-14"
         : size === 80
-        ? "h-20 w-20"
-        : size === 128
-          ? "h-32 w-32"
-          : size === 144
-            ? "h-36 w-36"
-            : "";
+          ? "h-20 w-20"
+          : size === 96
+            ? "h-24 w-24"
+            : size === 112
+              ? "h-28 w-28"
+              : size === 128
+                ? "h-32 w-32"
+                : size === 144
+                  ? "h-36 w-36"
+                  : "";
 
   const dimensionStyle = sizeClass ? undefined : { width: size, height: size };
 
@@ -56,7 +60,7 @@ export default function MiinAvatar({ size = 80, className = "", priority = false
       alt="미인"
       width={size}
       height={size}
-      className={`shrink-0 rounded-full border border-[#E8D7C4] bg-[#FFF8EE] object-cover object-center shadow-[0_4px_14px_rgba(139,111,71,0.15)] ${sizeClass} ${className}`}
+      className={`shrink-0 rounded-full border border-[#E8D7C4] bg-[#FFF8EE] object-cover object-[center_18%] shadow-[0_4px_14px_rgba(139,111,71,0.15)] ${sizeClass} ${className}`}
       style={dimensionStyle}
       priority={priority}
       onError={() => setImageFailed(true)}

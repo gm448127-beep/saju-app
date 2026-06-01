@@ -8,7 +8,7 @@ const DEFAULT_OG_IMAGE = "/kakao-og-20260518.png";
 export function getSiteUrl() {
   const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim();
   if (raw) return raw.replace(/\/$/, "");
-  return "https://saju-app-vert.vercel.app";
+  return "https://www.unmyeongbiseo.kr";
 }
 
 type PageMetaKey =

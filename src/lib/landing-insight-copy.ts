@@ -168,7 +168,7 @@ function buildTiming(report: DailyFortuneContent, exposure: ToneExposure): Landi
   return {
     label: "행동하기 좋은 타이밍",
     fortune: timeRange,
-    insight: `${energy}\n\n${note}`,
+    insight: `${energy}\n${note}`,
   };
 }
 

@@ -1,0 +1,139 @@
+/* 랜딩 — 오늘의 운세 한 장 리포트 */
+
+.landing-sheet {
+  margin-top: 1.5rem;
+  padding: 1.25rem 1.1rem 1.35rem;
+  border-radius: 1.25rem;
+  border: 1px solid var(--line);
+  background: #ffffff;
+  box-shadow: var(--shadow-card);
+}
+
+.landing-sheet__eyebrow {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.landing-sheet__date {
+  margin: 0.35rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+}
+
+.landing-sheet__tone {
+  display: inline-block;
+  margin-top: 0.75rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 9999px;
+  background: var(--accent-soft);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.landing-sheet__headline {
+  margin: 0.85rem 0 0;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+
+.landing-sheet__score-box {
+  margin-top: 1.1rem;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: var(--paper);
+  border: 1px solid var(--line);
+}
+
+.landing-sheet__score-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.landing-sheet__score-label {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+
+.landing-sheet__score-value {
+  margin: 0.15rem 0 0;
+  font-family: var(--font-serif);
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+}
+
+.landing-sheet__score-status {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.landing-sheet__axes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.landing-sheet__axis {
+  padding: 0.55rem 0.65rem;
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.landing-sheet__axis-label {
+  margin: 0;
+  font-size: 0.6875rem;
+  color: var(--ink-muted);
+}
+
+.landing-sheet__axis-value {
+  margin: 0.15rem 0 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.landing-sheet__guide {
+  margin: 1rem 0 0;
+  padding: 0.85rem 0.9rem;
+  border-radius: 0.75rem;
+  background: var(--accent-soft);
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--ink-body);
+}
+
+.landing-sheet__guide strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.landing-sheet__footer {
+  margin: 0.85rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.55;
+  text-align: center;
+  color: var(--ink-muted);
+}
+
+.landing-sheet__loading {
+  margin-top: 1.25rem;
+  font-size: 0.875rem;
+  text-align: center;
+  color: var(--ink-muted);
+}

@@ -1,6 +1,7 @@
 # 운명비서 콘텐츠 헌법 v2.1
 
-> **현행 헌법.** v1.0은 참고용.  
+> **Superseded by v3.0 (2026.05).** 신규·재작성은 [`content-constitution-3.0.md`](./content-constitution-3.0.md) 만 따른다.  
+> 본 문서는 v2.1 시점 구현·비교용으로 보존한다. v1.0은 참고용.  
 > 오늘의 운세 4단 구현: `src/lib/landing-insight-copy.ts` · `src/components/UnmyeongFourCardInsights.tsx`  
 > 적용 범위(재작성 대상): 오늘의 운세 · 사주 · 궁합 · 타로 · 토정비결
 
@@ -195,7 +196,7 @@
 |------|------|------|
 | 오늘의 운세 (무료 4단) | ✅ v2.1 반영 | `landing-insight-copy` + `/today` |
 | 오늘의 운세 (상세·행운) | 🔲 | 행운 §5, 유료 블록 |
-| 사주 | 🔲 | |
+| 사주 | 🔲 | [`saju-report-direction.md`](./saju-report-direction.md) — 원국 번역, 용어≠본문 |
 | 궁합 | 🔲 | |
 | 타로 | 🔲 | |
 | 토정비결 | 🔲 | |

@@ -19,6 +19,7 @@ import {
   setIntroOnboarded,
   setOnboardingInputTarget,
 } from "@/lib/onboarding-storage";
+import { isLandingPath } from "@/lib/landing-routes";
 import {
   getProfileDisplayName,
   getUserProfile,
@@ -74,15 +75,11 @@ export default function UserProfileProvider({ children }: { children: ReactNode 
     return () => window.removeEventListener(PROFILE_UPDATED_EVENT, onUpdate);
   }, [refreshProfile]);
 
-  const isLandingPath =
-    pathname === "/landing-mbti" ||
-    pathname === "/landing-restart" ||
-    pathname === "/landing-decision" ||
-    pathname?.startsWith("/landing-");
+  const onLanding = isLandingPath(pathname);
 
   useEffect(() => {
     if (!isReady) return;
-    if (isLandingPath) {
+    if (onLanding) {
       setShowIntro(false);
       setShowOnboarding(false);
       return;
@@ -100,7 +97,7 @@ export default function UserProfileProvider({ children }: { children: ReactNode 
     } else {
       setShowOnboarding(false);
     }
-  }, [isReady, profile, onboardingDismissed, pathname, isLandingPath]);
+  }, [isReady, profile, onboardingDismissed, pathname, onLanding]);
 
   const finishIntro = useCallback(() => {
     setIntroOnboarded();
@@ -139,7 +136,7 @@ export default function UserProfileProvider({ children }: { children: ReactNode 
   return (
     <UserProfileContext.Provider value={value}>
       {children}
-      {showIntro && (
+      {showIntro && !onLanding && (
         <IntroOnboarding
           onSkip={() => finishIntro()}
           onStart={() => {
@@ -152,7 +149,7 @@ export default function UserProfileProvider({ children }: { children: ReactNode 
         />
       )}
       <OnboardingModal
-        open={showOnboarding && !showIntro}
+        open={showOnboarding && !showIntro && !onLanding}
         onComplete={saveProfile}
         onClose={() => {
           setOnboardingDismissed(true);

@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import TodayReportToolbar from "@/components/today/TodayReportToolbar";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import TomorrowPreviewTeaser from "@/components/TomorrowPreviewTeaser";
 import TodayDomainFortuneAccordion from "@/components/today/TodayDomainFortuneAccordion";
@@ -38,6 +38,7 @@ type TodaySecretaryReportProps = {
   result: TodayApiResult;
   birthKey: string;
   dateLabel?: string;
+  exportTargetRef: React.RefObject<HTMLDivElement | null>;
 };
 
 function buildOverallFromAxis(report: DailyFortuneContent) {
@@ -54,6 +55,7 @@ export default function TodaySecretaryReport({
   result,
   birthKey,
   dateLabel,
+  exportTargetRef,
 }: TodaySecretaryReportProps) {
   const dateKey = getTodayDateKey();
   const scores = result.scores ?? {};
@@ -157,21 +159,13 @@ export default function TodaySecretaryReport({
     <section className="today-secretary" aria-label="오늘의 운세 리포트">
       <TodayReadingGuide />
 
-      <div className="today-secretary__toolbar" data-pdf-ignore>
-        <button
-          type="button"
-          onClick={handleSave}
-          className={`today-secretary__toolbar-btn today-secretary__toolbar-btn--primary ${savePulse ? "scale-105" : ""}`}
-        >
-          {saved ? "저장됨 ✓" : "저장하기"}
-        </button>
-        <Link href="#today-share-actions" className="today-secretary__toolbar-btn today-secretary__toolbar-btn--ghost">
-          공유
-        </Link>
-        <Link href="/history" className="today-secretary__toolbar-btn today-secretary__toolbar-btn--ghost">
-          기록
-        </Link>
-      </div>
+      <TodayReportToolbar
+        saved={saved}
+        savePulse={savePulse}
+        onSave={handleSave}
+        exportTargetRef={exportTargetRef}
+        exportFileName="today-fortune"
+      />
 
       {/* 무료 영역 — 헌법 4단 (랜딩과 동일 카피) */}
       <div className="today-secretary__four-card">
@@ -205,7 +199,7 @@ export default function TodaySecretaryReport({
 
       {/* 유료 영역 — 본문 항상 표시 (잠금·블러 없음) */}
       <div className="today-secretary__premium scroll-mt-24" id="today-premium">
-        <p className="text-sm leading-relaxed text-[#5A4E48]">
+        <p className="text-sm leading-relaxed text-ink-body">
           오늘 선택을 돕는 상세 리포트예요. 계약·연락·투자 같은 고민부터 행운 시간까지 이어서 읽어 보세요.
         </p>
 
@@ -229,7 +223,7 @@ export default function TodaySecretaryReport({
           <div className="today-secretary__premium-head">
             <h3>{TODAY_PREMIUM_SECTIONS[1].title}</h3>
           </div>
-          <div className="today-secretary__premium-body today-secretary__premium-body--flush">
+          <div className="today-secretary__premium-body">
             <TodayDomainFortuneAccordion cards={domainCards} result={result} />
           </div>
         </article>
@@ -248,10 +242,10 @@ export default function TodaySecretaryReport({
             <h3>{TODAY_PREMIUM_SECTIONS[3].title}</h3>
           </div>
           <div className="today-secretary__premium-body">
-            <p className="text-sm text-[#8A7E78]">{luckyTime.hourLabel}</p>
+            <p className="text-sm text-ink-body">오후 2~4시 · {luckyTime.hourLabel}</p>
             <span className="today-secretary__lucky-time">{luckyTime.rangeLabel}</span>
             <p className="today-secretary__body mt-3">
-              <span className="font-semibold text-[#8B6F47]">추천 행동 · </span>
+              <span className="font-semibold text-accent">추천 행동 · </span>
               {luckyTime.recommendedAction}
             </p>
           </div>

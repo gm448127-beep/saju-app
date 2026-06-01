@@ -1,6 +1,7 @@
 "use client";
 
 import { BIRTH_TIME_MARKETING } from "@/lib/engine-copy";
+import { stripScoreMentions } from "@/lib/today-score-ui-copy";
 import {
   LineChart,
   Line,
@@ -36,6 +37,9 @@ interface HourlyFlowSectionProps {
   hourlyFlowIntro?: string;
   hourlyPeak?: HourlyFlowSlot;
   hourlyCaution?: HourlyFlowSlot;
+  /** false면 시진 카드 목록 대신 자세히 탭 안내 */
+  showSijinDetails?: boolean;
+  onOpenDetail?: () => void;
 }
 
 function pickPeak(flow: HourlyFlowSlot[]) {
@@ -89,19 +93,38 @@ function PeakCautionCard({
   slot: HourlyFlowSlot;
 }) {
   const isPeak = type === "peak";
+
   return (
-    <div className="rounded-xl p-4 border border-[#E2D7D0] bg-white">
-      <p className="text-[10px] tracking-[0.08em] mb-2 font-semibold text-[#8B6F47]">
+    <div className="rounded-xl border border-[#E2D7D0] bg-white p-4">
+      <div
+        className={`mb-3 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold tracking-tight ${
+          isPeak ? "bg-[#3D5838] text-[#F5F1EB]" : "bg-[#7A4A3D] text-[#FFF8F5]"
+        }`}
+      >
+        <span aria-hidden className="text-[10px] leading-none opacity-90">
+          {isPeak ? "▲" : "▼"}
+        </span>
         {isPeak ? "가장 좋은 시간" : "조심할 시간"}
+      </div>
+
+      <p className="text-xs font-semibold leading-snug text-[#5A4E48]">
+        {isPeak ? "중요한 일·연락·결정을 이 시간에 맞춰보세요" : "서두른 확답과 큰 결정은 이 시간대를 피하세요"}
       </p>
-      <p className="text-sm text-[#3D3338]" style={{ fontFamily: "Jua, sans-serif" }}>
-        {slot.hour} <span className="text-[#8B6F47]">{slot.range}시</span>
-      </p>
-      <p className="text-xs text-[#5A4E48] mt-1">
-        {slot.score}점 · {slot.label}
-        {slot.sipsin ? ` · ${slot.sipsin}` : ""}
-      </p>
-      {slot.advice && <p className="text-xs text-[#5A4E48] mt-2 leading-relaxed">{slot.advice}</p>}
+
+      <div className="mt-3 rounded-xl border border-[#E2D7D0] bg-[#FAF8F5] px-3.5 py-3">
+        <p className="text-base text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
+          {slot.hour} <span className="text-[#8B6F47]">{slot.range}시</span>
+        </p>
+        <p className="mt-1 text-sm font-semibold text-[#4A403B]">
+          {slot.label}
+          {slot.sipsin ? ` · ${slot.sipsin}` : ""}
+        </p>
+        {slot.advice && (
+          <p className="mt-2 border-t border-[#EDE4DC] pt-2 text-xs leading-relaxed text-[#5A4E48]">
+            {stripScoreMentions(slot.advice)}
+          </p>
+        )}
+      </div>
     </div>
   );
 }
@@ -115,8 +138,6 @@ function SijinDetailCard({
   isPeak: boolean;
   isCaution: boolean;
 }) {
-  const scoreColor = slot.score >= 70 ? "#5FB88A" : slot.score >= 50 ? "#E8A87C" : "#D87A8C";
-
   const isMyHour = slot.isMyHour;
 
   return (
@@ -132,7 +153,7 @@ function SijinDetailCard({
       }`}
     >
       <div className="flex justify-between items-start gap-2 mb-2">
-        <div className="flex items-center gap-2 min-w-0">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           <span className="text-sm shrink-0 text-[#B8A78D]">{slot.hanja}</span>
           <div className="min-w-0">
             <p style={{ fontFamily: "Jua, sans-serif" }} className="text-sm text-[#3D3338]">
@@ -146,13 +167,10 @@ function SijinDetailCard({
             <p className="text-[11px] text-[#8A7E78]">
               시진 · {slot.element} · {slot.keyword}
             </p>
+            {slot.label && (
+              <p className="mt-0.5 text-[11px] font-semibold text-[#5A4E48]">{slot.label}</p>
+            )}
           </div>
-        </div>
-        <div className="text-right shrink-0">
-          <p className="text-base font-bold" style={{ color: scoreColor }}>
-            {slot.score}점
-          </p>
-          <p className="text-[11px] text-[#8A7E78]">{slot.label}</p>
         </div>
       </div>
 
@@ -169,7 +187,7 @@ function SijinDetailCard({
         </p>
       ))}
 
-      {slot.advice && <p className="text-xs text-[#5A4E48] leading-relaxed">{slot.advice}</p>}
+      {slot.advice && <p className="text-xs text-[#5A4E48] leading-relaxed">{stripScoreMentions(slot.advice)}</p>}
 
       {(slot.goodFor || slot.avoid) && (
         <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2 pt-2 border-t border-[#EDE4DC]">
@@ -186,6 +204,8 @@ export default function HourlyFlowSection({
   hourlyFlowIntro,
   hourlyPeak,
   hourlyCaution,
+  showSijinDetails = true,
+  onOpenDetail,
 }: HourlyFlowSectionProps) {
   const peak = hourlyPeak ?? pickPeak(hourlyFlow);
   const caution = hourlyCaution ?? pickCaution(hourlyFlow);
@@ -240,7 +260,7 @@ export default function HourlyFlowSection({
               return (
                 <div className="max-w-[180px] rounded-xl border border-[#D9C8C0] bg-[#FAF6F2] px-2.5 py-2 text-[10px] text-[#3D3338] shadow-[0_8px_20px_rgba(61,51,56,0.08)] sm:max-w-[280px] sm:px-3.5 sm:py-3 sm:text-xs">
                   <p className="mb-1 font-semibold leading-tight" style={{ fontFamily: "Jua, sans-serif" }}>
-                    {d.hour} ({d.range}시) · {d.score}점
+                    {d.hour} ({d.range}시)
                   </p>
                   <p className="mt-1 leading-snug text-[#5A4E48]">{summary}</p>
                 </div>
@@ -273,26 +293,49 @@ export default function HourlyFlowSection({
         </LineChart>
       </ResponsiveContainer>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-6 pt-6 border-t border-[#D9C8C0]">
-        <PeakCautionCard type="peak" slot={peak} />
-        <PeakCautionCard type="caution" slot={caution} />
+      <div className="mt-6 pt-6 border-t border-[#D9C8C0]">
+        <p className="mb-3 text-xs font-bold tracking-[0.06em] text-[#8B6F47]">오늘의 시간 가이드</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <PeakCautionCard type="peak" slot={peak} />
+          <PeakCautionCard type="caution" slot={caution} />
+        </div>
       </div>
 
       <div className="mt-6 pt-6 border-t border-[#D9C8C0]">
         <h3 className="label mb-3">시진별 상세 해설</h3>
-        <p className="text-xs text-[#8A7E78] mb-4">
-          각 시진은 2시간 단위입니다. 점수·십성·합충을 반영한 오늘 맞춤 해석이에요.
-        </p>
-        <div className="space-y-3 max-h-[480px] overflow-y-auto pr-1">
-          {hourlyFlow.map((slot) => (
-            <SijinDetailCard
-              key={slot.hour}
-              slot={slot}
-              isPeak={peak.hour === slot.hour}
-              isCaution={caution.hour === slot.hour}
-            />
-          ))}
-        </div>
+        {showSijinDetails ? (
+          <>
+            <p className="text-xs text-[#8A7E78] mb-4">
+              각 시진은 2시간 단위입니다. 십성·합충을 반영한 오늘 맞춤 해석이에요.
+            </p>
+            <div className="space-y-3 max-h-[480px] overflow-y-auto pr-1">
+              {hourlyFlow.map((slot) => (
+                <SijinDetailCard
+                  key={slot.hour}
+                  slot={slot}
+                  isPeak={peak.hour === slot.hour}
+                  isCaution={caution.hour === slot.hour}
+                />
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="rounded-xl border border-[#E8D7C4] bg-[#FAF5ED] px-4 py-3">
+            <p className="text-sm leading-relaxed text-[#5A4E48]">
+              시진별 상세 해설은 <span className="font-bold text-[#8B6F47]">자세히</span> 탭에서 확인할 수
+              있어요.
+            </p>
+            {onOpenDetail ? (
+              <button
+                type="button"
+                onClick={onOpenDetail}
+                className="mt-3 rounded-xl bg-[#2F282B] px-4 py-2.5 text-xs font-bold text-white transition hover:bg-[#3D3338]"
+              >
+                자세히 탭에서 보기
+              </button>
+            ) : null}
+          </div>
+        )}
       </div>
     </div>
   );

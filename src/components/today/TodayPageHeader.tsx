@@ -8,10 +8,10 @@ type TodayPageHeaderProps = {
   subtitle?: string;
 };
 
-/** 오늘 운세 상단 헤더 — 우측 미인 캐릭터 (80px 원형) */
+/** 오늘 운세 상단 헤더 — 우측 미인 캐릭터 */
 export default function TodayPageHeader({ title, dateLabel, subtitle }: TodayPageHeaderProps) {
   return (
-    <header className="flex items-center justify-between gap-4 border-b border-[#E8D7C4] pb-5">
+    <header className="flex items-start justify-between gap-4 border-b border-[#E8D7C4] pb-5">
       <div className="min-w-0 flex-1">
         <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">오늘의 운세</p>
         <h1 className="mt-1 text-2xl text-[#2F282B] sm:text-3xl" style={{ fontFamily: "Jua, sans-serif" }}>
@@ -22,7 +22,7 @@ export default function TodayPageHeader({ title, dateLabel, subtitle }: TodayPag
           <p className="mt-2 max-w-md text-xs leading-relaxed text-[#8A7E78]">{subtitle}</p>
         )}
       </div>
-      <MiinAvatar size={80} priority />
+      <MiinAvatar size={128} priority className="h-24 w-24 sm:h-32 sm:w-32" />
     </header>
   );
 }

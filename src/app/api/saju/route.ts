@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { calculateSaju } from "ssaju";
 import { getInterpretation } from "@/data/interpretations";
+import {
+  buildSecretaryReading,
+  buildV3SummaryText,
+  buildSipsinSceneLine,
+  buildOhaengFactLine,
+  type SecretaryReading,
+} from "@/lib/saju-secretary-reading";
 
 const ganInfo: Record<string, { hanja: string; element: string; emoji: string; color: string; eum: string }> = {
   "갑": { hanja: "甲", element: "목(木)", emoji: "🌳", color: "#22c55e", eum: "양" },
@@ -30,7 +37,11 @@ const jiInfo: Record<string, { hanja: string; element: string; emoji: string; co
   "해": { hanja: "亥", element: "수(水)", emoji: "🐖", color: "#3b82f6", eum: "음", ddi: "돼지", ddiEmoji: "🐖" },
 };
 
-const personalityMap: Record<string, string> = {
+/**
+ * @deprecated v3.0 — `secretaryReading` 사용. `legacy.personality`로만 노출.
+ * content-constitution-3.0 §3-1 금지 문체 포함.
+ */
+const LEGACY_personalityMap: Record<string, string> = {
   "갑": "큰 나무처럼 곧고 정직하며 리더십이 강합니다. 자존심이 높고 진취적이며 새로운 것을 개척하는 힘이 있습니다. 독립심이 강하고 남에게 지기 싫어하며, 대의를 위해 솔선수범하는 기질이 있습니다.",
   "을": "덩굴처럼 유연하고 적응력이 뛰어납니다. 부드럽지만 끈기 있으며 예술적 감각이 풍부합니다. 타인과의 조화를 중시하고 섬세한 감수성으로 주변을 따뜻하게 만듭니다.",
   "병": "태양처럼 밝고 화려하며 열정적입니다. 활동적이고 표현력이 강하며 주변을 환하게 만듭니다. 정의감이 강하고 솔직하며, 때로는 급한 성격으로 앞뒤를 가리지 않을 수 있습니다.",
@@ -43,7 +54,8 @@ const personalityMap: Record<string, string> = {
   "계": "맑은 샘물처럼 깨끗하고 지적입니다. 섬세하고 직관력이 뛰어나며 학문적 능력이 출중합니다. 총명하고 영리하며 감수성이 풍부합니다. 내성적이지만 관찰력이 뛰어나고 깊은 통찰력을 가졌습니다.",
 };
 
-const sipsinDesc: Record<string, string> = {
+/** @deprecated v3.0 — `buildSipsinSceneLine` / `secretaryReading.scenes` */
+const LEGACY_sipsinDesc: Record<string, string> = {
   "비견": "자기주장이 강하고 독립적입니다. 경쟁심과 자존심이 강하며 형제·친구와의 인연이 깊습니다.",
   "겁재": "추진력과 승부욕이 강합니다. 과감한 행동력이 있으나 재물 손실에 주의가 필요합니다.",
   "식신": "먹복이 좋고 표현력이 뛰어납니다. 예술적 감각과 창의력이 풍부하며 낙천적입니다.",
@@ -57,13 +69,76 @@ const sipsinDesc: Record<string, string> = {
   "(일간)": "자기 자신을 나타냅니다.",
 };
 
-const ohaengDesc: Record<string, string> = {
+/** @deprecated v3.0 — `buildOhaengFactLine` (강/약 문구 제거) */
+const LEGACY_ohaengDesc: Record<string, string> = {
   "목(木)": "성장·발전·인자함을 상징합니다. 목이 강하면 리더십과 추진력이 있고, 부족하면 결단력이 약할 수 있습니다.",
   "화(火)": "열정·예의·표현력을 상징합니다. 화가 강하면 활동적이고 밝지만, 부족하면 소극적일 수 있습니다.",
   "토(土)": "신뢰·중재·포용력을 상징합니다. 토가 강하면 안정적이고 듬직하지만, 과하면 고집이 셀 수 있습니다.",
   "금(金)": "결단·의리·정의를 상징합니다. 금이 강하면 완벽주의적이고 자기관리에 뛰어나며 책임감이 강합니다. 언행이 명확하고 일처리가 꼼꼼합니다. 과하면 예민하고 인간관계에서 손절이 빠르며 내재된 날카로움이 나타날 수 있습니다. 금이 없으면 결단력이 부족하고 우유부단해질 수 있으며, 재물 관리와 현실 감각이 약해질 수 있습니다. 금은 폐·호흡기와 관련이 깊고, 계절로는 가을, 색상은 흰색, 방향은 서쪽에 해당합니다.",
   "수(水)": "지혜·유연함·창의력을 상징합니다. 수가 강하면 총명하지만, 과하면 우유부단할 수 있습니다.",
 };
+
+/** @deprecated v2 종합 요약 — `legacy.summary` 전용 */
+function buildLegacySummaryText(params: {
+  dayGanKo: string;
+  dayGanData: { hanja?: string; element?: string };
+  personality: string;
+  strength: string;
+  strengthScore?: number;
+  gyeok: string;
+  yongshin: string;
+  ohaengCount: Record<string, number>;
+  sipsinCount: Record<string, number>;
+  gilsin: string[];
+  hyungsin: string[];
+  gongmangText: string;
+  interpretationSummary: string;
+  currentYear: number;
+}): string {
+  const {
+    dayGanKo,
+    dayGanData,
+    personality,
+    strength,
+    strengthScore,
+    gyeok,
+    yongshin,
+    ohaengCount,
+    sipsinCount,
+    gilsin,
+    hyungsin,
+    gongmangText,
+    interpretationSummary,
+    currentYear,
+  } = params;
+
+  const maxOhaeng = Object.entries(ohaengCount).sort((a, b) => b[1] - a[1])[0];
+  const minOhaeng = Object.entries(ohaengCount).sort((a, b) => a[1] - b[1])[0];
+  const maxSipsin = Object.entries(sipsinCount)
+    .filter(([k]) => k !== "(일간)")
+    .sort((a, b) => b[1] - a[1])[0];
+
+  let summary = `일간 ${dayGanKo}(${dayGanData.hanja || ""})은(는) ${dayGanData.element || ""} 오행으로, ${personality}\n\n`;
+  if (strength) {
+    summary += `사주의 강약은 "${strength}"이며${strengthScore ? ` (점수: ${strengthScore})` : ""}, `;
+  }
+  if (gyeok) summary += `격국은 "${gyeok}"입니다. `;
+  if (yongshin) summary += `용신은 ${yongshin}입니다.\n\n`;
+  if (maxOhaeng) {
+    summary += `오행 중 ${maxOhaeng[0]}이(가) ${maxOhaeng[1]}개로 가장 많고, `;
+  }
+  if (minOhaeng) summary += `${minOhaeng[0]}이(가) ${minOhaeng[1]}개로 가장 적습니다.\n`;
+  if (maxSipsin) {
+    summary += `십성 중 ${maxSipsin[0]}이(가) ${maxSipsin[1]}개로 두드러집니다. ${LEGACY_sipsinDesc[maxSipsin[0]] || ""}\n\n`;
+  }
+  if (gilsin.length > 0) summary += `길신: ${gilsin.join(", ")}\n`;
+  if (hyungsin.length > 0) summary += `흉신: ${hyungsin.join(", ")}\n`;
+  if (gongmangText) summary += `공망: ${gongmangText}\n`;
+  if (interpretationSummary) {
+    summary += `\n📌 ${currentYear}년 참고: ${interpretationSummary}\n`;
+  }
+  return summary;
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -264,53 +339,85 @@ export async function POST(req: NextRequest) {
       stage12: w.stage12 || w["12unsung"] || "",
     }));
 
-    const personality = personalityMap[dayGanKo] || "";
+    const monthBranchKo = pd.month.branchKo;
+
+    const relationTypes = brRelSummary.map((r) => r.type);
+    const daeunLabel = daeunCurrent
+      ? `${daeunCurrent.stem || daeunCurrent.ganzhi || ""}(${daeunCurrent.startAge}세~)`
+      : undefined;
+
+    const secretaryReading: SecretaryReading = buildSecretaryReading({
+      dayGanKo,
+      monthBranchKo,
+      sipsinCount,
+      yongshin: yongshin || undefined,
+      gyeok: gyeok || undefined,
+      relationTypes,
+      daeunLabel,
+      seyunYear: currentYear,
+    });
 
     const sipsinAnalysis: Array<{ name: string; count: number; desc: string }> = [];
     for (const [name, count] of Object.entries(sipsinCount)) {
-      sipsinAnalysis.push({ name, count: count as number, desc: sipsinDesc[name] || "" });
+      sipsinAnalysis.push({
+        name,
+        count: count as number,
+        desc: buildSipsinSceneLine(name),
+      });
     }
 
     const ohaengAnalysis: Array<{ name: string; count: number; desc: string }> = [];
     for (const [name, count] of Object.entries(ohaengCount)) {
-      ohaengAnalysis.push({ name, count, desc: ohaengDesc[name] || "" });
+      ohaengAnalysis.push({
+        name,
+        count,
+        desc: buildOhaengFactLine(name, count),
+      });
     }
 
-    const maxOhaeng = Object.entries(ohaengCount).sort((a, b) => b[1] - a[1])[0];
-    const minOhaeng = Object.entries(ohaengCount).sort((a, b) => a[1] - b[1])[0];
-    const maxSipsin = Object.entries(sipsinCount).filter(([k]) => k !== "(일간)").sort((a, b) => b[1] - a[1])[0];
-
-    let summary = `일간 ${dayGanKo}(${dayGanData.hanja || ""})은(는) ${dayGanData.element || ""} 오행으로, ${personality}\n\n`;
-    if (strength) summary += `사주의 강약은 "${strength}"이며${strengthScore ? ` (점수: ${strengthScore})` : ""}, `;
-    if (gyeok) summary += `격국은 "${gyeok}"입니다. `;
-    if (yongshin) summary += `용신은 ${yongshin}입니다.\n\n`;
-    if (maxOhaeng) summary += `오행 중 ${maxOhaeng[0]}이(가) ${maxOhaeng[1]}개로 가장 강하고, `;
-    if (minOhaeng) summary += `${minOhaeng[0]}이(가) ${minOhaeng[1]}개로 가장 약합니다.\n`;
-
-    // === 금(金) 상세 분석 (유튜브 참고: 팔자에 金이 있고 없고의 큰 차이점) ===
-    const goldCount = ohaengCount["\uAE08(\u91D1)"] || 0;
-    if (goldCount === 0) {
-      const dayEl = dayGanData?.element || "";
-      let goldMsg = "\uC774 \uC0AC\uC8FC\uC5D0\uB294 \uAE08(\u91D1)\uC758 \uAE30\uC6B4\uC774 \uC5C6\uC2B5\uB2C8\uB2E4. ";
-      if (dayEl.includes("\uBAA9")) goldMsg += "\uBAA9 \uC77C\uAC04\uC5D0 \uAE08\uC774 \uC5C6\uC73C\uBA74 \uD604\uC2E4 \uAC10\uAC01\uC774 \uB5A8\uC5B4\uC9C0\uAC70\uB098 \uC774\uC0C1\uC744 \uB354 \uCD94\uAD6C\uD558\uB294 \uACBD\uD5A5\uC774 \uC788\uC2B5\uB2C8\uB2E4. ";
-      else if (dayEl.includes("\uD654")) goldMsg += "\uD654 \uC77C\uAC04\uC5D0 \uAE08\uC774 \uC5C6\uC73C\uBA74 \uC77C\uC758 \uC131\uCDE8\uC640 \uACB0\uACFC\uB97C \uAC00\uC838\uAC00\uAE30 \uC5B4\uB824\uC6B8 \uC218 \uC788\uC73C\uB2C8 \uBC29\uD5A5\uC131\uC744 \uBB50\uB837\uD558\uAC8C \uC7A1\uC544\uC57C \uD569\uB2C8\uB2E4. ";
-      else if (dayEl.includes("\uD1A0")) goldMsg += "\uD1A0 \uC77C\uAC04\uC5D0 \uAE08\uC774 \uC5C6\uC73C\uBA74 \uD45C\uD604\uB825 \uBC1C\uD604\uC744 \uC704\uD574 \uAFB8\uC900\uD788 \uB178\uB825\uD574\uC57C \uD569\uB2C8\uB2E4. ";
-      else if (dayEl.includes("\uAE08")) goldMsg += "\uAE08 \uC77C\uAC04\uC778\uB370 \uAE08\uC774 \uBD80\uC871\uD558\uBA74 \uC758\uACAC \uD45C\uCD9C\uC774 \uC5B4\uB835\uACE0 \uC0DD\uAC01\uB9CC \uD558\uACE0 \uB05D\uB098\uB294 \uACBD\uC6B0\uAC00 \uC788\uC2B5\uB2C8\uB2E4. ";
-      else if (dayEl.includes("\uC218")) goldMsg += "\uC218 \uC77C\uAC04\uC5D0 \uAE08\uC774 \uC5C6\uC73C\uBA74 \uC778\uBCF5\uC744 \uC2A4\uC2A4\uB85C \uD0A4\uC6CC\uB098\uAC00\uB294 \uB178\uB825\uC774 \uD544\uC694\uD569\uB2C8\uB2E4. ";
-      goldMsg += "\uAC1C\uC6B4\uBC95: \uD770\uC0C9/\uAE08\uC18D \uC18C\uC7AC \uD65C\uC6A9, \uD638\uD761\uAE30 \uAC74\uAC15 \uAD00\uB9AC, \uACB0\uB2E8\uB825 \uD6C8\uB828\uC774 \uB3C4\uC6C0\uB429\uB2C8\uB2E4.";
-      summary += goldMsg + "\\n";
-    } else if (goldCount >= 3) {
-      summary += "\uAE08(\u91D1)\uC774 " + goldCount + "\uAC1C\uB85C \uB9E4\uC6B0 \uAC15\uD569\uB2C8\uB2E4. \uC644\uBCBD\uC8FC\uC758 \uC131\uD5A5\uACFC \uC608\uB9AC\uD55C \uD310\uB2E8\uB825\uC774 \uC7A5\uC810\uC774\uC9C0\uB9CC, \uC778\uAC04\uAD00\uACC4\uC5D0\uC11C \uC720\uC5F0\uD568\uC744 \uAE30\uB974\uACE0 \uD0C0\uC778\uC744 \uC218\uC6A9\uD558\uB294 \uC790\uC138\uAC00 \uD544\uC694\uD569\uB2C8\uB2E4. \uC2A4\uD2B8\uB808\uC2A4\xB7\uC608\uBBFC\uD568 \uAD00\uB9AC\uC5D0 \uC2E0\uACBD \uC4F0\uC138\uC694.\\n";
+    const legacySipsinAnalysis: Array<{ name: string; count: number; desc: string }> = [];
+    for (const [name, count] of Object.entries(sipsinCount)) {
+      legacySipsinAnalysis.push({
+        name,
+        count: count as number,
+        desc: LEGACY_sipsinDesc[name] || "",
+      });
     }
-    if (maxSipsin) summary += `십성 중 ${maxSipsin[0]}이(가) ${maxSipsin[1]}개로 두드러집니다. ${sipsinDesc[maxSipsin[0]] || ""}\n\n`;
-    if (gilsin.length > 0) summary += `길신: ${gilsin.join(", ")}\n`;
-    if (hyungsin.length > 0) summary += `흉신: ${hyungsin.join(", ")}\n`;
-    if (gongmangText) summary += `공망: ${gongmangText}\n`;
 
-    // 종합 해석에 올해 운세 요약 추가
-    if (interpretationSummary) {
-      summary += `\n📌 ${currentYear}년 운세 한줄평: ${interpretationSummary}\n`;
+    const legacyOhaengAnalysis: Array<{ name: string; count: number; desc: string }> = [];
+    for (const [name, count] of Object.entries(ohaengCount)) {
+      legacyOhaengAnalysis.push({
+        name,
+        count,
+        desc: LEGACY_ohaengDesc[name] || "",
+      });
     }
+
+    const legacySummary = buildLegacySummaryText({
+      dayGanKo,
+      dayGanData,
+      personality: LEGACY_personalityMap[dayGanKo] || "",
+      strength,
+      strengthScore,
+      gyeok,
+      yongshin,
+      ohaengCount,
+      sipsinCount,
+      gilsin,
+      hyungsin,
+      gongmangText,
+      interpretationSummary,
+      currentYear,
+    });
+
+    /** v3 요약 — UI `summary` 필드에 노출 */
+    const summary = buildV3SummaryText(secretaryReading);
+
+    /** v3 성격 블록 대체 — UI `personality` 필드 (장면·반응) */
+    const personality = [
+      secretaryReading.environment.text,
+      secretaryReading.responsePattern.text,
+    ].join("\n\n");
 
     const compactText = result.toCompact?.() || "";
     const markdownText = result.toMarkdown?.() || "";
@@ -339,6 +446,17 @@ export async function POST(req: NextRequest) {
       sipsinCount,
       sipsinAnalysis,
       personality,
+      secretaryReading,
+      v3: {
+        constitution: "3.0",
+        secretaryReading,
+      },
+      legacy: {
+        personality: LEGACY_personalityMap[dayGanKo] || "",
+        summary: legacySummary,
+        sipsinAnalysis: legacySipsinAnalysis,
+        ohaengAnalysis: legacyOhaengAnalysis,
+      },
       stemRelations,
       branchRelations: brRelSummary,
       salsSummary,

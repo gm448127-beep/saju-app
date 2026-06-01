@@ -7,7 +7,7 @@ import { INTRO_SLIDE2_IMAGE } from "@/lib/intro-onboarding-assets";
 
 const SLIDE_COUNT = 3;
 const SWIPE_THRESHOLD_PX = 48;
-const BG = "#F5F1EB";
+const BG = "var(--paper)";
 
 interface IntroOnboardingProps {
   onSkip: () => void;
@@ -72,7 +72,7 @@ function FullImageSlide({
         className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[40%]"
         style={{
           background:
-            "linear-gradient(to top, #F5F1EB 0%, #F5F1EB 12%, rgba(245, 241, 235, 0.88) 42%, rgba(245, 241, 235, 0.45) 72%, transparent 100%)",
+            "linear-gradient(to top, var(--paper) 0%, var(--paper) 12%, color-mix(in srgb, var(--paper) 88%, transparent) 42%, color-mix(in srgb, var(--paper) 45%, transparent) 72%, transparent 100%)",
         }}
         aria-hidden
       />

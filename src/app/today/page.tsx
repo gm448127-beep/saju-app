@@ -3,8 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import StoredProfileBar from "@/components/StoredProfileBar";
 import { useUserProfile } from "@/components/UserProfileProvider";
-import ShareButton from "@/components/ShareButton";
-import PdfButton from "@/components/PdfButton";
 import TodayPageHeader from "@/components/today/TodayPageHeader";
 import TodayPersonalizeForm, { isValidBirthDate } from "@/components/TodayPersonalizeForm";
 import TodaySecretaryReport from "@/components/today/TodaySecretaryReport";
@@ -282,23 +280,13 @@ export default function TodayPage() {
                   dateLabel={todayLabel}
                   subtitle="흐름 → 타이밍 → 실수 장면 → 비서 제안까지 무료로 읽고, 아래에서 상세 리포트를 확인하세요."
                 />
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" data-pdf-ignore>
-                  <p className="text-sm text-[#5A4E48]">저장 · 공유 · PDF</p>
-                  <div
-                    id="today-share-actions"
-                    className="flex w-full flex-nowrap gap-1 sm:w-auto sm:gap-2"
-                    data-pdf-ignore
-                  >
-                    <PdfButton targetRef={resultRef} fileName="today-fortune" />
-                    <ShareButton targetRef={resultRef} fileName="today-fortune" />
-                  </div>
-                </div>
 
                 <TodaySecretaryReport
                   report={personalizedReport}
                   result={result}
                   birthKey={birthKey}
                   dateLabel={todayLabel}
+                  exportTargetRef={resultRef}
                 />
               </section>
             </div>

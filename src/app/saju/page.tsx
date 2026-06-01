@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import StoredProfileBar from "@/components/StoredProfileBar";
 import { useUserProfile } from "@/components/UserProfileProvider";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
@@ -8,10 +8,16 @@ import ShareButton from "@/components/ShareButton";
 import BirthDateNumberInputs, { isValidBirthDate } from "@/components/BirthDateNumberInputs";
 import OhaengChart from "@/components/OhaengChart";
 import { buildSajuBirthKey, saveSajuRecord } from "@/lib/archive-storage";
-import type { UserBirthProfile } from "@/lib/user-profile-storage";
+import {
+  applyProfileToBirthForm,
+  profileToSajuPayload,
+  type UserBirthProfile,
+} from "@/lib/user-profile-storage";
 import { matchCharacter, findStrongestSipsin } from "@/data/matchCharacter";
 import { Character } from "@/data/characters";
 import { CHEONGAN_DICT, GYEOK_DICT, STRENGTH_DICT, GONGMANG_DICT, GILSIN_DICT, HYUNGSIN_DICT, OHAENG_DICT } from "@/data/wisdomDict";
+import type { SecretaryReading } from "@/lib/saju-secretary-reading";
+import SajuSecretaryReadingSection from "@/components/saju/SajuSecretaryReadingSection";
 
 
 
@@ -40,12 +46,22 @@ interface SajuResult {
   ohaengAnalysis?: Array<{ name: string; count: number; desc: string }>;
   sipsinCount: Record<string, number>;
   sipsinAnalysis?: Array<{ name: string; count: number; desc: string }>;
-  personality: string;
+  personality?: string;
+  secretaryReading?: SecretaryReading;
+  v3?: { constitution?: string; secretaryReading?: SecretaryReading };
+  legacy?: {
+    personality?: string;
+    summary?: string;
+    sipsinAnalysis?: Array<{ name: string; count: number; desc: string }>;
+    ohaengAnalysis?: Array<{ name: string; count: number; desc: string }>;
+  };
   stemRelations?: Array<{ type: string; desc: string; pillars: string[]; stems: string[] }>;
   branchRelations?: Array<{ type: string; details: Record<string, string> }>;
   salsSummary?: Array<{ pillar: string; twelveSal: string; specialSals: string[] }>;
   gongmang?: string;
-  summary: string; compactText: string; markdownText: string;
+  summary?: string;
+  compactText: string;
+  markdownText: string;
   daeun?: Array<{ age: number; endAge?: number; ganzhi?: string; gan: string; ji: string; ganKo: string; jiKo: string; tenGodStem?: string; tenGodBranch?: string; stage12?: string; sal?: string[] }>;
   daeunStartAge?: number;
   daeunCurrent?: { age: number; ganzhi: string; ganKo: string; jiKo: string } | null;
@@ -188,8 +204,9 @@ function formatRelationDetail(key: string, value: string) {
 }
 
 export default function SajuPage() {
-  const { profile, saveProfile, displayName } = useUserProfile();
+  const { profile, saveProfile, displayName, isReady: profileReady } = useUserProfile();
   const resultRef = useRef<HTMLDivElement | null>(null);
+  const autoLoadedRef = useRef<string | null>(null);
   const [name, setName] = useState("");
   const [year, setYear] = useState("1995");
   const [month, setMonth] = useState("1");
@@ -207,55 +224,80 @@ export default function SajuPage() {
 
   useEffect(() => {
     if (!profile) return;
-    if (profile.name) setName(profile.name);
-    setYear(profile.year);
-    setMonth(profile.month);
-    setDay(profile.day);
-    setGender(profile.gender);
-    setCalendarType(profile.calendarType);
-    setTimeMode(profile.timeMode);
-    setSlotValue(profile.slotHour);
-    setExactHour(profile.exactHour);
-    setExactMinute(profile.exactMinute);
+    applyProfileToBirthForm(profile, {
+      setYear,
+      setMonth,
+      setDay,
+      setTimeMode,
+      setSlotHour: setSlotValue,
+      setExactHour,
+      setExactMinute,
+      setCalendarType,
+      setGender,
+      setName,
+    });
   }, [profile]);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  const fetchSajuReport = useCallback(async (payload?: ReturnType<typeof profileToSajuPayload>, scrollToResult = true) => {
     setError(""); setResult(null);
-    if (!isValidBirthDate(year, month, day)) {
+    const body = payload ?? {
+      name,
+      year: Number(year),
+      month: Number(month),
+      day: Number(day),
+      hour: timeMode === "exact" ? exactHour : timeMode === "slot" ? slotValue : undefined,
+      minute: timeMode === "exact" ? exactMinute : timeMode === "slot" ? 0 : undefined,
+      gender,
+      isLunar: calendarType !== "solar",
+    };
+
+    if (!isValidBirthDate(String(body.year), String(body.month), String(body.day))) {
       setError("생년월일을 숫자로 정확히 입력해주세요.");
       return;
     }
     setLoading(true);
     try {
-      let sendHour: number | undefined;
-      let sendMinute: number | undefined;
-      if (timeMode === "exact") { sendHour = exactHour; sendMinute = exactMinute; }
-      else if (timeMode === "slot") { sendHour = slotValue; sendMinute = 0; }
-
       const res = await fetch("/api/saju", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, year: Number(year), month: Number(month), day: Number(day), hour: sendHour, minute: sendMinute, gender, isLunar: calendarType !== "solar" }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "분석 실패");
       setResult(data);
-      const stored: Omit<UserBirthProfile, "savedAt"> = {
-        name: name.trim() || undefined,
-        year,
-        month,
-        day,
-        gender,
-        calendarType: calendarType as UserBirthProfile["calendarType"],
-        timeMode,
-        slotHour: slotValue,
-        exactHour,
-        exactMinute,
-      };
-      saveProfile(stored);
+      if (!payload) {
+        saveProfile({
+          name: name.trim() || undefined,
+          year,
+          month,
+          day,
+          gender,
+          calendarType: calendarType as UserBirthProfile["calendarType"],
+          timeMode,
+          slotHour: slotValue,
+          exactHour,
+          exactMinute,
+        });
+      }
+      if (scrollToResult) {
+        window.setTimeout(() => {
+          resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 80);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "오류가 발생했습니다.");
     } finally { setLoading(false); }
+  }, [name, year, month, day, timeMode, exactHour, exactMinute, slotValue, gender, calendarType, saveProfile]);
+
+  useEffect(() => {
+    if (!profileReady || !profile) return;
+    if (autoLoadedRef.current === profile.savedAt) return;
+    autoLoadedRef.current = profile.savedAt;
+    fetchSajuReport(profileToSajuPayload(profile), true);
+  }, [profile, profileReady, fetchSajuReport]);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    await fetchSajuReport(undefined, true);
   }
 
   useEffect(() => {
@@ -268,7 +310,11 @@ export default function SajuPage() {
       dayGan: result.dayGan,
       gyeok: result.gyeok,
       mainElement: result.mainElement,
-      summary: result.summary?.slice(0, 160) || result.personality?.slice(0, 160) || "사주 리포트",
+      summary:
+        result.secretaryReading?.closingLine?.slice(0, 160) ||
+        result.v3?.secretaryReading?.closingLine?.slice(0, 160) ||
+        result.summary?.slice(0, 160) ||
+        "사주 리포트",
     });
   }, [result, name, year, month, day, gender]);
 
@@ -397,6 +443,19 @@ export default function SajuPage() {
                 사주 원국과 오늘의 흐름이 맞물릴 때의 신호를 읽습니다.
               </p>
             </div>
+
+          <SajuSecretaryReadingSection
+            reading={
+              result.secretaryReading ??
+              result.v3?.secretaryReading ??
+              null
+            }
+            fallbackText={
+              result.legacy?.summary ||
+              result.summary ||
+              result.personality
+            }
+          />
 
                   {/* 🌟 캐릭터 카드 (운명비서 핵심 - A 시적·감성형) */}
           {(() => {
@@ -1655,6 +1714,9 @@ export default function SajuPage() {
 
           {/* 🌟 오행표 (五行表) - 정통 전문가형 */}
 {result.ohaengCount && (() => {
+  const hasV3Reading = !!(
+    result.secretaryReading ?? result.v3?.secretaryReading
+  );
   const ohaengList = [
   { key: "wood",  ko: "목", hanja: "木", count: (result.ohaengCount as any)["목(木)"] ?? 0, color: "#5C8B6F" },
   { key: "fire",  ko: "화", hanja: "火", count: (result.ohaengCount as any)["화(火)"] ?? 0, color: "#B85C4C" },
@@ -1665,29 +1727,34 @@ export default function SajuPage() {
 
 
   const getStatus = (count: number) => {
+    if (hasV3Reading) {
+      if (count === 0) return { label: "0개", highlight: false, warning: true };
+      return { label: `${count}개`, highlight: false, warning: false };
+    }
     if (count === 0) return { label: "비어있음", highlight: false, warning: true };
-    if (count === 1) return { label: "약함",     highlight: false, warning: false };
-    if (count === 2) return { label: "보통",     highlight: false, warning: false };
-    if (count === 3) return { label: "균형",     highlight: true,  warning: false };
-    if (count === 4) return { label: "강함",     highlight: false, warning: false };
-    return                  { label: "과함",     highlight: false, warning: true };
+    if (count === 1) return { label: "적음", highlight: false, warning: false };
+    if (count === 2) return { label: "보통", highlight: false, warning: false };
+    if (count === 3) return { label: "균형", highlight: true, warning: false };
+    if (count === 4) return { label: "많음", highlight: false, warning: false };
+    return { label: "과함", highlight: false, warning: true };
   };
 
-  const strong = ohaengList.filter(o => o.count >= 4).map(o => `${o.ko}(${o.hanja})`);
-  const weak   = ohaengList.filter(o => o.count <= 1).map(o => `${o.ko}(${o.hanja})`);
-  const balanced = ohaengList.filter(o => o.count === 3);
-
   let diagnosis = "";
-  if (strong.length > 0 && weak.length > 0) {
-    diagnosis = `${strong.join("·")}이(가) 강하고, ${weak.join("·")}이(가) 약한 사주입니다.`;
-  } else if (strong.length > 0) {
-    diagnosis = `${strong.join("·")}이(가) 강한 사주입니다.`;
-  } else if (weak.length > 0) {
-    diagnosis = `${weak.join("·")}이(가) 약한 사주입니다.`;
-  } else if (balanced.length >= 3) {
-    diagnosis = "오행이 비교적 균형 잡힌 사주입니다.";
-  } else {
-    diagnosis = "오행이 비교적 고르게 분포된 사주입니다.";
+  if (!hasV3Reading) {
+    const strong = ohaengList.filter((o) => o.count >= 4).map((o) => `${o.ko}(${o.hanja})`);
+    const weak = ohaengList.filter((o) => o.count <= 1).map((o) => `${o.ko}(${o.hanja})`);
+    const balanced = ohaengList.filter((o) => o.count === 3);
+    if (strong.length > 0 && weak.length > 0) {
+      diagnosis = `${strong.join("·")} 원국에서 많고, ${weak.join("·")}은(는) 적게 나타납니다.`;
+    } else if (strong.length > 0) {
+      diagnosis = `${strong.join("·")} 원국에서 두드러집니다.`;
+    } else if (weak.length > 0) {
+      diagnosis = `${weak.join("·")} 원국에서 적게 나타납니다.`;
+    } else if (balanced.length >= 3) {
+      diagnosis = "오행 개수가 비교적 고르게 분포되어 있습니다.";
+    } else {
+      diagnosis = "오행 개수가 비교적 고르게 분포되어 있습니다.";
+    }
   }
 
   return (
@@ -1710,6 +1777,9 @@ export default function SajuPage() {
         <p className="text-xs mt-1" style={{ fontFamily: "'Noto Serif KR', serif", color: "#8A7E78", letterSpacing: "0.2em" }}>
           五 行 表
         </p>
+        {hasV3Reading && (
+          <p className="text-[11px] mt-2 text-[#8A7E78]">원국 오행 개수만 표시해요. 해석은 위 패턴 리포트를 봐 주세요.</p>
+        )}
       </div>
 
       <div className="hidden">
@@ -1776,71 +1846,16 @@ export default function SajuPage() {
         <div className="h-px w-24" style={{ background: "linear-gradient(to right, transparent, #B89968, transparent)" }} />
       </div>
 
-      <div className="rounded-2xl px-5 py-4 text-center" style={{ background: "#FFFFFF", border: "1px solid #E2D7D0" }}>
-        <p className="text-xs mb-2" style={{ fontFamily: "Jua, sans-serif", color: "#B89968", letterSpacing: "0.1em" }}>
-          ─── 균형 한 줄 진단 ───
-        </p>
-
-        {/* 🌳 오행별 우리말 풀이 */}
-<div className="mt-5 space-y-2">
-  {ohaengList.map((o) => {
-    const dict = OHAENG_DICT[o.ko];
-    if (!dict) return null;
-    return (
-      <div
-        key={`desc-${o.key}`}
-        className="rounded-xl px-4 py-3"
-        style={{
-          background: "rgba(255,255,255,0.5)",
-          border: "1px solid #EAE0D5"
-        }}
-      >
-        <p
-          className="text-xs leading-relaxed"
-          style={{ fontFamily: "Jua, sans-serif", color: "#5A4E48" }}
-        >
-          <span
-            style={{
-              color: dict.color,
-              fontWeight: 700,
-              fontFamily: "'Noto Serif KR', serif"
-            }}
-          >
-            {o.ko}({o.hanja})
-          </span>
-          <span style={{ color: "#8A7E78" }}> ({o.count}개)</span>
-          <span style={{ color: "#B89968" }}>: </span>
-          <span style={{ color: "#3D3338", fontWeight: 600 }}>
-            {dict.keywords}
-          </span>
-          을(를) 상징합니다.{" "}
-          {o.count >= 3 ? (
-            <>
-              <span style={{ color: dict.color, fontWeight: 600 }}>
-                {o.ko}이(가) 강하니
-              </span>{" "}
-              {dict.strong}.
-            </>
-          ) : o.count <= 1 ? (
-            <>
-              <span style={{ color: "#C9766B", fontWeight: 600 }}>
-                {o.ko}이(가) 부족하여
-              </span>{" "}
-              {dict.weak}.
-            </>
-          ) : (
-            <>{o.ko}의 기운이 보통 수준으로 균형 잡혀 있습니다.</>
-          )}
-        </p>
-      </div>
-    );
-  })}
-</div>
-
-        <p className="text-sm leading-relaxed" style={{ fontFamily: "Jua, sans-serif", color: "#3D3338" }}>
-          {diagnosis}
-        </p>
-      </div>
+      {!hasV3Reading && diagnosis && (
+        <div className="rounded-2xl px-5 py-4 text-center" style={{ background: "#FFFFFF", border: "1px solid #E2D7D0" }}>
+          <p className="text-xs mb-2" style={{ fontFamily: "Jua, sans-serif", color: "#B89968", letterSpacing: "0.1em" }}>
+            ─── 원국 오행 개수 ───
+          </p>
+          <p className="text-sm leading-relaxed" style={{ fontFamily: "Jua, sans-serif", color: "#3D3338" }}>
+            {diagnosis}
+          </p>
+        </div>
+      )}
 
       <div className="hidden">
         <span className="text-sm" style={{ color: "#B89968" }}>✦</span>
@@ -1852,28 +1867,6 @@ export default function SajuPage() {
 })()}
 
 
-
-          {/* 십성 분석 */}
-          {result.sipsinAnalysis && result.sipsinAnalysis.length > 0 && (
-            <div className="card">
-              <h2 className="text-lg font-bold text-[#3D3338] mb-3" style={{ fontFamily: "Jua, sans-serif" }}>⭐ 십성 분석</h2>
-              <div className="flex flex-wrap gap-2 justify-center mb-4">
-                {result.sipsinAnalysis.map((s) => (
-                  <div key={s.name} className="rounded-lg border border-[#E2D7D0] bg-white px-3 py-2 text-center">
-                    <div className="text-xs text-[#8A7E78]">{s.name}</div>
-                    <div className="font-bold text-[#3D3338]">{s.count}</div>
-                  </div>
-                ))}
-              </div>
-              <div className="space-y-2">
-                {result.sipsinAnalysis.filter(s => s.desc && s.name !== "(일간)").map((s) => (
-                  <div key={s.name} className="rounded-lg border border-[#E2D7D0] bg-white p-2 text-xs text-[#5A5A5A]">
-                    <span className="font-bold text-[#3D3338]">{s.name} ({s.count}개)</span>: {s.desc}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* 천간/지지 관계 */}
           {((result.stemRelations && result.stemRelations.length > 0) || (result.branchRelations && result.branchRelations.length > 0)) && (
@@ -2012,14 +2005,6 @@ export default function SajuPage() {
             </div>
           )}
 
-          {/* 성격 분석 */}
-          {result.personality && (
-            <div className="card">
-              <h2 className="text-lg font-bold text-[#3D3338] mb-3" style={{ fontFamily: "Jua, sans-serif" }}>🧠 성격 분석</h2>
-              <p className="text-sm text-[#5A5A5A] leading-relaxed">{result.personality}</p>
-            </div>
-          )}
-
           {/* 대운 */}
           {result.daeun && result.daeun.length > 0 && (
             <div className="card">
@@ -2118,14 +2103,6 @@ export default function SajuPage() {
             </div>
           )}
 
-          {/* 종합 해석 */}
-          {result.summary && (
-            <div className="card">
-              <h2 className="text-lg font-bold text-[#3D3338] mb-3" style={{ fontFamily: "Jua, sans-serif" }}>종합 해석</h2>
-              <p className="text-sm text-[#5A5A5A] leading-relaxed whitespace-pre-line">{result.summary}</p>
-            </div>
-          )}
-
           {/* AI 해석 (라이브러리 제공) */}
           {result.interpretation && (
             <div className="card">
@@ -2141,7 +2118,7 @@ export default function SajuPage() {
               <h2 className="text-lg font-bold mb-2 text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>더 깊은 사주 해설이 궁금하신가요?</h2>
               <p className="text-sm mb-4 text-[#5A4E48]">AI가 분석하는 프리미엄 사주 리포트</p>
               <div className="text-xs mb-4 space-y-2 text-left inline-block text-[#3D3338]">
-                <div>십성 심화 해설과 성격 분석</div>
+                <div>반복 패턴·5축 장면 심화 해설</div>
                 <div>대운별 인생 흐름 상세 풀이</div>
                 <div>올해와 내년 운세 심층 분석</div>
                 <div>재물운 · 직업운 · 건강운 · 연애운</div>

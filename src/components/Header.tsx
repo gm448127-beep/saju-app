@@ -10,10 +10,10 @@ import {
 import { AI_CHAT_ENABLED } from "@/lib/feature-flags";
 
 const NAV_ITEMS = [
-  { href: "/today", label: "오늘운세", color: "#3D3338" },
+  { href: "/today", label: "오늘의 운세", color: "#3D3338" },
   { href: "/saju", label: "사주", color: "#3D3338" },
-  { href: "/tojeong", label: "토정비결", color: "#3D3338" },
   { href: "/compatibility", label: "궁합", color: "#3D3338" },
+  { href: "/tojeong", label: "토정비결", color: "#3D3338" },
   { href: "/tarot", label: "타로", color: "#3D3338" },
   { href: "/dream", label: "꿈해몽", color: "#3D3338" },
   // AI_CHAT_ENABLED가 true일 때만 노출
@@ -43,10 +43,10 @@ export default function Header() {
       WebkitBackdropFilter: 'blur(20px)',
       borderBottom: '1px solid rgba(217, 200, 192, 0.55)'
     }}>
-      <div className="flex h-14 w-full items-center justify-between px-4">
-        <Link href="/" className="group flex items-center gap-2.5">
-          <span className="relative flex h-9 w-9 items-center justify-center rounded-2xl bg-[#2F282B] text-lg font-bold text-[#F4E7D6] shadow-[0_8px_18px_rgba(47,40,43,0.18)] transition-all group-hover:-translate-y-0.5 group-hover:bg-[#8B6F47]">
-            <span className="absolute inset-1 rounded-[14px] border border-[#F4E7D6]/25" />
+      <div className="flex h-14 w-full items-center gap-2 px-4">
+        <Link href="/" className="group flex shrink-0 items-center gap-2.5">
+          <span className="relative flex h-9 w-9 items-center justify-center rounded-2xl bg-[var(--ink)] text-lg font-bold text-[var(--accent-soft)] shadow-[0_8px_18px_rgba(51,51,51,0.12)] transition-all group-hover:-translate-y-0.5 group-hover:bg-[var(--accent)]">
+            <span className="absolute inset-1 rounded-[14px] border border-white/25" />
             <span className="relative" style={{ fontFamily: "'Noto Serif KR', serif" }}>
               命
             </span>
@@ -54,7 +54,7 @@ export default function Header() {
           <span className="flex flex-col leading-none">
             <span
               style={{ fontFamily: "Jua, sans-serif" }}
-              className="text-lg tracking-[-0.03em] text-[#2F282B] transition-colors group-hover:text-[#8B6F47]"
+              className="text-lg tracking-[-0.03em] text-[var(--ink)] transition-colors group-hover:text-[var(--accent)]"
             >
               운명비서
             </span>
@@ -64,15 +64,15 @@ export default function Header() {
           </span>
         </Link>
 
-        {/* 데스크탑 네비게이션 */}
-        <nav className="hidden @md:flex items-center gap-1">
+        {/* 데스크탑·넓은 앱 쉘 네비 — 640px 컨테이너부터, 좁으면 가로 스크롤 */}
+        <nav className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 overflow-x-auto @[640px]:flex @lg:gap-1">
           {NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`px-2.5 py-1.5 rounded-full text-xs transition-all @lg:px-3 @lg:text-sm ${
+                className={`shrink-0 whitespace-nowrap px-2 py-1.5 rounded-full text-xs transition-all @lg:px-3 @lg:text-sm ${
                   isActive
                     ? "bg-white shadow-sm font-bold"
                     : "text-[#8A7E78] hover:bg-[#F8F3EE]"
@@ -89,7 +89,17 @@ export default function Header() {
           })}
         </nav>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex shrink-0 items-center gap-1.5">
+          <Link
+            href="/today"
+            className={`@[640px]:hidden rounded-full px-2.5 py-1.5 text-xs font-bold transition-all ${
+              pathname === "/today"
+                ? "bg-[var(--accent)] text-white shadow-sm"
+                : "border border-[var(--line)] bg-[var(--paper-elevated)] text-[var(--accent)]"
+            }`}
+          >
+            오늘의 운세
+          </Link>
           {profileLabel && (
             <span className="hidden rounded-full border border-[#E8D7C4] bg-[#FFF8EE] px-2.5 py-1 text-[10px] font-bold text-[#8B6F47] @sm:inline">
               {profileLabel}
@@ -114,7 +124,7 @@ export default function Header() {
           {/* 모바일 햄버거 */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="@md:hidden text-[#8A7E78] hover:text-[#3D3338] p-2"
+            className="@[640px]:hidden text-[#8A7E78] hover:text-[#3D3338] p-2"
           >
             {menuOpen ? (
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -131,7 +141,7 @@ export default function Header() {
 
       {/* 모바일 메뉴 */}
       {menuOpen && (
-        <div className="@md:hidden px-4 py-3" style={{
+        <div className="@[640px]:hidden px-4 py-3" style={{
           background: 'rgba(255, 255, 255, 0.95)',
           backdropFilter: 'blur(16px)',
           borderTop: '1px solid rgba(204, 182, 176, 0.3)'

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useMemo } from "react";
+import { type ReactNode, useMemo } from "react";
 import AxisScorePanel from "@/components/AxisScorePanel";
 import ToneDecisionChip from "@/components/ToneDecisionChip";
 import { TODAY_EMPTY_COPY } from "@/lib/history-copy";
@@ -46,6 +46,26 @@ function formatTodayLabel(date = new Date()) {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, "0")}.${String(date.getDate()).padStart(2, "0")} (${weekdays[date.getDay()]})`;
 }
 
+function PanelShell({
+  embedMode,
+  className,
+  children,
+}: {
+  embedMode: boolean;
+  className: string;
+  children: ReactNode;
+}) {
+  if (embedMode) {
+    return <div className={className}>{children}</div>;
+  }
+
+  return (
+    <Link href="/today#personalize" className={className}>
+      {children}
+    </Link>
+  );
+}
+
 interface HomeResultPreviewProps {
   content: DailyFortuneContent;
   displayName?: string;
@@ -58,6 +78,10 @@ interface HomeResultPreviewProps {
   apiOverall?: number | null;
   /** 어제 대비 비교용 birthKey */
   birthKey?: string | null;
+  /** 랜딩 임베드 — 앱 링크 없이 미리보기만 */
+  embedMode?: boolean;
+  /** 하단 TODAY / WEEKLY 미니 카드 */
+  showMiniCards?: boolean;
 }
 
 export default function HomeResultPreview({
@@ -68,6 +92,8 @@ export default function HomeResultPreview({
   toneTooltipBasis = null,
   apiOverall = null,
   birthKey = null,
+  embedMode = false,
+  showMiniCards = false,
 }: HomeResultPreviewProps) {
   const scores = getPreviewScores(content);
   const displayOverall =
@@ -83,11 +109,26 @@ export default function HomeResultPreview({
     ? buildToneChipTooltip(toneTooltipBasis, content.toneLabel)
     : null;
 
+  const panelClass =
+    "group relative overflow-hidden rounded-[26px] border border-[#E8D7C4] bg-[#FFF8EE] px-5 py-5 shadow-[0_12px_32px_rgba(61,51,56,0.05)]";
+  const sideClass =
+    "group flex flex-col rounded-[26px] border border-[#E2D7D0] bg-white px-5 py-5 shadow-[0_12px_32px_rgba(61,51,56,0.05)]";
+  const interactiveClass = embedMode ? "" : " transition hover:-translate-y-0.5";
+
+  const weeklyTrend =
+    content.weekly.trend.length >= 7
+      ? content.weekly.trend.slice(0, 7)
+      : [...content.weekly.trend, ...Array(Math.max(0, 7 - content.weekly.trend.length)).fill(displayOverall)];
+  const todayIndex = (new Date().getDay() + 6) % 7;
+
   return (
-    <section className="overflow-hidden rounded-[30px] border border-[#E2D7D0] bg-white p-4 shadow-[0_18px_48px_rgba(61,51,56,0.07)] sm:p-5">
+    <section className="@container overflow-hidden rounded-[30px] border border-[#E2D7D0] bg-white p-4 shadow-[0_18px_48px_rgba(61,51,56,0.07)] sm:p-5">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <div className="flex flex-wrap items-center gap-2">
+          {embedMode ? (
+            <p className="text-[10px] font-bold tracking-[0.18em] text-[#8A7E78]">AI SAJU REPORT</p>
+          ) : null}
+          <div className={`flex flex-wrap items-center gap-2${embedMode ? " mt-1" : ""}`}>
             <p className="text-xs font-bold tracking-[0.14em] text-[#8B6F47]">TODAY PREVIEW</p>
             {isPersonalized ? (
               <span className="rounded-full border border-[#8B6F47]/40 bg-[#FFF8EE] px-2 py-0.5 text-[10px] font-bold text-[#8B6F47]">
@@ -100,11 +141,13 @@ export default function HomeResultPreview({
             )}
           </div>
           <h2 className="mt-1 text-xl leading-tight text-[#2F282B] sm:text-2xl" style={{ fontFamily: "Jua, sans-serif" }}>
-            {isPersonalized && displayName
-              ? `${displayName}의 오늘`
-              : isLoadingPersonalized && displayName
+            {embedMode
+              ? "당신의 오늘"
+              : isPersonalized && displayName
                 ? `${displayName}의 오늘`
-                : "오늘의 흐름은 이렇게 읽힙니다"}
+                : isLoadingPersonalized && displayName
+                  ? `${displayName}의 오늘`
+                  : "오늘의 흐름은 이렇게 읽힙니다"}
           </h2>
           <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-[#8A7E78]">
             {isLoadingPersonalized
@@ -114,20 +157,19 @@ export default function HomeResultPreview({
                 : `${TODAY_EMPTY_COPY.ctaLead}\n→ ${TODAY_EMPTY_COPY.ctaAction}`}
           </p>
         </div>
-        <Link
-          href="/today#personalize"
-          className="inline-flex items-center gap-2 rounded-full border border-[#D9C8C0] bg-[#FAF8F5] px-4 py-2 text-xs font-bold text-[#2F282B] transition hover:bg-white"
-        >
-          {isPersonalized ? "오늘 리포트 보기" : TODAY_EMPTY_COPY.ctaButton}
-          <span className="text-base leading-none">›</span>
-        </Link>
+        {!embedMode ? (
+          <Link
+            href="/today#personalize"
+            className="inline-flex items-center gap-2 rounded-full border border-[#D9C8C0] bg-[#FAF8F5] px-4 py-2 text-xs font-bold text-[#2F282B] transition hover:bg-white"
+          >
+            {isPersonalized ? "오늘 리포트 보기" : TODAY_EMPTY_COPY.ctaButton}
+            <span className="text-base leading-none">›</span>
+          </Link>
+        ) : null}
       </div>
 
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1.15fr_0.85fr]">
-        <Link
-          href="/today#personalize"
-          className="group relative overflow-hidden rounded-[26px] border border-[#E8D7C4] bg-[#FFF8EE] px-5 py-5 shadow-[0_12px_32px_rgba(61,51,56,0.05)] transition hover:-translate-y-0.5"
-        >
+      <div className="grid grid-cols-1 gap-3 @[34rem]:grid-cols-[1.15fr_0.88fr]">
+        <PanelShell embedMode={embedMode} className={`${panelClass}${interactiveClass}`}>
           <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/40" />
           <div className="relative">
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-bold text-[#8B6F47]">
@@ -198,16 +240,13 @@ export default function HomeResultPreview({
               <p className="mt-2 text-sm leading-relaxed text-[#4A403B]">{content.flow}</p>
             </div>
           </div>
-        </Link>
+        </PanelShell>
 
-        <Link
-          href="/today#personalize"
-          className="group flex flex-col rounded-[26px] border border-[#E2D7D0] bg-white px-5 py-5 shadow-[0_12px_32px_rgba(61,51,56,0.05)] transition hover:-translate-y-0.5"
-        >
+        <PanelShell embedMode={embedMode} className={`${sideClass}${interactiveClass}`}>
           <p className="text-xs font-bold text-[#8B6F47]">지금 잘 맞는 움직임</p>
           <p className="mt-1 text-sm text-[#8A7E78]">오늘의 흐름에 맞게 바로 적용할 수 있는 선택들</p>
 
-          <div className="mt-4 grid flex-1 grid-cols-1 gap-2 sm:grid-cols-2">
+          <div className="mt-4 grid grid-cols-1 gap-2.5">
             {[
               ["권하는 움직임", content.actionGuide.dos],
               ["늦추는 편이 좋은 것", content.actionGuide.donts],
@@ -234,11 +273,11 @@ export default function HomeResultPreview({
             <p className="mt-1 text-xs leading-relaxed text-[#5A4E48]">{content.emotionPoint.description}</p>
           </div>
 
-          <div className="-mx-1 mt-4 flex gap-2 overflow-x-auto overscroll-x-contain pb-1 snap-x snap-mandatory [-webkit-overflow-scrolling:touch] [scrollbar-width:none] sm:mx-0 sm:grid sm:grid-cols-4 sm:gap-2 sm:overflow-visible sm:pb-0 sm:snap-none [&::-webkit-scrollbar]:hidden">
+          <div className="mt-4 grid grid-cols-2 gap-2 @[22rem]:grid-cols-4">
             {content.timeSlots.map((slot) => (
               <div
                 key={slot.label}
-                className="min-w-[4.75rem] shrink-0 snap-start rounded-xl border border-[#E2D7D0] bg-[#FAF8F5] px-2.5 py-2.5 text-center sm:min-w-0 sm:shrink"
+                className="rounded-xl border border-[#E2D7D0] bg-[#FAF8F5] px-2.5 py-2.5 text-center"
               >
                 <p className="text-[10px] text-[#8A7E78]">{slot.label}</p>
                 <p className="mt-0.5 text-sm text-[#2F282B]" style={{ fontFamily: "Jua, sans-serif" }}>
@@ -248,11 +287,51 @@ export default function HomeResultPreview({
             ))}
           </div>
 
-          <p className="mt-4 text-xs font-bold text-[#8B6F47] transition group-hover:translate-x-0.5">
-            오늘의 리포트 이어 읽기 ›
-          </p>
-        </Link>
+          {!embedMode ? (
+            <p className="mt-4 text-xs font-bold text-[#8B6F47] transition group-hover:translate-x-0.5">
+              오늘의 리포트 이어 읽기 ›
+            </p>
+          ) : null}
+        </PanelShell>
       </div>
+
+      {showMiniCards ? (
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="rounded-[22px] border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4">
+            <p className="text-[10px] font-bold tracking-[0.12em] text-[#8B6F47]">TODAY</p>
+            <h3 className="mt-2 text-base font-bold text-[#2F282B]">오늘의 한 줄</h3>
+            <p className="mt-2 text-sm leading-relaxed text-[#5A4E48]">{content.sentence}</p>
+            {!embedMode ? (
+              <p className="mt-3 text-xs font-bold text-[#8B6F47]">자세히 보기 ›</p>
+            ) : null}
+          </div>
+
+          <div className="rounded-[22px] border border-[#E2D7D0] bg-[#FAF8F5] px-4 py-4">
+            <p className="text-[10px] font-bold tracking-[0.12em] text-[#8B6F47]">WEEKLY</p>
+            <h3 className="mt-2 text-base font-bold text-[#2F282B]">이번 주의 흐름</h3>
+            <div className="mt-3 flex h-8 items-end gap-1.5">
+              {weeklyTrend.map((value, index) => (
+                <div key={index} className="relative flex flex-1 flex-col items-center gap-0.5">
+                  {index === todayIndex ? (
+                    <span className="absolute -top-2.5 h-1.5 w-1.5 rounded-full bg-[#333333] ring-2 ring-[#f5f2ed]" />
+                  ) : null}
+                  <div
+                    className="w-full rounded-t-full bg-[#8B6F47]"
+                    style={{ height: `${Math.max(value / 3, 10)}px`, opacity: 0.45 + index * 0.06 }}
+                  />
+                  <span className="text-[9px] text-[#8A7E78]">{"월화수목금토일"[index]}</span>
+                </div>
+              ))}
+            </div>
+            <p className="mt-2 text-sm leading-relaxed text-[#5A4E48]">
+              {content.weekly.summary || `${content.weekly.keyDay}에 흐름이 모입니다.`}
+            </p>
+            {!embedMode ? (
+              <p className="mt-3 text-xs font-bold text-[#8B6F47]">주간 보기 ›</p>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

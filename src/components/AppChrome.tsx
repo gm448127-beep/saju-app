@@ -3,25 +3,11 @@
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import Header from "@/components/Header";
-
-/** 랜딩 전용 경로 — 글로벌 헤더·기본 main 패딩 없음 */
-const MINIMAL_CHROME_PREFIXES = [
-  "/landing-mbti",
-  "/landing-restart",
-  "/landing-decision",
-  "/landing-assets",
-];
-
-function isMinimalChrome(pathname: string | null) {
-  if (!pathname) return false;
-  return MINIMAL_CHROME_PREFIXES.some(
-    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
-  );
-}
+import { isLandingPath } from "@/lib/landing-routes";
 
 export default function AppChrome({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const minimal = isMinimalChrome(pathname);
+  const minimal = isLandingPath(pathname);
 
   if (minimal) {
     return <main className="flex-1">{children}</main>;
@@ -30,7 +16,7 @@ export default function AppChrome({ children }: { children: ReactNode }) {
   return (
     <>
       <Header />
-      <main className="flex-1 px-4 py-6">{children}</main>
+      <main className="flex-1 px-4 py-6 md:px-8 lg:px-10">{children}</main>
     </>
   );
 }

@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import { ACTION_GUIDE_COPY } from "@/lib/history-copy";
 import HourlyFlowSection, { type HourlyFlowSlot } from "@/components/HourlyFlowSection";
 import TodayReadingGuide from "@/components/today/TodayReadingGuide";
 import MyeongriBasisToggle from "@/components/MyeongriBasisToggle";
 import AxisScorePanel from "@/components/AxisScorePanel";
+import TomorrowPreviewTeaser from "@/components/TomorrowPreviewTeaser";
 import ToneDecisionChip from "@/components/ToneDecisionChip";
 import { TODAY_CARD_META, TODAY_CARD_SURFACE } from "@/lib/today-page-copy";
 import { buildTodayMyeongriBasis, buildToneChipTooltip } from "@/lib/today-basis-helpers";
@@ -31,6 +32,7 @@ import {
   clampFortuneScore,
   type TodayApiScores,
 } from "@/lib/today-score-display";
+import { buildTomorrowPreview, profileFromTodayApiResult } from "@/lib/tomorrow-preview";
 
 function CardShell({
   cardId,
@@ -207,6 +209,18 @@ export default function TodayFiveCardReport({
     ? buildToneChipTooltip(result, report.toneLabel)
     : null;
   const toneChipLabel = `${tonePrefix} · ${report.toneLabel}`;
+
+  const tomorrowPreview = useMemo(
+    () =>
+      buildTomorrowPreview(
+        profileFromTodayApiResult(
+          result as { todaySipsin?: string; myElement?: string } | undefined,
+        ),
+        new Date(),
+        report.toneKey,
+      ),
+    [result, report.toneKey],
+  );
 
   useEffect(() => {
     if (!isPersonalized) return;
@@ -493,6 +507,8 @@ export default function TodayFiveCardReport({
               hourlyFlowIntro={hourlyFlowIntro}
               hourlyPeak={hourlyPeak}
               hourlyCaution={hourlyCaution}
+              showSijinDetails={false}
+              onOpenDetail={onOpenDetail}
             />
           </div>
         </CardShell>
@@ -513,6 +529,8 @@ export default function TodayFiveCardReport({
           </div>
         )
       )}
+
+      <TomorrowPreviewTeaser preview={tomorrowPreview} />
     </section>
   );
 }

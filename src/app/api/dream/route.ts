@@ -1,4 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { buildDreamGenerationSystemPrompt } from '@/lib/dream-generation-prompts';
+import {
+  attachRouteLintMeta,
+  collectDreamDisplayFields,
+} from '@/lib/unmyeong-route-lint';
 
 const DREAM_SYMBOL_GUIDE = [
   {
@@ -165,46 +170,15 @@ export async function POST(request: NextRequest) {
     const trimmedMood = typeof mood === 'string' ? mood.trim().slice(0, 80) : '';
 
     if (!apiKey) {
-      return NextResponse.json({ interpretation: buildFallbackInterpretation(trimmedDream, trimmedMood) });
+      const payload = { interpretation: buildFallbackInterpretation(trimmedDream, trimmedMood) };
+      return NextResponse.json(
+        attachRouteLintMeta(payload, 'dream', collectDreamDisplayFields(payload)),
+      );
     }
 
     const dreamGuide = buildDreamGuidePrompt(trimmedDream);
 
-    const systemPrompt = `당신은 '운명비서'의 꿈해몽 전문 비서입니다.
-
-역할:
-- 무섭고 단정적인 예언이 아니라, 품격 있고 차분한 수석비서처럼 꿈의 상징을 현실 조언으로 풀어줍니다.
-- 길몽/흉몽을 자극적으로 말하지 않습니다.
-- 꿈을 심리, 관계, 일상, 선택의 신호로 해석합니다.
-- 사용자가 오늘 바로 활용할 수 있는 조언을 줍니다.
-- 아래 꿈 상징 자료를 우선 참고하되, 사용자의 꿈 내용에 맞게 자연스럽게 풀어냅니다.
-
-꿈 상징 참고 자료:
-${dreamGuide}
-
-답변 형식:
-**운명비서 꿈해몽 리포트**
-
-**전체 해석**
-2~4문장으로 꿈의 큰 흐름을 설명합니다.
-
-**주요 상징**
-- 꿈속 상징 3~5개를 쉬운 말로 해석합니다.
-
-**오늘의 메시지**
-오늘 어떤 마음가짐이 좋은지 안내합니다.
-
-**조심할 점**
-- 과한 해석, 관계 단정, 충동적인 결정을 피하도록 안내합니다.
-
-**운명비서의 조언**
-마지막에 현실적인 행동 조언을 2~3문장으로 정리합니다.
-
-주의:
-- 이모지는 사용하지 않습니다.
-- 불길한 예언처럼 겁주지 않습니다.
-- 의학, 법률, 투자 판단은 전문가 상담을 권합니다.
-- 한국어 존댓말로 답합니다.`;
+    const systemPrompt = buildDreamGenerationSystemPrompt(dreamGuide);
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -227,13 +201,19 @@ ${dreamGuide}
     });
 
     if (!response.ok) {
-      return NextResponse.json({ interpretation: buildFallbackInterpretation(trimmedDream, trimmedMood) });
+      const payload = { interpretation: buildFallbackInterpretation(trimmedDream, trimmedMood) };
+      return NextResponse.json(
+        attachRouteLintMeta(payload, 'dream', collectDreamDisplayFields(payload)),
+      );
     }
 
     const data = await response.json();
     const interpretation = data.content?.[0]?.text || buildFallbackInterpretation(trimmedDream, trimmedMood);
 
-    return NextResponse.json({ interpretation });
+    const payload = { interpretation };
+    return NextResponse.json(
+      attachRouteLintMeta(payload, 'dream', collectDreamDisplayFields(payload)),
+    );
   } catch (error) {
     console.error('꿈해몽 오류:', error);
     return NextResponse.json({ error: '꿈해몽 중 오류가 발생했습니다.' }, { status: 500 });

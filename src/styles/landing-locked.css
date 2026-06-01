@@ -1,49 +1,56 @@
-/* 랜딩 — 결과(공개) 운세 카드 */
+/* 랜딩 — 결과(공개) 운세 카드 · 4단 리포트 */
 
 .landing-unlocked {
+  --unlocked-leading: 1.7;
+  --unlocked-gap: 0.85rem;
+
   overflow: hidden;
   border-radius: 1.25rem;
   border: 1px solid var(--line);
-  background: #ffffff;
-  padding: 1rem;
+  background: var(--paper-elevated);
+  padding: 1.125rem 1rem 1rem;
   box-shadow: var(--shadow-card);
 }
 
 .landing-unlocked__header {
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.65rem;
+  margin-bottom: var(--unlocked-gap);
+  padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--line);
 }
 
+/* 브랜드 — 크기·색으로 본문과 구분 */
 .landing-unlocked__brand {
   margin: 0;
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  color: var(--ink-muted);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  color: var(--accent);
 }
 
 .landing-unlocked__hook {
-  margin: 0.35rem 0 0;
+  margin: 0.65rem 0 0;
   font-family: var(--font-serif);
   font-size: 1.125rem;
   font-weight: 700;
-  line-height: 1.35;
+  line-height: var(--unlocked-leading);
   letter-spacing: -0.03em;
   color: var(--ink);
 }
 
+/* 후크와 날짜 사이 한 칸 */
 .landing-unlocked__date {
-  margin: 0.35rem 0 0;
+  margin: 0.85rem 0 0;
   font-size: 0.8125rem;
+  line-height: var(--unlocked-leading);
   color: var(--ink-muted);
 }
 
 .landing-unlocked__title {
-  margin: 0 0 0.85rem;
+  margin: 0 0 var(--unlocked-gap);
   font-family: var(--font-serif);
   font-size: 1rem;
   font-weight: 700;
+  line-height: var(--unlocked-leading);
   color: var(--ink);
 }
 
@@ -53,53 +60,37 @@
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: var(--unlocked-gap);
 }
 
 .landing-unlocked__item {
-  display: flex;
-  gap: 0.65rem;
-  padding: 0.8rem 0.75rem;
+  padding: 0.85rem 0.8rem;
   border-radius: 0.75rem;
-  background: var(--paper, #f5f0e8);
-  border: 1px solid rgba(232, 228, 222, 0.9);
-}
-
-.landing-unlocked__item-num {
-  flex-shrink: 0;
-  margin: 0;
-  width: 1.5rem;
-  height: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9999px;
-  background: var(--accent-soft, #f0e4de);
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--accent, #7a5d35);
+  background: var(--paper);
+  border: 1px solid color-mix(in srgb, var(--line) 85%, transparent);
 }
 
 .landing-unlocked__item-body {
   min-width: 0;
-  flex: 1;
 }
 
+/* 예: 1. 오늘의 흐름 */
 .landing-unlocked__item-label {
-  margin: 0 0 0.4rem;
-  font-size: 0.875rem;
+  margin: 0 0 0.55rem;
+  font-size: 0.9375rem;
   font-weight: 700;
-  color: var(--accent, #7a5d35);
+  line-height: var(--unlocked-leading);
+  letter-spacing: -0.02em;
+  color: var(--ink);
 }
 
 .landing-unlocked__item--quote {
-  border-color: rgba(181, 86, 46, 0.22);
-  background: rgba(255, 252, 247, 0.95);
+  border-color: color-mix(in srgb, var(--accent) 22%, var(--line));
+  background: color-mix(in srgb, var(--paper) 70%, var(--accent-soft));
 }
 
 .landing-unlocked__fortune--quote {
-  font-size: 1.125rem;
-  color: var(--accent, #7a5d35);
+  color: var(--accent);
 }
 
 .landing-unlocked__fortune {
@@ -107,17 +98,17 @@
   font-family: var(--font-serif);
   font-size: 1.0625rem;
   font-weight: 700;
-  line-height: 1.65;
+  line-height: var(--unlocked-leading);
   letter-spacing: -0.02em;
   color: var(--ink);
 }
 
 .landing-unlocked__insight {
-  margin: 0.5rem 0 0;
-  padding-top: 0.5rem;
-  border-top: 1px dashed rgba(232, 228, 222, 0.9);
+  margin: 0.55rem 0 0;
+  padding-top: 0.55rem;
+  border-top: 1px dashed color-mix(in srgb, var(--line) 90%, transparent);
   font-size: 0.875rem;
-  line-height: 1.65;
+  line-height: var(--unlocked-leading);
   color: var(--ink-body);
 }
 
@@ -126,24 +117,24 @@
   font-family: var(--font-serif);
   font-size: 1rem;
   font-weight: 700;
-  line-height: 1.65;
+  line-height: var(--unlocked-leading);
   letter-spacing: -0.02em;
   color: var(--ink);
 }
 
 .landing-unlocked__note {
-  margin: 0.45rem 0 0;
+  margin: 0.55rem 0 0;
   font-size: 0.875rem;
-  line-height: 1.65;
+  line-height: var(--unlocked-leading);
   color: var(--ink-body);
 }
 
 .landing-unlocked__share {
-  margin: 0.85rem 0 0;
+  margin: var(--unlocked-gap) 0 0;
   padding-top: 0.75rem;
   border-top: 1px dashed var(--line);
   font-size: 0.8125rem;
-  line-height: 1.55;
+  line-height: var(--unlocked-leading);
   text-align: center;
   color: var(--ink-muted);
 }

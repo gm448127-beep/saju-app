@@ -94,6 +94,12 @@ body::before {
 .bg-paper-selected {
   background-color: var(--paper-selected);
 }
+.text-score {
+  color: var(--data-accent);
+}
+.bg-score {
+  background-color: var(--data-accent);
+}
 
 /* 모바일 터치 타깃 최소 44px (WCAG 2.5.5) */
 .touch-target {
@@ -172,8 +178,24 @@ p, li, td, th {
 .text-\[\#625B5B\],
 .text-\[\#6B5E58\],
 .text-\[\#6b5e58\],
-.text-\[\#4A403B\] {
+.text-\[\#4A403B\],
+.text-\[\#3D3338\],
+.text-\[\#3d3338\],
+.text-\[\#2F282B\],
+.text-\[\#2f282b\] {
   color: var(--ink-body) !important;
+}
+
+h1.text-\[\#2F282B\],
+h2.text-\[\#2F282B\],
+h3.text-\[\#2F282B\],
+.font-bold.text-\[\#2F282B\] {
+  color: var(--ink) !important;
+}
+
+.bg-\[\#2F282B\],
+.bg-\[\#2f282b\] {
+  background-color: var(--primary-dark) !important;
 }
 
 .border-\[\#8B6F47\],
@@ -230,7 +252,7 @@ p, li, td, th {
 }
 
 .label {
-  color: #2F282B !important;
+  color: var(--ink) !important;
   font-size: 17px;
   font-weight: 700;
   letter-spacing: -0.02em;

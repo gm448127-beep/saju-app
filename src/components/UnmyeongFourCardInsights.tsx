@@ -51,11 +51,10 @@ export function UnmyeongFourCardInsights({
             key={item.label}
             className={`landing-unlocked__item${item.highlight ? " landing-unlocked__item--quote" : ""}`}
           >
-            <p className="landing-unlocked__item-num" aria-hidden>
-              {index + 1}
-            </p>
             <div className="landing-unlocked__item-body">
-              <h3 className="landing-unlocked__item-label">{item.label}</h3>
+              <h3 className="landing-unlocked__item-label">
+                {index + 1}. {item.label}
+              </h3>
               <p
                 className={
                   item.highlight

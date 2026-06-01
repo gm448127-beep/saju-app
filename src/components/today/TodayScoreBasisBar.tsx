@@ -10,7 +10,9 @@ type TodayScoreBasisBarProps = {
   onRecalculate?: () => void;
 };
 
-/** 화면에 보이는 점수가 어떤 입력·날짜 기준인지 표시 */
+/** 화면에 보이는 점수가 어떤 입력·날짜 기준인지 표시
+ *  @deprecated UI 숨김 — 복원: src/lib/today-score-ui-archive.ts
+ */
 export default function TodayScoreBasisBar({
   overall,
   calcDateKey,

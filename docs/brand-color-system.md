@@ -16,7 +16,7 @@
 | `--paper` | `#F5F0E8` | 페이지 베이스 |
 | `--paper-elevated` | `#FFFDFC` | 카드·입력 |
 | `--paper-selected` | `#F2EBE3` | 선택 칩 배경 |
-| `--ink` | `#2F282B` | 제목·다크 CTA |
+| `--ink` | `#1C1A17` | 제목·헤딩 (v3 text-primary) |
 | `--ink-body` | `#5A504B` | 본문 (AAA) |
 | `--ink-muted` | `#726963` | 마이크로카피 (AA) |
 | `--line` | `#DCCFBE` | 섹션·카드 보더 |

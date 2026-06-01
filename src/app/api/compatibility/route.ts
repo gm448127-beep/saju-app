@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { calculateSaju } from "ssaju";
+import {
+  attachRouteLintMeta,
+  collectCompatibilityDisplayFields,
+} from "@/lib/unmyeong-route-lint";
 
 type PersonRequest = {
   name?: string;
@@ -435,7 +439,7 @@ export async function POST(req: NextRequest) {
       "서로 잘 맞는 부분은 루틴으로 만들고, 반복해서 부딪히는 부분은 규칙을 정해두는 편이 좋습니다.",
     ];
 
-    return NextResponse.json({
+    const payload = {
       person1: p1,
       person2: p2,
       overallScore,
@@ -453,7 +457,15 @@ export async function POST(req: NextRequest) {
       strengths,
       weaknesses,
       tips,
-    });
+    };
+
+    return NextResponse.json(
+      attachRouteLintMeta(
+        payload,
+        "compatibility",
+        collectCompatibilityDisplayFields(payload),
+      ),
+    );
   } catch (err: any) {
     console.error("Compatibility API error:", err);
     return NextResponse.json(

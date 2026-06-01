@@ -8,43 +8,20 @@ import {
   hasTarotFavorite,
   saveTarotFavorite,
 } from '@/lib/archive-storage';
+import { getTarotImageCandidates } from '@/lib/tarot-assets';
 
 interface TarotCard {
+  id?: number;
   name: string;
   english: string;
   isReversed: boolean;
   position: string;
   meaning: string;
   advice: string;
-  image?: string;
-  suit?: string;
-  rank?: string;
+  image: string;
+  keywordsLeft?: string[];
+  keywordsRight?: string[];
 }
-
-const CARD_VISUALS: Record<string, { symbol: string; motif: string; tone: string }> = {
-  바보: { symbol: '旅', motif: '새로운 길', tone: 'from-[#FFF8E8] to-[#E8D7B8]' },
-  마법사: { symbol: '術', motif: '의지와 도구', tone: 'from-[#FFF7EF] to-[#E7CDB6]' },
-  여사제: { symbol: '月', motif: '조용한 직감', tone: 'from-[#F8F5FF] to-[#D9CDE8]' },
-  여황제: { symbol: '豊', motif: '풍요와 성장', tone: 'from-[#FFF7F2] to-[#E8C9BC]' },
-  황제: { symbol: '權', motif: '기준과 책임', tone: 'from-[#F7F1EA] to-[#D8C0A6]' },
-  교황: { symbol: '導', motif: '조언과 기준', tone: 'from-[#FBF8EF] to-[#E1D4B7]' },
-  연인: { symbol: '緣', motif: '마음의 선택', tone: 'from-[#FFF4F4] to-[#E9C2C2]' },
-  전차: { symbol: '進', motif: '전진과 승부', tone: 'from-[#F3F7FF] to-[#C8D4E8]' },
-  힘: { symbol: '柔', motif: '부드러운 힘', tone: 'from-[#FFF8EC] to-[#E6CEAA]' },
-  은둔자: { symbol: '燈', motif: '내면의 등불', tone: 'from-[#F8F7F2] to-[#D9D1C2]' },
-  '운명의 수레바퀴': { symbol: '輪', motif: '흐름의 전환', tone: 'from-[#FFF9EE] to-[#E3D1A8]' },
-  정의: { symbol: '衡', motif: '균형과 판단', tone: 'from-[#F7FAF8] to-[#C9D8CF]' },
-  '매달린 사람': { symbol: '待', motif: '멈춤의 의미', tone: 'from-[#F8F5EF] to-[#D9CCB8]' },
-  죽음: { symbol: '轉', motif: '끝과 전환', tone: 'from-[#F7F3F1] to-[#CDBFB9]' },
-  절제: { symbol: '和', motif: '조율과 회복', tone: 'from-[#F7FBF8] to-[#CBE0D1]' },
-  악마: { symbol: '執', motif: '집착의 확인', tone: 'from-[#F9F2EF] to-[#D8B8AE]' },
-  탑: { symbol: '破', motif: '균열과 각성', tone: 'from-[#F8F4EF] to-[#D6BCA2]' },
-  별: { symbol: '星', motif: '희망과 회복', tone: 'from-[#F7FAFF] to-[#C9D8EA]' },
-  달: { symbol: '夢', motif: '불확실한 감정', tone: 'from-[#FAF7FF] to-[#D6C7E4]' },
-  태양: { symbol: '日', motif: '밝은 성취', tone: 'from-[#FFF8E4] to-[#E9CF88]' },
-  심판: { symbol: '醒', motif: '다시 부름', tone: 'from-[#F9F7F2] to-[#D9CBB4]' },
-  세계: { symbol: '完', motif: '완성과 다음 문', tone: 'from-[#F7FBF8] to-[#CBDCCF]' },
-};
 
 const TOPICS = ['일반', '연애', '재물', '직업', '관계', '선택'];
 
@@ -71,13 +48,6 @@ function getHorizonFromQuestion(text: string): (typeof TIME_HORIZONS)[number] {
   if (text.includes('3개월 후')) return '3개월 후';
   return '지금';
 }
-
-const SUIT_ART = {
-  완드: { icon: '✦', line: 'bg-[#B89968]', mark: 'WANDS' },
-  컵: { icon: '◡', line: 'bg-[#7EA4B8]', mark: 'CUPS' },
-  소드: { icon: '◇', line: 'bg-[#8C9AAE]', mark: 'SWORDS' },
-  펜타클: { icon: '◆', line: 'bg-[#9B875E]', mark: 'PENTACLES' },
-} as const;
 
 function renderContent(content: string) {
   return content.split('\n').map((line, index) => {
@@ -109,118 +79,57 @@ function renderContent(content: string) {
   });
 }
 
-function getCardVisual(name: string) {
-  if (CARD_VISUALS[name]) return CARD_VISUALS[name];
-  if (name.startsWith('완드')) return { symbol: '火', motif: '의지와 추진력', tone: 'from-[#FFF8E8] to-[#E7C28F]' };
-  if (name.startsWith('컵')) return { symbol: '水', motif: '감정과 관계', tone: 'from-[#F3FAFF] to-[#BFD8E8]' };
-  if (name.startsWith('소드')) return { symbol: '風', motif: '생각과 판단', tone: 'from-[#F7FAFF] to-[#CBD3E4]' };
-  if (name.startsWith('펜타클')) return { symbol: '土', motif: '현실과 결과', tone: 'from-[#FAF7EE] to-[#D8C6A4]' };
-  return { symbol: '命', motif: '선택의 신호', tone: 'from-[#FFFDF8] to-[#E8D7C4]' };
-}
-
-function getRankLabel(rank?: string) {
-  if (!rank) return '';
-  const labels: Record<string, string> = {
-    에이스: 'A',
-    페이지: 'P',
-    나이트: 'N',
-    퀸: 'Q',
-    킹: 'K',
-  };
-  return labels[rank] ?? rank;
-}
-
 function TarotCardArtwork({ card }: { card: TarotCard }) {
-  const [imageFailed, setImageFailed] = useState(false);
-  const visual = getCardVisual(card.name);
-  const suitArt = card.suit ? SUIT_ART[card.suit as keyof typeof SUIT_ART] : null;
-  const rankLabel = getRankLabel(card.rank);
-  const isCourt = ['페이지', '나이트', '퀸', '킹'].includes(card.rank ?? '');
-  const numericCount = card.rank && /^\d+$/.test(card.rank) ? Number(card.rank) : card.rank === '에이스' ? 1 : 0;
-  const shouldShowImage = Boolean(card.image && !imageFailed);
+  const imageCandidates = useMemo(
+    () => getTarotImageCandidates(card.image, card.english),
+    [card.image, card.english],
+  );
+  const [imageIndex, setImageIndex] = useState(0);
+  const imageSrc = imageCandidates[imageIndex];
+  const shouldShowImage = Boolean(imageSrc && imageIndex < imageCandidates.length);
+
+  useEffect(() => {
+    setImageIndex(0);
+  }, [card.image, card.english]);
+
+  const handleImageError = () => {
+    setImageIndex((current) => current + 1);
+  };
 
   return (
-    <div className={`relative mt-3 min-h-[310px] overflow-hidden rounded-[24px] border border-[#D9C8C0] bg-gradient-to-br ${visual.tone} px-4 py-5 text-center shadow-[0_16px_34px_rgba(61,51,56,0.10)]`}>
-      <div className="absolute inset-3 rounded-[20px] border border-white/80" />
-      <div className="absolute inset-6 rounded-[16px] border border-[#8B6F47]/15" />
-      <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/35" />
-      <div className="absolute -bottom-12 left-1/2 h-36 w-36 -translate-x-1/2 rounded-full border border-white/75" />
-
+    <div className="relative mt-3 min-h-[310px] overflow-hidden rounded-[24px] border border-[#D9C8C0] bg-[#FAF8F5] px-4 py-5 text-center shadow-[0_16px_34px_rgba(61,51,56,0.10)]">
       {shouldShowImage ? (
-        <div className="relative min-h-[270px] overflow-hidden rounded-[18px] border border-white/80 bg-white/30">
+        <div className="relative min-h-[270px] overflow-hidden rounded-[18px] border border-[#E2D7D0] bg-white">
           <img
-            src={card.image}
-            alt={`${card.name} 타로 카드 이미지`}
-            className={`${card.isReversed ? 'rotate-180' : ''} h-[270px] w-full object-cover transition-transform`}
+            src={imageSrc}
+            alt={`${card.name} 타로 카드`}
+            className={`${card.isReversed ? 'rotate-180' : ''} mx-auto h-[270px] w-full max-w-[200px] object-contain transition-transform`}
             draggable={false}
-            onError={() => setImageFailed(true)}
+            onError={handleImageError}
           />
-          <div className="pointer-events-none absolute inset-2 rounded-[14px] border border-white/70" />
           {card.isReversed && (
-            <p className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-white/80 px-2 py-1 text-[10px] font-bold text-[#8B6F47]">
+            <p className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-white/90 px-2 py-1 text-[10px] font-bold text-[#8B6F47] shadow-sm">
               역방향
             </p>
           )}
         </div>
       ) : (
-      <div className="relative flex min-h-[270px] flex-col justify-between">
-        <div className="flex items-center justify-between text-[#8B6F47]">
-          <div className="text-left">
-            <p className="text-[10px] font-bold tracking-[0.18em]">UNMYEONG</p>
-            <p className="text-[9px] font-semibold tracking-[0.14em]">TAROT DECK</p>
-          </div>
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/80 bg-white/50 text-sm font-bold">
-            {rankLabel || visual.symbol}
-          </div>
-        </div>
-
-        <div className={`${card.isReversed ? 'rotate-180' : ''} relative mx-auto flex h-40 w-40 items-center justify-center rounded-full border border-white/85 bg-white/35 shadow-inner transition-transform`}>
-          <div className="absolute h-32 w-32 rounded-full border border-[#8B6F47]/20" />
-          <div className="absolute h-px w-28 bg-[#8B6F47]/20" />
-          <div className="absolute h-28 w-px bg-[#8B6F47]/20" />
-
-          {suitArt && numericCount > 0 && !isCourt ? (
-            <div className="grid max-w-[118px] grid-cols-3 gap-2">
-              {Array.from({ length: numericCount }).map((_, index) => (
-                <span
-                  key={index}
-                  className="flex h-7 w-7 items-center justify-center rounded-full border border-white/80 bg-white/55 text-sm font-bold text-[#2F282B]"
-                >
-                  {suitArt.icon}
-                </span>
-              ))}
-            </div>
-          ) : suitArt && isCourt ? (
-            <div className="space-y-2 text-[#2F282B]">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-white/80 bg-white/60 text-4xl">
-                {card.rank === '페이지' ? '書' : card.rank === '나이트' ? '馬' : card.rank === '퀸' ? '后' : '王'}
-              </div>
-              <div className={`mx-auto h-1 w-20 rounded-full ${suitArt.line}`} />
-              <p className="text-[10px] font-bold tracking-[0.18em] text-[#8B6F47]">{suitArt.mark}</p>
-            </div>
-          ) : (
-            <div className="space-y-2 text-[#2F282B]">
-              <div className="text-7xl" style={{ fontFamily: "'Noto Serif KR', serif" }}>
-                {visual.symbol}
-              </div>
-              <div className="mx-auto h-1 w-20 rounded-full bg-[#8B6F47]/45" />
-            </div>
-          )}
-        </div>
-
-        <div>
+        <div className="flex min-h-[270px] flex-col items-center justify-center gap-2 rounded-[18px] border border-dashed border-[#D9C8C0] bg-white/80 px-4">
           <p className="text-2xl text-[#2F282B]" style={{ fontFamily: 'Jua, sans-serif' }}>
             {card.name}
           </p>
-          <p className="mt-1 text-xs text-[#6B5E58]">{card.english}</p>
-          <p className="mt-2 text-[11px] font-semibold text-[#8B6F47]">{visual.motif}</p>
-          {card.isReversed && (
-            <p className="mt-2 inline-flex rounded-full bg-white/75 px-2 py-1 text-[10px] font-bold text-[#8B6F47]">
-              역방향
-            </p>
-          )}
+          <p className="text-xs text-[#6B5E58]">{card.english}</p>
+          <p className="text-[11px] text-[#8A7E78]">카드 이미지를 준비 중이에요</p>
         </div>
-      </div>
+      )}
+      <p className="mt-3 text-sm font-bold text-[#2F282B]">{card.name}</p>
+      {(card.keywordsLeft?.length || card.keywordsRight?.length) ? (
+        <p className="mt-1 text-[10px] text-[#8B6F47]">
+          {[...(card.keywordsLeft ?? []), ...(card.keywordsRight ?? [])].join(' · ')}
+        </p>
+      ) : null}
+      {card.isReversed && !shouldShowImage && (
+        <p className="mt-1 text-[10px] font-bold text-[#8B6F47]">역방향</p>
       )}
     </div>
   );
@@ -304,20 +213,20 @@ export default function TarotPage() {
 
   return (
     <div className="space-y-5">
-      <section className="relative overflow-hidden rounded-[30px] border border-[#E2D7D0] bg-white px-5 py-7 shadow-[0_18px_48px_rgba(61,51,56,0.07)] sm:px-8 sm:py-9">
-        <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-[#F3E8D5]" />
-        <div className="absolute -bottom-28 left-6 h-72 w-72 rounded-full bg-[#FFF7E8]" />
+      <section className="relative overflow-hidden rounded-[22px] border border-[#E2D7D0] bg-white px-4 py-4 shadow-[0_10px_28px_rgba(61,51,56,0.06)] sm:px-5 sm:py-5">
+        <div className="absolute -right-14 -top-16 h-40 w-40 rounded-full bg-[#F3E8D5]/80" />
+        <div className="absolute -bottom-16 left-4 h-36 w-36 rounded-full bg-[#FFF7E8]/90" />
         <div className="relative">
-          <p className="mb-3 inline-flex rounded-full border border-[#E2D7D0] bg-[#FAF8F5] px-3 py-1 text-xs font-semibold text-[#8B6F47]">
+          <p className="mb-2 inline-flex rounded-full border border-[#E2D7D0] bg-[#FAF8F5] px-2.5 py-0.5 text-[10px] font-semibold text-[#8B6F47]">
             TAROT REPORT
           </p>
-          <h1 className="text-3xl leading-tight text-[#2F282B] sm:text-5xl" style={{ fontFamily: 'Jua, sans-serif' }}>
+          <h1 className="text-xl leading-snug text-[#2F282B] sm:text-2xl" style={{ fontFamily: 'Jua, sans-serif' }}>
             선택 앞에서 필요한 조언을
             <br />
             세 장의 카드로 정리해드릴게요
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-[#4A403B]">
-            78장 전체 덱으로 현재와 미래의 흐름을 정리합니다. 3개월·1년·2년 후의 모습도 카드가 비추는 가능한 풍경으로 풀어드립니다.
+          <p className="mt-2 max-w-xl text-sm leading-relaxed text-[#4A403B]">
+            22장 덱으로 현재와 미래의 흐름을 정리합니다. 3개월·1년·2년 후의 모습도 카드가 비추는 가능한 풍경으로 풀어드립니다.
           </p>
         </div>
       </section>
@@ -384,7 +293,7 @@ export default function TarotPage() {
                 <p className="text-xs tracking-[0.12em] text-[#8B6F47]">CARD PICKING</p>
                 <p className="text-sm font-bold text-[#2F282B]">질문을 떠올리고 카드를 섞어주세요</p>
               </div>
-              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-bold text-[#8B6F47]">78장 덱</span>
+              <span className="rounded-full bg-white px-3 py-1 text-[10px] font-bold text-[#8B6F47]">22장 덱</span>
             </div>
             <div className="grid grid-cols-3 gap-2">
               {[0, 1, 2].map((item) => (
@@ -401,7 +310,7 @@ export default function TarotPage() {
             </div>
             <p className="mt-3 text-xs leading-relaxed text-[#6B5E58]">
               {timeHorizon === '지금'
-                ? '버튼을 누르면 전체 78장 중 세 장이 섞여 뽑히고, 현재 상황 · 다가오는 흐름 · 조언으로 펼쳐집니다.'
+                ? '버튼을 누르면 22장 중 세 장이 섞여 뽑히고, 현재 상황 · 다가오는 흐름 · 조언으로 펼쳐집니다.'
                 : `버튼을 누르면 ${timeHorizon} 예언 스프레드로 세 장이 펼쳐집니다.`}
             </p>
           </div>

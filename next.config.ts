@@ -10,6 +10,11 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/landing-decis",
+        destination: "/landing-decision",
+        permanent: true,
+      },
+      {
         source: "/landing-assets",
         destination: "/landing-download/",
         permanent: false,
