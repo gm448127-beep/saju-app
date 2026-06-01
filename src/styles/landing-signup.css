@@ -1,4 +1,4 @@
-/* 출시 알림 폼 — 랜딩 공통 */
+/* 출시 알림 흼 — 랜딩 공통 */
 
 .landing-signup {
   margin-top: 0;
@@ -165,7 +165,7 @@
   content: "·";
   position: absolute;
   left: 0;
-  color: var(--accent, #b5562e);
+  color: var(--accent, #7a5d35);
   font-weight: 700;
 }
 

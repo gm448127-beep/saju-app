@@ -1,3 +1,4 @@
+import { brandGradeStyle } from '@/lib/brand-colors';
 import {
   CHEONGAN,
   JIJI,
@@ -78,12 +79,10 @@ const HEXAGRAM_DATA: Record<number, { name: string; poem: string; summary: strin
 };
 
 function getGrade(gwae: number): { grade: string; color: string; emoji: string } {
-  if (gwae <= 5) return { grade: 'SSS', color: '#f59e0b', emoji: '👑' };
-  if (gwae <= 10) return { grade: 'S', color: '#a855f7', emoji: '🌟' };
-  if (gwae <= 15) return { grade: 'A', color: '#22c55e', emoji: '✨' };
-  if (gwae <= 20) return { grade: 'B', color: '#3b82f6', emoji: '👍' };
-  if (gwae <= 25) return { grade: 'C', color: '#6b7280', emoji: '💪' };
-  return { grade: 'D', color: '#ef4444', emoji: '🛡️' };
+  const grade =
+    gwae <= 5 ? 'SSS' : gwae <= 10 ? 'S' : gwae <= 15 ? 'A' : gwae <= 20 ? 'B' : gwae <= 25 ? 'C' : 'D';
+  const style = brandGradeStyle(grade);
+  return { grade, color: style.color, emoji: style.emoji };
 }
 
 function generateCategories(gwae: number): { label: string; emoji: string; score: number; description: string }[] {

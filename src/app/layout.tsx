@@ -31,9 +31,9 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen md:bg-[#ebe7e0]">
+      <body className="min-h-screen md:bg-[var(--paper-desktop)]">
         <ClientProviders>
-          <div className="app-viewport mx-auto flex min-h-[100dvh] w-full max-w-[430px] flex-col shadow-none md:my-3 md:min-h-[calc(100dvh-1.5rem)] md:rounded-[1.75rem] md:border md:border-[#ddd5c6]/80 md:shadow-[0_24px_64px_rgba(47,40,43,0.12)]">
+          <div className="app-viewport mx-auto flex min-h-[100dvh] w-full flex-col shadow-none md:my-3 md:min-h-[calc(100dvh-1.5rem)] md:rounded-[1.75rem] md:border md:border-[color-mix(in_srgb,var(--line)_85%,transparent)] md:shadow-[0_24px_64px_rgba(51,51,51,0.12)]">
             <AppChrome>{children}</AppChrome>
           </div>
         </ClientProviders>

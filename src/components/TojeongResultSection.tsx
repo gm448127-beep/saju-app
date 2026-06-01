@@ -1,5 +1,7 @@
 "use client";
 
+import { brandScoreColor } from "@/lib/brand-colors";
+
 interface TojeongResultSectionProps {
   result: any;
   selectedMonth: number | null;
@@ -7,10 +9,7 @@ interface TojeongResultSectionProps {
 }
 
 function scoreColor(score: number) {
-  if (score >= 80) return "#B89968";
-  if (score >= 65) return "#8B6F47";
-  if (score >= 50) return "#9B9591";
-  return "#6B5E58";
+  return brandScoreColor(score);
 }
 
 function scoreLabel(score: number) {

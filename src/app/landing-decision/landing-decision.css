@@ -10,14 +10,14 @@
 
 .landing-decision-page {
   --paper: #f5f0e8;
-  --paper-elevated: #ffffff;
-  --ink: #333333;
-  --ink-body: #706b67;
-  --ink-muted: #9a9490;
-  --line: #e8e4de;
-  --accent: #b5562e;
-  --accent-hover: #9f4c29;
-  --accent-soft: #f0e4de;
+  --paper-elevated: #fffdfc;
+  --ink: #2f282b;
+  --ink-body: #5a504b;
+  --ink-muted: #726963;
+  --line: #dccfbe;
+  --accent: #7a5d35;
+  --accent-hover: #6b502e;
+  --accent-soft: #f2ebe3;
   --font-serif: "Gowun Batang", "Noto Serif KR", serif;
   --font-sans: "IBM Plex Sans KR", "Noto Sans KR", -apple-system, sans-serif;
   --shadow-card: 0 4px 24px rgba(51, 51, 51, 0.06);

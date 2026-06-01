@@ -1,3 +1,4 @@
+import { brandGradeStyle } from '@/lib/brand-colors';
 import {
   CHEONGAN,
   JIJI,
@@ -108,12 +109,20 @@ function calcDdiScore(ji1: number, ji2: number): number {
 }
 
 function getGrade(score: number): { grade: string; color: string; emoji: string } {
-  if (score >= 90) return { grade: 'SSS', color: '#f59e0b', emoji: '👑' };
-  if (score >= 80) return { grade: 'S', color: '#a855f7', emoji: '🌟' };
-  if (score >= 70) return { grade: 'A', color: '#22c55e', emoji: '✨' };
-  if (score >= 60) return { grade: 'B', color: '#3b82f6', emoji: '👍' };
-  if (score >= 50) return { grade: 'C', color: '#6b7280', emoji: '💪' };
-  return { grade: 'D', color: '#ef4444', emoji: '🛡️' };
+  const grade =
+    score >= 90
+      ? 'SSS'
+      : score >= 80
+        ? 'S'
+        : score >= 70
+          ? 'A'
+          : score >= 60
+            ? 'B'
+            : score >= 50
+              ? 'C'
+              : 'D';
+  const style = brandGradeStyle(grade);
+  return { grade, color: style.color, emoji: style.emoji };
 }
 
 function generateAdvice(el1: string, el2: string, score: number): string {

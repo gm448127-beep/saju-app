@@ -1,6 +1,7 @@
 @import "../styles/landing-signup.css";
 @import "../styles/landing-canvas.css";
 @import "../styles/landing-preview.css";
+@import "../styles/landing-today-sheet.css";
 
 /* 브랜드 OS — paper / ink / accent */
 :root {
@@ -10,7 +11,7 @@
   --ink-body: #706b67;
   --ink-muted: #9a9490;
   --line: #e8e4de;
-  --accent: #b5562e;
+  --accent: #7a5d35;
   --accent-hover: #9f4c29;
   --accent-soft: #f0e4de;
   --font-serif: "Gowun Batang", "Noto Serif KR", serif;

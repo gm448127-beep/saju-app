@@ -1,7 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BirthDateNumberInputs, { isValidBirthDate } from "@/components/BirthDateNumberInputs";
+import StoredProfileBar from "@/components/StoredProfileBar";
+import { useUserProfile } from "@/components/UserProfileProvider";
+import {
+  compatibilityPersonToProfile,
+  profileToCompatibilityPerson,
+} from "@/lib/user-profile-storage";
+import { brandScoreColor } from "@/lib/brand-colors";
 
 /* ── 시간 선택용 상수 ── */
 const TIME_SLOTS = [
@@ -50,12 +57,8 @@ const defaultPerson = (gender: string): PersonInput => ({
   exactMinute: "",
 });
 
-/* ── 점수 색상 ── */
 function scoreColor(s: number) {
-  if (s >= 80) return "#B89968";
-  if (s >= 60) return "#8B6F47";
-  if (s >= 40) return "#9B9591";
-  return "#6B5E58";
+  return brandScoreColor(s);
 }
 
 /* ── 시간 입력 서브컴포넌트 ── */
@@ -271,11 +274,17 @@ function PillarTable({ label, pillars, hasHour }: { label: string; pillars: any;
    메인 페이지 컴포넌트
    ══════════════════════════════════════════ */
 export default function CompatibilityPage() {
+  const { profile, saveProfile, isReady: profileReady } = useUserProfile();
   const [person1, setPerson1] = useState<PersonInput>(defaultPerson("남"));
   const [person2, setPerson2] = useState<PersonInput>(defaultPerson("여"));
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!profileReady || !profile) return;
+    setPerson1((prev) => ({ ...prev, ...profileToCompatibilityPerson(profile) }));
+  }, [profile, profileReady]);
 
   /* 시간 값 추출 */
   function extractTime(p: PersonInput) {
@@ -322,6 +331,7 @@ export default function CompatibilityPage() {
       const data = text ? JSON.parse(text) : {};
       if (!res.ok) throw new Error(data.error || "분석 실패");
       setResult(data);
+      saveProfile(compatibilityPersonToProfile(person1));
     } catch (e: any) {
       setError(e instanceof SyntaxError ? "서버 응답을 해석하지 못했습니다." : e.message || "오류가 발생했습니다.");
     } finally {
@@ -338,7 +348,16 @@ export default function CompatibilityPage() {
       </div>
 
       {/* 인물 입력 */}
-      <PersonCard label="내 정보" person={person1} onChange={(k, v) => setPerson1((p) => ({ ...p, [k]: v }))} />
+      {profile ? (
+        <StoredProfileBar
+          profile={profile}
+          subtitle="저장된 사주가 내 정보에 자동으로 채워집니다"
+          onEdit={() => document.getElementById("compatibility-person1")?.scrollIntoView({ behavior: "smooth" })}
+        />
+      ) : null}
+      <div id="compatibility-person1">
+        <PersonCard label="내 정보" person={person1} onChange={(k, v) => setPerson1((p) => ({ ...p, [k]: v }))} />
+      </div>
       <div className="flex justify-center">
         <span className="h-px w-16 bg-[#D9C8C0]" />
       </div>

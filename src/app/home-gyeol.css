@@ -4,20 +4,20 @@
  */
 
 .home-gyeol {
-  /* 색상 토큰 */
-  --gyeol-bg: #f5f2ed;
-  --gyeol-card: #ffffff;
-  --gyeol-ink: #333333;
-  --gyeol-body: #706b67;
-  --gyeol-muted: #9a9490;
-  --gyeol-line: #e8e4de;
-  --gyeol-terracotta: #a65d43;
-  --gyeol-terracotta-soft: #d4a894;
-  --gyeol-terracotta-pale: #f0e4de;
-  --gyeol-sage-bg: #e8f0e5;
-  --gyeol-sage-text: #5e7a5e;
-  --gyeol-tab-active: #333333;
-  --gyeol-shadow: 0 4px 24px rgba(51, 51, 51, 0.06);
+  /* 브랜드 토큰 alias — src/styles/brand-tokens.css */
+  --gyeol-bg: var(--paper);
+  --gyeol-card: var(--paper-elevated);
+  --gyeol-ink: var(--ink);
+  --gyeol-body: var(--ink-body);
+  --gyeol-muted: var(--ink-muted);
+  --gyeol-line: var(--line);
+  --gyeol-terracotta: var(--accent);
+  --gyeol-terracotta-soft: var(--accent-muted);
+  --gyeol-terracotta-pale: var(--accent-soft);
+  --gyeol-sage-bg: var(--sage-bg);
+  --gyeol-sage-text: var(--sage-text);
+  --gyeol-tab-active: var(--ink);
+  --gyeol-shadow: var(--shadow-card);
 
   --gyeol-font-sans: "Pretendard", "IBM Plex Sans KR", "Noto Sans KR", -apple-system, sans-serif;
   --gyeol-font-serif: "Gowun Batang", "Noto Serif KR", serif;

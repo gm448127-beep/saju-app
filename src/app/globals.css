@@ -1,20 +1,48 @@
 @import "tailwindcss";
+@import "../styles/brand-tokens.css";
+@import "../styles/tomorrow-preview.css";
 
-/* 모바일 앱 쉘 — 컨테이너 너비 기준 반응형(@sm, @md 등) */
+/* 모바일 앱 쉘 — 모바일은 좁게, PC는 화면에 맞게 넓게 */
 .app-viewport {
   position: relative;
   z-index: 1;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(250, 248, 245, 0.9) 100%);
+  width: 100%;
+  max-width: 100%;
+  background: var(--app-bg);
   container-type: inline-size;
   container-name: app;
+}
+
+@media (min-width: 480px) {
+  .app-viewport {
+    max-width: min(430px, calc(100vw - 1rem));
+  }
+}
+
+@media (min-width: 768px) {
+  .app-viewport {
+    max-width: min(720px, calc(100vw - 2.5rem));
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-viewport {
+    max-width: min(960px, calc(100vw - 3rem));
+  }
+}
+
+@media (min-width: 1280px) {
+  .app-viewport {
+    max-width: min(1080px, calc(100vw - 4rem));
+  }
 }
 
 /* ===== 기본 배경 & 폰트 ===== */
 body {
   position: relative;
-  background: linear-gradient(180deg, #FFFFFF 0%, #FAF8F5 100%);
+  background: var(--app-bg);
   font-family: 'Noto Sans KR', sans-serif !important;
-  color: #2F282B;
+  color: var(--ink);
   font-size: 16px;
   line-height: 1.75;
   letter-spacing: -0.015em;
@@ -35,6 +63,38 @@ body::before {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
 }
 
+/* 브랜드 유틸 */
+.bg-paper {
+  background-color: var(--paper);
+}
+.bg-paper-elevated {
+  background-color: var(--paper-elevated);
+}
+.text-ink {
+  color: var(--ink);
+}
+.text-ink-body {
+  color: var(--ink-body);
+}
+.text-accent {
+  color: var(--accent);
+}
+.bg-accent {
+  background-color: var(--accent);
+}
+.border-line {
+  border-color: var(--line);
+}
+.border-line-strong {
+  border-color: var(--line-interactive);
+}
+.text-data-accent {
+  color: var(--data-accent);
+}
+.bg-paper-selected {
+  background-color: var(--paper-selected);
+}
+
 /* 모바일 터치 타깃 최소 44px (WCAG 2.5.5) */
 .touch-target {
   min-height: 2.75rem;
@@ -44,7 +104,7 @@ body::before {
 /* ===== 폰트 전역 적용 ===== */
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Noto Sans KR', sans-serif !important;
-  color: #2F282B;
+  color: var(--ink);
   font-weight: 700;
   line-height: 1.35;
   letter-spacing: -0.03em;
@@ -65,16 +125,16 @@ p, li, td, th {
   -webkit-backdrop-filter: blur(12px);
   border-radius: 20px;
   padding: 20px 24px;
-  border: 1px solid rgba(204, 182, 176, 0.5);
+  border: 1px solid color-mix(in srgb, var(--line) 70%, transparent);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 28px rgba(61, 51, 56, 0.06);
-  color: #3D3338;
+  box-shadow: var(--shadow-card);
+  color: var(--ink-body);
 }
 
 .card-hover:hover {
   transform: translateY(-2px);
   box-shadow: 0 14px 34px rgba(61, 51, 56, 0.09);
-  border-color: #D9C8C0;
+  border-color: var(--line-strong);
 }
 
 /* ===== 태그 ===== */
@@ -86,40 +146,87 @@ p, li, td, th {
   padding: 6px 16px;
   font-size: 13px;
   font-weight: 600;
-  color: #5A4E48;
+  color: var(--ink-body);
   backdrop-filter: blur(4px);
 }
 
-/* ===== 텍스트 가독성 개선 ===== */
-.text-\[\#B8A78D\] {
-  color: #8B6F47 !important;
+/* ===== 레거시 hex → 브랜드 토큰 (PDF 심층 진단) ===== */
+.text-\[\#8B6F47\],
+.text-\[\#8b6f47\],
+.text-\[\#B8A78D\],
+.text-\[\#b8a78d\] {
+  color: var(--accent) !important;
 }
 
-.text-\[\#9B9B9B\] {
-  color: #6B5E58 !important;
+.text-\[\#8F8681\],
+.text-\[\#8f8681\],
+.text-\[\#8A7E78\],
+.text-\[\#8a7e78\] {
+  color: var(--ink-muted) !important;
 }
 
-.text-\[\#8A7E78\] {
-  color: #6B5E58 !important;
+.text-\[\#9B9B9B\],
+.text-\[\#6B6B6B\],
+.text-\[\#5A4E48\],
+.text-\[\#5a4e48\],
+.text-\[\#625B5B\],
+.text-\[\#6B5E58\],
+.text-\[\#6b5e58\],
+.text-\[\#4A403B\] {
+  color: var(--ink-body) !important;
 }
 
-.text-\[\#6B6B6B\] {
-  color: #5A4E48 !important;
+.border-\[\#8B6F47\],
+.border-\[\#8b6f47\],
+.hover\:border-\[\#8B6F47\]:hover,
+.hover\:border-\[\#8b6f47\]:hover,
+.focus\:border-\[\#8B6F47\]:focus,
+.focus\:border-\[\#8b6f47\]:focus {
+  border-color: var(--accent) !important;
 }
 
-.text-\[\#5A4E48\] {
-  color: #4A403B !important;
+.border-\[\#D9C8C0\],
+.border-\[\#d9c8c0\],
+.border-\[\#E2D7D0\],
+.border-\[\#e2d7d0\],
+.border-\[\#E6DED5\],
+.border-\[\#e6ded5\],
+.border-\[\#E8D7C4\],
+.border-\[\#e8d7c4\] {
+  border-color: var(--line) !important;
+}
+
+.bg-\[\#8B6F47\],
+.bg-\[\#8b6f47\] {
+  background-color: var(--accent) !important;
+}
+
+.ring-\[\#8B6F47\],
+.ring-\[\#8b6f47\],
+.ring-\[\#8B6F47\]\/25,
+.ring-\[\#8b6f47\]\/25 {
+  --tw-ring-color: color-mix(in srgb, var(--accent) 25%, transparent) !important;
+}
+
+[stroke="#8B6F47"],
+[stroke="#8b6f47"] {
+  stroke: var(--data-accent) !important;
+}
+
+[fill="#8B6F47"],
+[fill="#8b6f47"] {
+  fill: var(--data-accent) !important;
 }
 
 .card p {
-  color: #4A403B !important;
+  color: var(--ink-body) !important;
   line-height: 1.78;
 }
 
 .card h3 {
   font-size: 18px;
   font-weight: 700;
-  color: #2F282B;
+  color: var(--ink);
 }
 
 .label {
@@ -140,12 +247,6 @@ p, li, td, th {
   line-height: 1.7 !important;
 }
 
-/* ===== 버튼 ===== */
-:root {
-  --btn-primary: #7B7355;
-  --btn-primary-hover: #6A6349;
-}
-
 button, .btn, [role="button"] {
   font-weight: 600;
 }
@@ -153,22 +254,22 @@ button, .btn, [role="button"] {
 /* ===== 입력 폼 ===== */
 input, select, textarea {
   font-size: 16px !important;
-  color: #3D3338;
+  color: var(--ink-body);
   background: rgba(255, 255, 255, 0.9);
-  border: 1.5px solid rgba(204, 182, 176, 0.6);
+  border: 1.5px solid color-mix(in srgb, var(--line) 80%, transparent);
   border-radius: 12px;
   transition: all 0.2s ease;
 }
 
 input:focus, select:focus, textarea:focus {
-  border-color: #D9C8C0;
-  box-shadow: 0 0 0 3px rgba(204, 182, 176, 0.3);
+  border-color: var(--line-interactive);
+  box-shadow: 0 0 0 3px var(--accent-soft);
   outline: none;
 }
 
 /* ===== 푸터 ===== */
 footer p {
-  color: #6B5E58 !important;
+  color: var(--ink-muted) !important;
   font-size: 13px;
 }
 
@@ -235,7 +336,7 @@ footer p {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #D9C8C0;
+  background: var(--line-strong);
   border-radius: 3px;
 }
 

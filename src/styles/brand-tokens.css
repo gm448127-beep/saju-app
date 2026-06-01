@@ -1,0 +1,79 @@
+/**
+ * 운명비서 브랜드 컬러 — 단일 소스
+ * 근거: docs/brand-color-audit.md (스크린샷 색채 심층 진단 PDF 반영)
+ *
+ * 골격 유지: 아이보리·크림·딥 브라운·골드 브라운
+ * 보정: 마이크로카피·본문·CTA·인터랙티브 보더 대비 (WCAG)
+ */
+
+:root {
+  /* ── 서피스 계층 (명도 차 의도적 확대) ── */
+  --paper: #f5f0e8;
+  --paper-subtle: #faf6ef;
+  --paper-elevated: #fffdfc;
+  --paper-inset: #f7f2ec;
+  --paper-selected: #f2ebe3;
+  --paper-selected-strong: #eadfcf;
+  --paper-desktop: #ebe6df;
+
+  /* ── 텍스트 (대비 AA/AAA) ── */
+  --ink: #2f282b;
+  --ink-body: #5a504b;
+  --ink-muted: #726963;
+  --ink-on-dark: #ffffff;
+  --ink-inverse: #f5f0e8;
+
+  /* ── 보더 2단계: 섹션 vs 인터랙티브 ── */
+  --line: #dccfbe;
+  --line-interactive: #917d63;
+  --line-strong: var(--line-interactive);
+
+  /* ── 액션: 골드 CTA (브라운 혼용 금지) ── */
+  --accent: #7a5d35;
+  --accent-hover: #6b502e;
+  --accent-soft: #f2ebe3;
+  --accent-muted: #9a8265;
+  --on-accent: #ffffff;
+
+  /* ── 다크 primary (헤딩·주요 다크 버튼) ── */
+  --primary-dark: #2f282b;
+  --primary-dark-hover: #463a40;
+  --on-primary-dark: #ffffff;
+
+  /* ── 데이터·차트·점수 강조 (CTA와 분리) ── */
+  --data-accent: #c79a5a;
+  --data-accent-soft: #e8b682;
+
+  /* ── 상태 ── */
+  --sage-bg: #e8f0e5;
+  --sage-text: #5e7a5e;
+  --danger: #8a4a3d;
+  --danger-soft: #fff8f5;
+
+  /* ── 그림자 ── */
+  --shadow-card: 0 4px 24px rgba(47, 40, 43, 0.06);
+  --shadow-elevated: 0 14px 34px rgba(47, 40, 43, 0.09);
+
+  /* ── 오행 (명리 차트 전용) ── */
+  --ohaeng-wood: #5c8b6f;
+  --ohaeng-fire: #b85c4c;
+  --ohaeng-earth: #b89968;
+  --ohaeng-metal: #9b9591;
+  --ohaeng-water: #3d4a5c;
+
+  /* ── 점수 스케일 ── */
+  --score-excellent: var(--data-accent);
+  --score-good: var(--accent);
+  --score-mid: var(--ink-muted);
+  --score-low: var(--ink-body);
+
+  /* ── 레거시 alias (점진 제거) ── */
+  --bronze: var(--data-accent);
+  --app-bg: var(--paper);
+  --app-bg-soft: var(--paper-subtle);
+  --app-bg-elevated: var(--paper-elevated);
+  --app-bg-desktop: var(--paper-desktop);
+  --btn-primary: var(--accent);
+  --btn-primary-hover: var(--accent-hover);
+  --btn-primary-dark: var(--primary-dark);
+}

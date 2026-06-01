@@ -21,8 +21,13 @@ export const JI_OHAENG: Record<string, string> = {
   술: '토', 해: '수',
 };
 
+/** 브랜드 오행 팔레트 — 네온 색 금지 */
 export const OHAENG_COLOR: Record<string, string> = {
-  목: '#22c55e', 화: '#ef4444', 토: '#eab308', 금: '#a3a3a3', 수: '#3b82f6',
+  목: '#5C8B6F',
+  화: '#B85C4C',
+  토: '#B89968',
+  금: '#9B9591',
+  수: '#3D4A5C',
 };
 
 export const OHAENG_EMOJI: Record<string, string> = {

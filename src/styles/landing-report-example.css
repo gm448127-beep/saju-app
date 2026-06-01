@@ -36,7 +36,7 @@
   margin: -0.35rem 0 0.75rem;
   font-size: 0.9375rem;
   font-weight: 600;
-  color: var(--accent, #b5562e);
+  color: var(--accent, #7a5d35);
 }
 
 .landing-report-cards__list {
@@ -69,7 +69,7 @@
   background: var(--accent-soft, #f0e4de);
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--accent, #b5562e);
+  color: var(--accent, #7a5d35);
 }
 
 .landing-report-cards__item-body {
@@ -81,7 +81,7 @@
   margin: 0 0 0.45rem;
   font-size: 0.875rem;
   font-weight: 700;
-  color: var(--accent, #b5562e);
+  color: var(--accent, #7a5d35);
   letter-spacing: -0.01em;
 }
 
