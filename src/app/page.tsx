@@ -351,8 +351,8 @@ export default function HomePage() {
         </time>
       </header>
 
-      {/* 히어로 */}
-      <section className="gyeol-card gyeol-hero" aria-labelledby="home-hero-title">
+      {/* 히어로 — 탭하면 오늘의 운세 */}
+      <Link href="/today" className="gyeol-card gyeol-hero gyeol-hero-link" aria-label="오늘의 운세 보기">
         <div className="gyeol-hero-stack">
           <div className="gyeol-hero-copy">
             <p className="gyeol-eyebrow">오늘의 결</p>
@@ -367,7 +367,7 @@ export default function HomePage() {
           </div>
           <HomeBrandMark variant="hero" priority />
         </div>
-      </section>
+      </Link>
 
       {/* 기능 캐러셀 */}
       <section className="gyeol-card gyeol-carousel">

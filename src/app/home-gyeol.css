@@ -216,6 +216,19 @@
   padding: 1.35rem 1.35rem 0.75rem;
 }
 
+.gyeol-hero-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.gyeol-hero-link:active {
+  transform: scale(0.985);
+}
+
 .gyeol-hero-stack {
   display: flex;
   flex-direction: column;
