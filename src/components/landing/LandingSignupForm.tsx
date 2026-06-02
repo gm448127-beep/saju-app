@@ -4,11 +4,14 @@ import { FormEvent, useId, useState } from "react";
 import { LandingBirthPreview } from "@/components/landing/LandingBirthPreview";
 import { LandingConversionHeadline } from "@/components/landing/LandingConversionHeadline";
 import { LandingCuriosityPrompt } from "@/components/landing/LandingCuriosityPrompt";
+import { LandingLockedPreview } from "@/components/landing/LandingLockedPreview";
 import { LandingServicePitch } from "@/components/landing/LandingServicePitch";
+import { LandingTrustPanel } from "@/components/landing/LandingTrustPanel";
 import { LandingTodaySheet } from "@/components/landing/LandingTodaySheet";
 import { submitLandingEmail } from "@/lib/landing-google-form";
 import { LANDING_CURIOSITY } from "@/lib/landing-curiosity-copy";
 import { LANDING_FORTUNE_BAIT } from "@/lib/landing-service-pitch";
+import { isValidBirthTimeExact } from "@/components/BirthTimeExactInputs";
 import { getStoredLandingBirth } from "@/lib/landing-preview-storage";
 import { fetchTodayReport, isValidLandingBirthDate } from "@/lib/landing-today-api";
 import { landingBirthKeyFromStored } from "@/lib/landing-birth-payload";
@@ -32,6 +35,7 @@ export function LandingSignupForm({ illustrationSrc }: { illustrationSrc?: strin
   const [submitting, setSubmitting] = useState(false);
   const [sheetLoading, setSheetLoading] = useState(false);
   const [sheet, setSheet] = useState<LandingTodaySheetData | null>(null);
+  const [birthReady, setBirthReady] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -44,8 +48,12 @@ export function LandingSignupForm({ illustrationSrc }: { illustrationSrc?: strin
     }
 
     const birth = getStoredLandingBirth();
-    if (!birth || !isValidLandingBirthDate(birth.year, birth.month, birth.day)) {
-      setError("생년월일, 태어난 시간, 성별을 입력해 주세요.");
+    const birthDateValid = Boolean(birth && isValidLandingBirthDate(birth.year, birth.month, birth.day));
+    const birthTimeValid =
+      birth?.timeMode === "none" ||
+      isValidBirthTimeExact(String(birth?.exactHour ?? ""), String(birth?.exactMinute ?? ""));
+    if (!birth || !birthDateValid || !birthTimeValid) {
+      setError("생년월일, 태어난 시·분(또는 시간 모름), 성별을 입력해 주세요.");
       document.getElementById("landing-birth-preview")?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
@@ -95,9 +103,13 @@ export function LandingSignupForm({ illustrationSrc }: { illustrationSrc?: strin
       <section id="launch-form" className="landing-signup" aria-label="나만의 통찰 받기">
         <LandingConversionHeadline illustrationSrc={illustrationSrc} />
 
+        {!sheet ? <LandingTrustPanel variant="why-free" /> : null}
+
         {!sheet ? <LandingServicePitch /> : null}
 
-        <LandingBirthPreview mode="form" />
+        <LandingBirthPreview mode="form" onBirthValidChange={setBirthReady} />
+
+        {!sheet && birthReady ? <LandingLockedPreview /> : null}
 
         {!sheet ? <LandingCuriosityPrompt /> : null}
 
@@ -119,6 +131,8 @@ export function LandingSignupForm({ illustrationSrc }: { illustrationSrc?: strin
         </form>
 
         <p className="landing-signup__hint-below">{LANDING_CURIOSITY.emailHint}</p>
+
+        <LandingTrustPanel variant="privacy" />
 
         {error ? <p className="landing-signup__message landing-signup__message--error">{error}</p> : null}
 
