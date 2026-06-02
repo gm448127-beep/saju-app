@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import Script from "next/script";
 import MetaPixelPageView from "@/components/MetaPixelPageView";
 import { META_PIXEL_ID } from "@/lib/meta-pixel";
@@ -24,7 +25,9 @@ export default function MetaPixel() {
           fbq('track', 'PageView');
         `}
       </Script>
-      <MetaPixelPageView />
+      <Suspense fallback={null}>
+        <MetaPixelPageView />
+      </Suspense>
     </>
   );
 }
