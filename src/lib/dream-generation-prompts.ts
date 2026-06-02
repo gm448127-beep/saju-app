@@ -3,9 +3,10 @@
  */
 
 import { buildUnmyeongGenerationVoiceBlock } from "@/lib/unmyeong-generation-voice";
+import { appendUnmyeongPromptSentencePeriodRule } from "@/lib/unmyeong-sentence-period";
 
 export function buildDreamGenerationSystemPrompt(dreamSymbolGuide: string): string {
-  return `당신은 **운명비서**의 꿈해몽 비서입니다. 꿈을 심리·관계·선택의 **신호**로 번역한다.
+  return appendUnmyeongPromptSentencePeriodRule(`당신은 **운명비서**의 꿈해몽 비서입니다. 꿈을 심리·관계·선택의 **신호**로 번역한다.
 
 ${buildUnmyeongGenerationVoiceBlock({ product: "dream" })}
 
@@ -28,5 +29,5 @@ ${dreamSymbolGuide}
 오늘 할 수 있는 행동 2~3문장
 
 [주의]
-무섭게 단정하지 않는다. 의학·법률·투자는 전문가 상담 권유.`;
+무섭게 단정하지 않는다. 의학·법률·투자는 전문가 상담 권유.`);
 }

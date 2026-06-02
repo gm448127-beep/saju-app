@@ -6,6 +6,10 @@ import { useUserProfile } from "@/components/UserProfileProvider";
 import { buildDailyFortuneContent } from "@/lib/today-content-engine";
 import ShareButton from "@/components/ShareButton";
 import BirthDateNumberInputs, { isValidBirthDate } from "@/components/BirthDateNumberInputs";
+import BirthTimeExactInputs, {
+  isValidBirthTimeExact,
+  parseBirthTimeExact,
+} from "@/components/BirthTimeExactInputs";
 import OhaengChart from "@/components/OhaengChart";
 import { buildSajuBirthKey, saveSajuRecord } from "@/lib/archive-storage";
 import {
@@ -213,8 +217,8 @@ export default function SajuPage() {
   const [day, setDay] = useState("1");
   const [timeMode, setTimeMode] = useState<"none" | "slot" | "exact">("none");
   const [slotValue, setSlotValue] = useState(9);
-  const [exactHour, setExactHour] = useState(9);
-  const [exactMinute, setExactMinute] = useState(0);
+  const [exactHour, setExactHour] = useState("9");
+  const [exactMinute, setExactMinute] = useState("0");
   const [gender, setGender] = useState<"남" | "여">("여");
   const [calendarType, setCalendarType] = useState("solar");
   const [loading, setLoading] = useState(false);
@@ -245,14 +249,28 @@ export default function SajuPage() {
       year: Number(year),
       month: Number(month),
       day: Number(day),
-      hour: timeMode === "exact" ? exactHour : timeMode === "slot" ? slotValue : undefined,
-      minute: timeMode === "exact" ? exactMinute : timeMode === "slot" ? 0 : undefined,
+      hour:
+        timeMode === "exact"
+          ? parseBirthTimeExact(exactHour, exactMinute)?.hour
+          : timeMode === "slot"
+            ? slotValue
+            : undefined,
+      minute:
+        timeMode === "exact"
+          ? parseBirthTimeExact(exactHour, exactMinute)?.minute
+          : timeMode === "slot"
+            ? 0
+            : undefined,
       gender,
       isLunar: calendarType !== "solar",
     };
 
     if (!isValidBirthDate(String(body.year), String(body.month), String(body.day))) {
       setError("생년월일을 숫자로 정확히 입력해주세요.");
+      return;
+    }
+    if (timeMode === "exact" && !isValidBirthTimeExact(exactHour, exactMinute)) {
+      setError("출생 시·분을 0~23시, 0~59분 범위로 입력해 주세요.");
       return;
     }
     setLoading(true);
@@ -274,8 +292,8 @@ export default function SajuPage() {
           calendarType: calendarType as UserBirthProfile["calendarType"],
           timeMode,
           slotHour: slotValue,
-          exactHour,
-          exactMinute,
+          exactHour: Number(exactHour),
+          exactMinute: Number(exactMinute),
         });
       }
       if (scrollToResult) {
@@ -375,21 +393,12 @@ export default function SajuPage() {
             {timeMode === "exact" && (
               <div className="bg-[#FAF8F5] border border-[#E2D7D0] rounded-xl p-4 space-y-3">
                 <p className="text-xs text-[#8B7968]">정확한 출생 시각을 입력하면 진태양시(서울 기준 약 -32분) 보정이 자동 적용됩니다.</p>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1">
-                    <label className="block text-xs text-[#8B7968] mb-1 font-medium">시</label>
-                    <select value={exactHour} onChange={(e) => setExactHour(Number(e.target.value))} className="w-full bg-white border-2 border-[#E2D7D0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#8B6F47] outline-none">
-                      {Array.from({ length: 24 }, (_, i) => i).map((h) => (<option key={h} value={h}>{String(h).padStart(2, "0")}시</option>))}
-                    </select>
-                  </div>
-                  <span className="text-[#8A7E78] font-bold text-xl mt-5">:</span>
-                  <div className="flex-1">
-                    <label className="block text-xs text-[#8B7968] mb-1 font-medium">분</label>
-                    <select value={exactMinute} onChange={(e) => setExactMinute(Number(e.target.value))} className="w-full bg-white border-2 border-[#E2D7D0] rounded-xl px-3 py-2.5 text-[#3D3338] text-sm focus:border-[#8B6F47] outline-none">
-                      {Array.from({ length: 12 }, (_, i) => i * 5).map((m) => (<option key={m} value={m}>{String(m).padStart(2, "0")}분</option>))}
-                    </select>
-                  </div>
-                </div>
+                <BirthTimeExactInputs
+                  hour={exactHour}
+                  minute={exactMinute}
+                  onHourChange={setExactHour}
+                  onMinuteChange={setExactMinute}
+                />
               </div>
             )}
           </div>

@@ -2,6 +2,10 @@
 
 import { useEffect, useState } from "react";
 import BirthDateNumberInputs, { isValidBirthDate } from "@/components/BirthDateNumberInputs";
+import BirthTimeExactInputs, {
+  isValidBirthTimeExact,
+  parseBirthTimeExact,
+} from "@/components/BirthTimeExactInputs";
 import StoredProfileBar from "@/components/StoredProfileBar";
 import { useUserProfile } from "@/components/UserProfileProvider";
 import {
@@ -26,9 +30,6 @@ const TIME_SLOTS = [
   { value: 21, label: "해시 (21:00~23:00)" },
 ];
 
-const HOURS = Array.from({ length: 24 }, (_, i) => i);
-const MINUTES = Array.from({ length: 60 }, (_, i) => i);
-
 type TimeMode = "none" | "slot" | "exact";
 
 interface PersonInput {
@@ -40,8 +41,8 @@ interface PersonInput {
   calendarType: string;
   timeMode: TimeMode;
   slotHour: number | "";
-  exactHour: number | "";
-  exactMinute: number | "";
+  exactHour: string;
+  exactMinute: string;
 }
 
 const defaultPerson = (gender: string): PersonInput => ({
@@ -106,27 +107,13 @@ function TimeInput({ person, onChange }: { person: PersonInput; onChange: (k: st
       )}
 
       {person.timeMode === "exact" && (
-        <div className="flex gap-2 mt-2">
-          <select
-            value={person.exactHour}
-            onChange={(e) => onChange("exactHour", e.target.value === "" ? "" : Number(e.target.value))}
-            className="flex-1 p-2 rounded-xl border-2 border-[#D9C8C0]"
-          >
-            <option value="">시</option>
-            {HOURS.map((h) => (
-              <option key={h} value={h}>{h}시</option>
-            ))}
-          </select>
-          <select
-            value={person.exactMinute}
-            onChange={(e) => onChange("exactMinute", e.target.value === "" ? "" : Number(e.target.value))}
-            className="flex-1 p-2 rounded-xl border-2 border-[#D9C8C0]"
-          >
-            <option value="">분</option>
-            {MINUTES.map((m) => (
-              <option key={m} value={m}>{m}분</option>
-            ))}
-          </select>
+        <div className="mt-2 rounded-xl border border-[#E2D7D0] bg-[#FAF8F5] p-3">
+          <BirthTimeExactInputs
+            hour={person.exactHour}
+            minute={person.exactMinute}
+            onHourChange={(exactHour) => onChange("exactHour", exactHour)}
+            onMinuteChange={(exactMinute) => onChange("exactMinute", exactMinute)}
+          />
         </div>
       )}
 
@@ -289,7 +276,10 @@ export default function CompatibilityPage() {
   /* 시간 값 추출 */
   function extractTime(p: PersonInput) {
     if (p.timeMode === "slot" && p.slotHour !== "") return { hour: p.slotHour as number };
-    if (p.timeMode === "exact" && p.exactHour !== "") return { hour: p.exactHour as number, minute: p.exactMinute !== "" ? (p.exactMinute as number) : 0 };
+    if (p.timeMode === "exact") {
+      const exact = parseBirthTimeExact(p.exactHour, p.exactMinute);
+      if (exact) return exact;
+    }
     return {};
   }
 
@@ -297,6 +287,14 @@ export default function CompatibilityPage() {
   const handleSubmit = async () => {
     if (!isValidBirthDate(person1.year, person1.month, person1.day) || !isValidBirthDate(person2.year, person2.month, person2.day)) {
       alert("두 사람의 생년월일을 숫자로 정확히 입력해주세요!");
+      return;
+    }
+    if (person1.timeMode === "exact" && !isValidBirthTimeExact(person1.exactHour, person1.exactMinute)) {
+      alert("첫 번째 분의 출생 시·분을 0~23시, 0~59분 범위로 입력해 주세요.");
+      return;
+    }
+    if (person2.timeMode === "exact" && !isValidBirthTimeExact(person2.exactHour, person2.exactMinute)) {
+      alert("두 번째 분의 출생 시·분을 0~23시, 0~59분 범위로 입력해 주세요.");
       return;
     }
     setLoading(true);

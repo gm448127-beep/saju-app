@@ -8,6 +8,7 @@ import {
   lintUnmyeongOutputFields,
   type UnmyeongViolation,
 } from "@/lib/unmyeong-output-lint";
+import { warnAiOutputFieldsWithoutPeriod } from "@/lib/unmyeong-sentence-period";
 
 export type RouteLintMeta = {
   lintOk: boolean;
@@ -36,6 +37,7 @@ export function runRouteOutputLint(
       violations.map((v) => `${v.type}@${v.index}:"${v.word}"`).join("; "),
     );
   }
+  warnAiOutputFieldsWithoutPeriod(fields, { source: route });
   return { lintOk: ok, lintViolations: violations };
 }
 

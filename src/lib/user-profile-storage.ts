@@ -189,8 +189,8 @@ export type BirthFormSetters = {
   setDay: (v: string) => void;
   setTimeMode: (v: BirthTimeMode) => void;
   setSlotHour: (v: number) => void;
-  setExactHour: (v: number) => void;
-  setExactMinute: (v: number) => void;
+  setExactHour: (v: string | number) => void;
+  setExactMinute: (v: string | number) => void;
   setCalendarType: (v: CalendarType | string) => void;
   setGender: (v: "남" | "여" | string) => void;
   setName?: (v: string) => void;
@@ -202,8 +202,8 @@ export function applyProfileToBirthForm(profile: UserBirthProfile, setters: Birt
   setters.setDay(profile.day);
   setters.setTimeMode(profile.timeMode);
   setters.setSlotHour(profile.slotHour);
-  setters.setExactHour(profile.exactHour);
-  setters.setExactMinute(profile.exactMinute);
+  setters.setExactHour(String(profile.exactHour));
+  setters.setExactMinute(String(profile.exactMinute));
   setters.setCalendarType(profile.calendarType);
   setters.setGender(profile.gender);
   setters.setName?.(profile.name?.trim() || "");
@@ -220,8 +220,8 @@ export function profileToCompatibilityPerson(profile: UserBirthProfile) {
     calendarType: profile.calendarType,
     timeMode: profile.timeMode,
     slotHour: profile.timeMode === "slot" ? profile.slotHour : ("" as const),
-    exactHour: profile.timeMode === "exact" ? profile.exactHour : ("" as const),
-    exactMinute: profile.timeMode === "exact" ? profile.exactMinute : ("" as const),
+    exactHour: profile.timeMode === "exact" ? String(profile.exactHour) : "",
+    exactMinute: profile.timeMode === "exact" ? String(profile.exactMinute) : "",
   };
 }
 
@@ -234,9 +234,17 @@ export function compatibilityPersonToProfile(person: {
   calendarType: string;
   timeMode: BirthTimeMode;
   slotHour: number | "";
-  exactHour: number | "";
-  exactMinute: number | "";
+  exactHour: string | number | "";
+  exactMinute: string | number | "";
 }): Omit<UserBirthProfile, "savedAt"> {
+  const exact =
+    person.timeMode === "exact" && person.exactHour !== "" && person.exactMinute !== ""
+      ? {
+          hour: Number(person.exactHour),
+          minute: Number(person.exactMinute),
+        }
+      : null;
+
   return {
     name: person.name?.trim() || undefined,
     year: person.year,
@@ -251,8 +259,8 @@ export function compatibilityPersonToProfile(person: {
           : "solar",
     timeMode: person.timeMode,
     slotHour: typeof person.slotHour === "number" ? person.slotHour : 9,
-    exactHour: typeof person.exactHour === "number" ? person.exactHour : 9,
-    exactMinute: typeof person.exactMinute === "number" ? person.exactMinute : 0,
+    exactHour: exact && !Number.isNaN(exact.hour) ? exact.hour : 9,
+    exactMinute: exact && !Number.isNaN(exact.minute) ? exact.minute : 0,
   };
 }
 
@@ -277,7 +285,7 @@ export function landingPreviewToProfile(input: {
       input.calendarType === "lunar" || input.calendarType === "lunarLeap"
         ? input.calendarType
         : "solar",
-    timeMode: input.timeMode ?? "slot",
+    timeMode: input.timeMode ?? "exact",
     slotHour: input.slotHour ?? 9,
     exactHour: input.exactHour ?? 9,
     exactMinute: input.exactMinute ?? 0,

@@ -15,6 +15,7 @@
 
 
 import { buildUnmyeongGenerationVoiceBlock } from "@/lib/unmyeong-generation-voice";
+import { appendUnmyeongPromptSentencePeriodRule } from "@/lib/unmyeong-sentence-period";
 
 
 
@@ -78,7 +79,7 @@ export type TodaySecretaryGeneratedCopy = {
 
 export function buildTodaySecretarySystemPrompt(): string {
 
-  return `당신은 **운명비서** 오늘의 운세 카피 작성자다.
+  return appendUnmyeongPromptSentencePeriodRule(`당신은 **운명비서** 오늘의 운세 카피 작성자다.
 
 제공된 명리 데이터만 근거로, 헌법 4단에 맞는 JSON을 쓴다.
 
@@ -118,7 +119,7 @@ ${TODAY_SECRETARY_COPY_PRINCIPLES.map((p) => `- ${p}`).join("\n")}
 
 [출력]
 
-유효한 JSON만. 다른 텍스트 없음.`;
+유효한 JSON만. 다른 텍스트 없음.`);
 
 }
 

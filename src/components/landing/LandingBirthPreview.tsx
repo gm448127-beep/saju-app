@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { BIRTH_TIME_SLOTS } from "@/lib/birth-time-slots";
+import BirthTimeExactInputs, {
+  isValidBirthTimeExact,
+  parseBirthTimeExact,
+} from "@/components/BirthTimeExactInputs";
 import {
   fetchTodayOneLiner,
   isValidLandingBirthDate,
@@ -32,6 +35,18 @@ const CALENDAR_OPTIONS = [
   ["lunarLeap", "윤달"],
 ] as const satisfies ReadonlyArray<readonly [CalendarType, string]>;
 
+function initialExactFromStored(stored: StoredLandingBirth) {
+  if (stored.timeMode === "none") {
+    return { timeMode: "none" as const, hour: "9", minute: "0" };
+  }
+  const hour =
+    stored.timeMode === "exact"
+      ? String(stored.exactHour ?? 9)
+      : String(stored.slotHour ?? stored.exactHour ?? 9);
+  const minute = stored.timeMode === "exact" ? String(stored.exactMinute ?? 0) : "0";
+  return { timeMode: "exact" as const, hour, minute };
+}
+
 function birthSnapshot(
   year: string,
   month: string,
@@ -39,17 +54,31 @@ function birthSnapshot(
   gender: "남" | "여",
   calendarType: CalendarType,
   timeMode: BirthTimeMode,
-  slotHour: number,
+  exactHour: string,
+  exactMinute: string,
 ): StoredLandingBirth {
-  return normalizeStoredLandingBirth({ year, month, day, gender, calendarType, timeMode, slotHour });
+  const exact = timeMode === "exact" ? parseBirthTimeExact(exactHour, exactMinute) : undefined;
+  return normalizeStoredLandingBirth({
+    year,
+    month,
+    day,
+    gender,
+    calendarType,
+    timeMode,
+    slotHour: exact?.hour ?? 9,
+    exactHour: exact?.hour ?? 9,
+    exactMinute: exact?.minute ?? 0,
+  });
 }
 
 type LandingBirthPreviewProps = {
   /** form: 입력만 저장 · preview: 한 줄 미리보기 API */
   mode?: "form" | "preview";
+  /** form 모드 — 생년월일 유효 여부를 부모에 전달 */
+  onBirthValidChange?: (valid: boolean) => void;
 };
 
-export function LandingBirthPreview({ mode = "form" }: LandingBirthPreviewProps) {
+export function LandingBirthPreview({ mode = "form", onBirthValidChange }: LandingBirthPreviewProps) {
   const hintId = useId();
   const isFormMode = mode === "form";
   const storedOnMount = useRef(normalizeStoredLandingBirth(getStoredLandingBirth() ?? {}));
@@ -60,8 +89,10 @@ export function LandingBirthPreview({ mode = "form" }: LandingBirthPreviewProps)
   const [calendarType, setCalendarType] = useState<CalendarType>(
     storedOnMount.current.calendarType ?? "solar",
   );
-  const [timeMode, setTimeMode] = useState<BirthTimeMode>(storedOnMount.current.timeMode ?? "slot");
-  const [slotHour, setSlotHour] = useState(storedOnMount.current.slotHour ?? 9);
+  const initialTime = initialExactFromStored(storedOnMount.current);
+  const [timeMode, setTimeMode] = useState<BirthTimeMode>(initialTime.timeMode);
+  const [exactHour, setExactHour] = useState(initialTime.hour);
+  const [exactMinute, setExactMinute] = useState(initialTime.minute);
   const [locked, setLocked] = useState(() => !isFormMode && hasUsedLandingPreview());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -77,22 +108,30 @@ export function LandingBirthPreview({ mode = "form" }: LandingBirthPreviewProps)
   const requestId = useRef(0);
 
   const birthValid = isValidLandingBirthDate(year, month, day);
+  const timeValid = timeMode === "none" || isValidBirthTimeExact(exactHour, exactMinute);
+  const formReady = birthValid && timeValid;
 
   useEffect(() => {
-    if (!birthValid) return;
-    saveStoredLandingBirth(birthSnapshot(year, month, day, gender, calendarType, timeMode, slotHour));
-  }, [birthValid, year, month, day, gender, calendarType, timeMode, slotHour]);
+    onBirthValidChange?.(formReady);
+  }, [formReady, onBirthValidChange]);
+
+  useEffect(() => {
+    if (!formReady) return;
+    saveStoredLandingBirth(
+      birthSnapshot(year, month, day, gender, calendarType, timeMode, exactHour, exactMinute),
+    );
+  }, [formReady, year, month, day, gender, calendarType, timeMode, exactHour, exactMinute]);
 
   useEffect(() => {
     if (isFormMode || locked) return;
 
-    if (!birthValid) {
+    if (!formReady) {
       setResult(null);
       setError("");
       return;
     }
 
-    const birth = birthSnapshot(year, month, day, gender, calendarType, timeMode, slotHour);
+    const birth = birthSnapshot(year, month, day, gender, calendarType, timeMode, exactHour, exactMinute);
 
     const timer = window.setTimeout(async () => {
       const currentId = ++requestId.current;
@@ -124,7 +163,7 @@ export function LandingBirthPreview({ mode = "form" }: LandingBirthPreviewProps)
     }, 450);
 
     return () => window.clearTimeout(timer);
-  }, [isFormMode, locked, birthValid, year, month, day, gender, calendarType, timeMode, slotHour]);
+  }, [isFormMode, locked, formReady, year, month, day, gender, calendarType, timeMode, exactHour, exactMinute]);
 
   const inputsDisabled = !isFormMode && (locked || loading);
 
@@ -145,8 +184,8 @@ export function LandingBirthPreview({ mode = "form" }: LandingBirthPreviewProps)
         </p>
       ) : (
         <p className="landing-preview__hint landing-preview__hint--form">
-          신분증·가족관계증명서에 적힌 달력(양력·음력·윤달)을 선택해 주세요. 태어난 시(時)도 알면
-          꼭 골라 주세요.
+          신분증·가족관계증명서에 적힌 달력(양력·음력·윤달)을 선택해 주세요. 태어난 시·분은 숫자로
+          직접 입력해 주세요.
         </p>
       )}
 
@@ -220,12 +259,12 @@ export function LandingBirthPreview({ mode = "form" }: LandingBirthPreviewProps)
       <div className="landing-preview__time-modes" role="group" aria-label="태어난 시간">
         <button
           type="button"
-          className={`landing-preview__time-mode${timeMode === "slot" ? " landing-preview__time-mode--active" : ""}`}
+          className={`landing-preview__time-mode${timeMode === "exact" ? " landing-preview__time-mode--active" : ""}`}
           disabled={inputsDisabled}
-          onClick={() => setTimeMode("slot")}
-          aria-pressed={timeMode === "slot"}
+          onClick={() => setTimeMode("exact")}
+          aria-pressed={timeMode === "exact"}
         >
-          시간대 선택
+          시·분 직접 입력
         </button>
         <button
           type="button"
@@ -238,21 +277,17 @@ export function LandingBirthPreview({ mode = "form" }: LandingBirthPreviewProps)
         </button>
       </div>
 
-      {timeMode === "slot" ? (
-        <select
-          id={`${hintId}-slot`}
-          className="landing-preview__time-select"
-          value={slotHour}
+      {timeMode === "exact" ? (
+        <BirthTimeExactInputs
+          hour={exactHour}
+          minute={exactMinute}
+          onHourChange={setExactHour}
+          onMinuteChange={setExactMinute}
           disabled={inputsDisabled}
-          onChange={(event) => setSlotHour(Number(event.target.value))}
-          aria-label="출생 시간대"
-        >
-          {BIRTH_TIME_SLOTS.map((slot) => (
-            <option key={slot.value} value={slot.value}>
-              {slot.label}
-            </option>
-          ))}
-        </select>
+          className="landing-preview__exact-time"
+          inputClassName="landing-preview__input"
+          showHint
+        />
       ) : (
         <p className="landing-preview__time-note">시간을 모르면 생년월일 기준으로 읽어 드립니다.</p>
       )}

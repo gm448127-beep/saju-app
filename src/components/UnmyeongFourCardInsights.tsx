@@ -3,6 +3,10 @@
 import { useMemo } from "react";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import { buildUnlockedInsights } from "@/lib/landing-insight-copy";
+import {
+  LANDING_INSIGHT_LOCK_MESSAGE,
+  LANDING_RESULT_LOCK_BADGE,
+} from "@/lib/landing-trust-copy";
 
 function renderMultiline(text: string) {
   return text.split("\n\n").map((paragraph, paragraphIndex) => (
@@ -27,6 +31,8 @@ type UnmyeongFourCardInsightsProps = {
   report: DailyFortuneContent;
   dateLabel?: string;
   showShareHint?: boolean;
+  /** 랜딩: 이 인덱스부터 보조 통찰(insight) 잠금 — 0=1번 카드 */
+  lockInsightFromIndex?: number;
 };
 
 /** 헌법 4단 — 흐름 · 타이밍 · 실수 장면 · 비서 제안 (랜딩·/today 공통) */
@@ -34,6 +40,7 @@ export function UnmyeongFourCardInsights({
   report,
   dateLabel,
   showShareHint = true,
+  lockInsightFromIndex,
 }: UnmyeongFourCardInsightsProps) {
   const items = useMemo(() => buildUnlockedInsights(report), [report]);
 
@@ -65,7 +72,19 @@ export function UnmyeongFourCardInsights({
                 {renderMultiline(item.fortune)}
               </p>
               {item.insight ? (
-                <p className="landing-unlocked__insight">{renderMultiline(item.insight)}</p>
+                lockInsightFromIndex !== undefined && index >= lockInsightFromIndex ? (
+                  <div className="landing-unlocked__insight-lock">
+                    <p className="landing-unlocked__insight landing-unlocked__insight--blurred" aria-hidden>
+                      {renderMultiline(item.insight)}
+                    </p>
+                    <div className="landing-unlocked__insight-lock-overlay">
+                      <span className="landing-unlocked__insight-lock-badge">{LANDING_RESULT_LOCK_BADGE}</span>
+                      <p className="landing-unlocked__insight-lock-text">{LANDING_INSIGHT_LOCK_MESSAGE}</p>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="landing-unlocked__insight">{renderMultiline(item.insight)}</p>
+                )
               ) : null}
             </div>
           </li>

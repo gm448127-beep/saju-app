@@ -4,6 +4,7 @@
  */
 
 import { applySecretaryVoice } from "@/lib/today-secretary-voice";
+import { warnSentencesWithoutPeriod } from "@/lib/unmyeong-sentence-period";
 
 /** 보고서체·역술가 패턴 → 해요체 (마크다운 헤더 제외) */
 const PREMIUM_LINE_REPLACEMENTS: Array<[RegExp, string]> = [
@@ -37,7 +38,7 @@ export function applySajuPremiumLineVoice(line: string): string {
   // applySecretaryVoice는 공백을 한 칸으로 — 줄 단위로만 적용
   if (!/^#/.test(out.trim())) {
     out = applySecretaryVoice(out.replace(/\s+/g, " "));
-    // applySecretaryVoice가 한 줄을 한 문장으로 뭉개면 원래 indent 복원 어려움 → 공백만 정리
+    warnSentencesWithoutPeriod(out, { source: "saju/premium", field: "line" });
   }
   return out;
 }

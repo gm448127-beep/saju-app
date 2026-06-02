@@ -20,6 +20,9 @@ describe("unmyeong-generation-voice", () => {
 
   it("경로별 프롬프트가 공통 문체를 포함한다", () => {
     expect(buildChatGenerationSystemPrompt("테스트 원국")).toContain("운명비서 헌법 v3.0");
+    expect(buildChatGenerationSystemPrompt("테스트 원국")).toContain(
+      "모든 문장은 반드시 마침표",
+    );
     expect(buildTarotGenerationSystemPrompt({ isFutureHorizon: false, horizonLabel: "지금" })).toContain(
       "오늘 비서의 제안",
     );

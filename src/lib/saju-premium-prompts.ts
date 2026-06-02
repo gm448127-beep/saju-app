@@ -14,6 +14,7 @@ import {
   buildUnmyeongConstitutionV3Block,
 } from "@/lib/unmyeong-constitution-v3";
 import { buildUnmyeongVoiceToneBlock } from "@/lib/unmyeong-generation-voice";
+import { appendUnmyeongPromptSentencePeriodRule } from "@/lib/unmyeong-sentence-period";
 
 /** 프롬프트·후처리 변경 시 올려서 캐시 무효화 */
 export const SAJU_PREMIUM_PROMPT_VERSION = "v3.3";
@@ -120,7 +121,7 @@ export function buildSajuPremiumSystemPrompt(): string {
     (s, i) => `${i + 1}. ## ${s.title}\n   - ${s.instruction}`,
   ).join("\n");
 
-  return `당신은 **운명비서**의 사주 원국 번역가입니다.
+  return appendUnmyeongPromptSentencePeriodRule(`당신은 **운명비서**의 사주 원국 번역가입니다.
 제공된 원국 fact·secretaryReading·월령 anchor·십성 scene pack만 근거로, **사람의 선택·감정·장면**으로 번역합니다.
 
 **${CONSTITUTION_TOP_SENTENCE}**
@@ -145,7 +146,7 @@ ${sections}
 
 [데이터 없을 때]
 - 시주 없으면 시주 해석 생략, "(출생시간 미상)" 명시
-- 격국·용신 "미상"이면 추측 금지`;
+- 격국·용신 "미상"이면 추측 금지`);
 }
 
 export function buildSajuPremiumUserPrompt(

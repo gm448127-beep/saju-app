@@ -1,6 +1,7 @@
 "use client";
 
 import BirthDateNumberInputs, { isValidBirthDate } from "@/components/BirthDateNumberInputs";
+import BirthTimeExactInputs, { isValidBirthTimeExact } from "@/components/BirthTimeExactInputs";
 import MiinAvatar from "@/components/MiinAvatar";
 import { TODAY_EMPTY_COPY } from "@/lib/history-copy";
 
@@ -27,8 +28,8 @@ interface TodayPersonalizeFormProps {
   day: string;
   timeMode: TimeMode;
   slotHour: number;
-  exactHour: number;
-  exactMinute: number;
+  exactHour: string;
+  exactMinute: string;
   calendarType: string;
   gender: string;
   loading: boolean;
@@ -41,8 +42,8 @@ interface TodayPersonalizeFormProps {
   onDayChange: (value: string) => void;
   onTimeModeChange: (value: TimeMode) => void;
   onSlotHourChange: (value: number) => void;
-  onExactHourChange: (value: number) => void;
-  onExactMinuteChange: (value: number) => void;
+  onExactHourChange: (value: string) => void;
+  onExactMinuteChange: (value: string) => void;
   onCalendarTypeChange: (value: string) => void;
   onGenderChange: (value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
@@ -132,33 +133,12 @@ export default function TodayPersonalizeForm(props: TodayPersonalizeFormProps) {
             )}
             {timeMode === "exact" && (
               <div className="mt-3 rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] p-4">
-                <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-3">
-                  <div>
-                    <label className="mb-1 block text-xs text-[#8A7E78]">시</label>
-                    <select
-                      value={exactHour}
-                      onChange={(e) => onExactHourChange(Number(e.target.value))}
-                      className="w-full rounded-xl border-2 border-[#E2D7D0] bg-white px-3 py-2.5 text-sm outline-none focus:border-[#8B6F47]"
-                    >
-                      {Array.from({ length: 24 }, (_, i) => i).map((h) => (
-                        <option key={h} value={h}>{String(h).padStart(2, "0")}시</option>
-                      ))}
-                    </select>
-                  </div>
-                  <span className="pb-3 text-[#A09488]">:</span>
-                  <div>
-                    <label className="mb-1 block text-xs text-[#8A7E78]">분</label>
-                    <select
-                      value={exactMinute}
-                      onChange={(e) => onExactMinuteChange(Number(e.target.value))}
-                      className="w-full rounded-xl border-2 border-[#E2D7D0] bg-white px-3 py-2.5 text-sm outline-none focus:border-[#8B6F47]"
-                    >
-                      {Array.from({ length: 12 }, (_, i) => i * 5).map((m) => (
-                        <option key={m} value={m}>{String(m).padStart(2, "0")}분</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+                <BirthTimeExactInputs
+                  hour={exactHour}
+                  minute={exactMinute}
+                  onHourChange={onExactHourChange}
+                  onMinuteChange={onExactMinuteChange}
+                />
               </div>
             )}
             {timeMode === "none" && (
@@ -230,7 +210,11 @@ export default function TodayPersonalizeForm(props: TodayPersonalizeFormProps) {
 
           <button
             type="submit"
-            disabled={loading || !isValidBirthDate(year, month, day)}
+            disabled={
+              loading ||
+              !isValidBirthDate(year, month, day) ||
+              (timeMode === "exact" && !isValidBirthTimeExact(exactHour, exactMinute))
+            }
             className="mt-auto w-full shrink-0 rounded-[20px] bg-[#2F282B] px-5 py-4 text-lg font-bold text-white transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-50"
             style={{ fontFamily: "Jua, sans-serif" }}
           >

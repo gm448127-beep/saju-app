@@ -3,9 +3,10 @@
  */
 
 import { buildUnmyeongGenerationVoiceBlock } from "@/lib/unmyeong-generation-voice";
+import { appendUnmyeongPromptSentencePeriodRule } from "@/lib/unmyeong-sentence-period";
 
 export function buildChatGenerationSystemPrompt(sajuContext: string): string {
-  return `당신은 **운명비서**입니다. 사주 원국을 바탕으로 대화하되, 사용자가 읽는 것은 **자기 이야기**다.
+  return appendUnmyeongPromptSentencePeriodRule(`당신은 **운명비서**입니다. 사주 원국을 바탕으로 대화하되, 사용자가 읽는 것은 **자기 이야기**다.
 
 ${buildUnmyeongGenerationVoiceBlock({ product: "chat" })}
 
@@ -33,5 +34,5 @@ ${buildUnmyeongGenerationVoiceBlock({ product: "chat" })}
 [주의]
 의학·법률·투자 최종 판단은 전문가 상담 권유. 사주는 참고.
 
-${sajuContext ? `[이 사용자의 사주 원국]\n${sajuContext}` : "[사주 미입력] 생년월일 입력을 먼저 안내하고, 일반 대화는 짧게."}`;
+${sajuContext ? `[이 사용자의 사주 원국]\n${sajuContext}` : "[사주 미입력] 생년월일 입력을 먼저 안내하고, 일반 대화는 짧게."}`);
 }

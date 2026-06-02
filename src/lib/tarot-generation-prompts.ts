@@ -3,6 +3,7 @@
  */
 
 import { buildUnmyeongGenerationVoiceBlock } from "@/lib/unmyeong-generation-voice";
+import { appendUnmyeongPromptSentencePeriodRule } from "@/lib/unmyeong-sentence-period";
 
 export function buildTarotGenerationSystemPrompt(options: {
   isFutureHorizon: boolean;
@@ -15,7 +16,7 @@ export function buildTarotGenerationSystemPrompt(options: {
 `
     : "";
 
-  return `당신은 **운명비서**의 타로 비서입니다. 타로는 예언이 아니라 **지금 선택을 정리하는 상징**이다.
+  return appendUnmyeongPromptSentencePeriodRule(`당신은 **운명비서**의 타로 비서입니다. 타로는 예언이 아니라 **지금 선택을 정리하는 상징**이다.
 
 ${buildUnmyeongGenerationVoiceBlock({ product: "tarot" })}
 
@@ -37,5 +38,5 @@ ${futureBlock}**오늘 비서의 제안**
 오늘 바로 할 수 있는 행동 2~3문장. 교훈·명언 금지.
 
 [주의]
-연애·재물·직업도 단정하지 말고 **선택 기준** 제시. 불안 조장 금지.`;
+연애·재물·직업도 단정하지 말고 **선택 기준** 제시. 불안 조장 금지.`);
 }

@@ -13,7 +13,6 @@ import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import { pickTodayToneTooltipSource, type TodayToneTooltipSource } from "@/lib/today-basis-helpers";
 import {
   PROFILE_UPDATED_EVENT,
-  profileToBirthKey,
   profileToTodayPayload,
 } from "@/lib/user-profile-storage";
 import { getSajuHistory, getTarotFavorites } from "@/lib/archive-storage";
@@ -97,7 +96,7 @@ function buildFeatureSlides(displayName: string | null, year = new Date().getFul
     },
     "/today": {
       headline: `${displayName}의 오늘의 결을 읽어보세요`,
-      subcopy: "오늘 일진과 맞춘 흐름·점수를\n한 장의 리포트로 정리합니다",
+      subcopy: "오늘 일진과 맞춘 흐름·행동을\n한 장의 리포트로 정리합니다",
     },
     "/tojeong": {
       headline: `${displayName}의 ${year}년 흐름을 정리해 두었습니다`,
@@ -172,7 +171,6 @@ export default function HomePage() {
   const [historyStats, setHistoryStats] = useState({ todayCount: 0, dayCount: 0, sajuCount: 0, tarotCount: 0, totalCount: 0 });
   const [personalizedContent, setPersonalizedContent] = useState<DailyFortuneContent | null>(null);
   const [personalizedToneBasis, setPersonalizedToneBasis] = useState<TodayToneTooltipSource | null>(null);
-  const [personalizedOverall, setPersonalizedOverall] = useState<number | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const featureSlides = useMemo(
     () => buildFeatureSlides(profile ? displayName : null),
@@ -243,7 +241,6 @@ export default function HomePage() {
     if (!profileReady || !profile) {
       setPersonalizedContent(null);
       setPersonalizedToneBasis(null);
-      setPersonalizedOverall(null);
       setPreviewLoading(false);
       return;
     }
@@ -262,19 +259,14 @@ export default function HomePage() {
         if (!cancelled && res.ok && json.dailyReport) {
           setPersonalizedContent(json.dailyReport as DailyFortuneContent);
           setPersonalizedToneBasis(pickTodayToneTooltipSource(json));
-          setPersonalizedOverall(
-            typeof json.scores?.overall === "number" ? json.scores.overall : null,
-          );
         } else if (!cancelled) {
           setPersonalizedContent(null);
           setPersonalizedToneBasis(null);
-          setPersonalizedOverall(null);
         }
       } catch {
         if (!cancelled) {
           setPersonalizedContent(null);
           setPersonalizedToneBasis(null);
-          setPersonalizedOverall(null);
         }
       } finally {
         if (!cancelled) setPreviewLoading(false);
@@ -300,9 +292,6 @@ export default function HomePage() {
           if (json.dailyReport) {
             setPersonalizedContent(json.dailyReport as DailyFortuneContent);
             setPersonalizedToneBasis(pickTodayToneTooltipSource(json));
-            setPersonalizedOverall(
-              typeof json.scores?.overall === "number" ? json.scores.overall : null,
-            );
           }
         })
         .finally(() => setPreviewLoading(false));
@@ -454,7 +443,7 @@ export default function HomePage() {
         <section aria-label="맞춤 오늘 흐름 로딩" className="gyeol-card gyeol-loading">
           <p className="gyeol-eyebrow">MY TODAY</p>
           <p className="gyeol-serif mt-2 text-lg">{displayName}의 오늘을 맞추는 중…</p>
-          <p className="gyeol-faint mt-2 text-sm">입력하신 사주 기준으로 점수와 한 줄을 계산하고 있습니다.</p>
+          <p className="gyeol-faint mt-2 text-sm">입력하신 사주 기준으로 흐름과 한 줄을 맞추는 중입니다.</p>
         </section>
       ) : (
         <div className="home-gyeol-preview">
@@ -464,8 +453,6 @@ export default function HomePage() {
           isPersonalized={isPersonalizedHome}
           isLoadingPersonalized={false}
           toneTooltipBasis={personalizedToneBasis}
-          apiOverall={personalizedOverall}
-          birthKey={profile ? profileToBirthKey(profile) : null}
         />
         </div>
       )}

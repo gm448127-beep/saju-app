@@ -3,6 +3,7 @@
  *
  * 규칙(헌법): `unmyeong-constitution-v3.ts` — buildUnmyeongConstitutionV3Block()
  * 후처리: `today-secretary-voice.ts` 의 applySecretaryVoice
+ * 마침표 검사: `unmyeong-sentence-period.ts`
  */
 
 import { buildUnmyeongConstitutionV3Block } from "@/lib/unmyeong-constitution-v3";

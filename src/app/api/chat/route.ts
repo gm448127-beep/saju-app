@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { buildChatSajuContext } from '@/lib/chat-saju-context';
 import { buildChatGenerationSystemPrompt } from '@/lib/chat-generation-prompts';
 import { getChatFallbackV3Response } from '@/lib/chat-fallback-v3';
+import { warnSentencesWithoutPeriod } from '@/lib/unmyeong-sentence-period';
 import { AI_CHAT_ENABLED } from '@/lib/feature-flags';
 
 export async function POST(request: NextRequest) {
@@ -44,6 +45,7 @@ export async function POST(request: NextRequest) {
 
     if (!apiKey) {
       const builtInResponse = getChatFallbackV3Response(message, sajuContext, chatHistory);
+      warnSentencesWithoutPeriod(builtInResponse, { source: 'chat/reply', field: 'fallback' });
       return NextResponse.json({ reply: builtInResponse });
     }
 
@@ -67,11 +69,13 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const builtInResponse = getChatFallbackV3Response(message, sajuContext, chatHistory);
+      warnSentencesWithoutPeriod(builtInResponse, { source: 'chat/reply', field: 'fallback' });
       return NextResponse.json({ reply: builtInResponse });
     }
 
     const data = await response.json();
     const reply = data.content?.[0]?.text || '죄송합니다, 응답을 생성하지 못했습니다.';
+    warnSentencesWithoutPeriod(reply, { source: 'chat/reply' });
 
     return NextResponse.json({ reply });
 

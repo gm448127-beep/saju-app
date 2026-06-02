@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import StoredProfileBar from "@/components/StoredProfileBar";
 import { useUserProfile } from "@/components/UserProfileProvider";
 import TodayPageHeader from "@/components/today/TodayPageHeader";
+import { isValidBirthTimeExact, parseBirthTimeExact } from "@/components/BirthTimeExactInputs";
 import TodayPersonalizeForm, { isValidBirthDate } from "@/components/TodayPersonalizeForm";
 import TodaySecretaryReport from "@/components/today/TodaySecretaryReport";
 import { formatKstDateLabel } from "@/lib/kst-date";
@@ -45,8 +46,8 @@ export default function TodayPage() {
   const [day, setDay] = useState("1");
   const [timeMode, setTimeMode] = useState<"none" | "slot" | "exact">("slot");
   const [slotHour, setSlotHour] = useState(9);
-  const [exactHour, setExactHour] = useState(9);
-  const [exactMinute, setExactMinute] = useState(0);
+  const [exactHour, setExactHour] = useState("9");
+  const [exactMinute, setExactMinute] = useState("0");
   const [calendarType, setCalendarType] = useState("solar");
   const [gender, setGender] = useState("남");
 
@@ -59,8 +60,11 @@ export default function TodayPage() {
     let hour: number | undefined;
     let minute: number | undefined;
     if (timeMode === "exact") {
-      hour = exactHour;
-      minute = exactMinute;
+      const exact = parseBirthTimeExact(exactHour, exactMinute);
+      if (exact) {
+        hour = exact.hour;
+        minute = exact.minute;
+      }
     } else if (timeMode === "slot") {
       hour = slotHour;
       minute = 0;
@@ -137,8 +141,8 @@ export default function TodayPage() {
       calendarType: calendarType as UserBirthProfile["calendarType"],
       timeMode,
       slotHour,
-      exactHour,
-      exactMinute,
+      exactHour: Number(exactHour),
+      exactMinute: Number(exactMinute),
     };
     saveProfile(next);
   }, [
@@ -212,6 +216,11 @@ export default function TodayPage() {
 
     if (!isValidBirthDate(year, month, day)) {
       setError("생년월일을 숫자로 정확히 입력해주세요.");
+      return;
+    }
+
+    if (timeMode === "exact" && !isValidBirthTimeExact(exactHour, exactMinute)) {
+      setError("출생 시·분을 0~23시, 0~59분 범위로 입력해 주세요.");
       return;
     }
 

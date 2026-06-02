@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { AI_CHAT_ENABLED } from '@/lib/feature-flags';
 import BirthDateNumberInputs, { isValidBirthDate } from '@/components/BirthDateNumberInputs';
+import BirthTimeExactInputs, { isValidBirthTimeExact } from '@/components/BirthTimeExactInputs';
 import StoredProfileBar from '@/components/StoredProfileBar';
 import { useUserProfile } from '@/components/UserProfileProvider';
 import {
@@ -39,8 +40,6 @@ const QUICK_QUESTIONS = [
   { text: '올해 운세 전체적으로 어때?' },
 ];
 
-const HOURS = Array.from({ length: 24 }, (_, i) => i);
-const MINUTES = Array.from({ length: 12 }, (_, i) => i * 5);
 const TIME_SLOTS = [
   { value: 23, label: '자시 (23:00~01:00)' },
   { value: 1, label: '축시 (01:00~03:00)' },
@@ -150,6 +149,10 @@ function ChatPageActive() {
   const saveBirthData = () => {
     if (!isValidBirthDate(birthData.year, birthData.month, birthData.day)) {
       alert('생년월일을 숫자로 정확히 입력해주세요!');
+      return;
+    }
+    if (birthData.timeMode === 'exact' && !isValidBirthTimeExact(birthData.exactHour, birthData.exactMinute)) {
+      alert('출생 시·분을 0~23시, 0~59분 범위로 입력해 주세요.');
       return;
     }
     persistBirthToProfile(birthData);
@@ -339,22 +342,13 @@ function ChatPageActive() {
                 </select>
               )}
               {birthData.timeMode === 'exact' && (
-                <div className="grid grid-cols-2 gap-2">
-                  <select
-                    value={birthData.exactHour}
-                    onChange={(e) => setBirthData(prev => ({ ...prev, exactHour: e.target.value }))}
-                    className="p-2 rounded-xl text-sm"
-                  >
-                    {HOURS.map((h) => <option key={h} value={h}>{String(h).padStart(2, '0')}시</option>)}
-                  </select>
-                  <select
-                    value={birthData.exactMinute}
-                    onChange={(e) => setBirthData(prev => ({ ...prev, exactMinute: e.target.value }))}
-                    className="p-2 rounded-xl text-sm"
-                  >
-                    {MINUTES.map((m) => <option key={m} value={m}>{String(m).padStart(2, '0')}분</option>)}
-                  </select>
-                </div>
+                <BirthTimeExactInputs
+                  hour={birthData.exactHour}
+                  minute={birthData.exactMinute}
+                  onHourChange={(exactHour) => setBirthData((prev) => ({ ...prev, exactHour }))}
+                  onMinuteChange={(exactMinute) => setBirthData((prev) => ({ ...prev, exactMinute }))}
+                  showHint={false}
+                />
               )}
               {birthData.timeMode === 'none' && (
                 <p className="rounded-xl border border-[#E2D7D0] bg-[#FAF8F5] px-3 py-2 text-xs text-[#8A7E78]">

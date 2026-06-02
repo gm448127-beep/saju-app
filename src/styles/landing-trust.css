@@ -1,0 +1,304 @@
+/* 랜딩 — 신뢰 문구 · 잠금 미리보기 · 유료 티저 */
+
+.landing-trust {
+  margin: 1rem 0 0;
+  padding: 0.85rem 0.9rem;
+  border-radius: 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--line) 90%, transparent);
+  background: color-mix(in srgb, var(--paper) 55%, var(--paper-elevated));
+}
+
+.landing-trust--why-free {
+  margin-top: 0.75rem;
+  border-color: color-mix(in srgb, var(--accent) 18%, var(--line));
+  background: color-mix(in srgb, var(--accent-soft) 45%, var(--paper-elevated));
+}
+
+.landing-trust--privacy {
+  margin-top: 0.65rem;
+}
+
+.landing-trust__title {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.landing-trust__list {
+  margin: 0.45rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: var(--ink-body);
+}
+
+.landing-trust__list li + li {
+  margin-top: 0.2rem;
+}
+
+.landing-trust__footnote {
+  margin: 0.55rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
+/* 이메일 전 — 4단 잠금 미리보기 */
+.landing-locked-preview {
+  margin: 1.1rem 0 0;
+  padding: 1rem 0.9rem;
+  border-radius: 1rem;
+  border: 1px dashed color-mix(in srgb, var(--accent) 35%, var(--line));
+  background: var(--paper-elevated);
+}
+
+.landing-locked-preview__title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.landing-locked-preview__hint {
+  margin: 0.35rem 0 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
+.landing-locked-preview__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.landing-locked-preview__item {
+  position: relative;
+  padding: 0.7rem 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--line);
+  background: var(--paper);
+  overflow: hidden;
+}
+
+.landing-locked-preview__label {
+  margin: 0 0 0.45rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.landing-locked-preview__blur {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  filter: blur(5px);
+  opacity: 0.55;
+  user-select: none;
+  pointer-events: none;
+}
+
+.landing-locked-preview__blur-line {
+  display: block;
+  height: 0.65rem;
+  border-radius: 0.25rem;
+  background: color-mix(in srgb, var(--ink-muted) 35%, transparent);
+}
+
+.landing-locked-preview__blur-line--short {
+  width: 72%;
+}
+
+.landing-locked-preview__badge {
+  position: absolute;
+  right: 0.65rem;
+  bottom: 0.55rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 9999px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+/* 결과 — 무료 배지 */
+.landing-sheet__free-badge {
+  margin: 0 0 0.65rem;
+  display: inline-block;
+  padding: 0.22rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+/* 3·4번 카드 — insight 잠금 */
+.landing-unlocked__insight-lock {
+  position: relative;
+  margin-top: 0.55rem;
+  padding-top: 0.55rem;
+  border-top: 1px dashed color-mix(in srgb, var(--line) 90%, transparent);
+  min-height: 3.25rem;
+}
+
+.landing-unlocked__insight--blurred {
+  margin: 0;
+  filter: blur(4px);
+  opacity: 0.45;
+  user-select: none;
+  pointer-events: none;
+}
+
+.landing-unlocked__insight-lock-overlay {
+  position: absolute;
+  inset: 0.55rem 0 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.5rem;
+  text-align: center;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--paper) 72%, transparent) 0%,
+    color-mix(in srgb, var(--paper-elevated) 92%, transparent) 55%
+  );
+}
+
+.landing-unlocked__insight-lock-badge {
+  display: inline-block;
+  padding: 0.18rem 0.45rem;
+  border-radius: 9999px;
+  font-size: 0.625rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  border: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.landing-unlocked__insight-lock-text {
+  margin: 0;
+  max-width: 16rem;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--ink-body);
+}
+
+/* 유료 영역 티저 */
+.landing-premium-lock {
+  margin-top: 1rem;
+  padding: 1rem 0.9rem 1.1rem;
+  border-radius: 1rem;
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--paper) 40%, var(--paper-elevated));
+}
+
+.landing-premium-lock__eyebrow {
+  margin: 0;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+
+.landing-premium-lock__title {
+  margin: 0.35rem 0 0;
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.landing-premium-lock__subtitle {
+  margin: 0.35rem 0 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--ink-body);
+}
+
+.landing-premium-lock__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.landing-premium-lock__item {
+  position: relative;
+  padding: 0.65rem 0.7rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--line);
+  background: var(--paper-elevated);
+  overflow: hidden;
+}
+
+.landing-premium-lock__item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.landing-premium-lock__item-title {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.landing-premium-lock__item-badge {
+  font-size: 0.875rem;
+  line-height: 1;
+  opacity: 0.85;
+}
+
+.landing-premium-lock__item-desc {
+  margin: 0.25rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--ink-muted);
+  filter: blur(2.5px);
+  opacity: 0.65;
+}
+
+.landing-premium-lock__item-blur {
+  position: absolute;
+  inset: auto 0 0;
+  height: 40%;
+  background: linear-gradient(180deg, transparent, var(--paper-elevated));
+  pointer-events: none;
+}
+
+.landing-premium-lock__cta {
+  display: block;
+  margin-top: 0.85rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.landing-premium-lock__cta-hint {
+  margin: 0.45rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  text-align: center;
+  color: var(--ink-muted);
+}

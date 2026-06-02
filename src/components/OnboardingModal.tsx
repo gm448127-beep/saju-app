@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import BirthDateNumberInputs, { isValidBirthDate } from "@/components/BirthDateNumberInputs";
+import BirthTimeExactInputs, { isValidBirthTimeExact } from "@/components/BirthTimeExactInputs";
 import type { UserBirthProfile } from "@/lib/user-profile-storage";
 
 const TIME_SLOTS = [
@@ -35,8 +36,8 @@ export default function OnboardingModal({ open, onComplete, onClose }: Onboardin
   const [gender, setGender] = useState<"남" | "여">("여");
   const [timeMode, setTimeMode] = useState<"none" | "slot" | "exact">("slot");
   const [slotHour, setSlotHour] = useState(9);
-  const [exactHour, setExactHour] = useState(9);
-  const [exactMinute, setExactMinute] = useState(0);
+  const [exactHour, setExactHour] = useState("9");
+  const [exactMinute, setExactMinute] = useState("0");
   const [error, setError] = useState("");
 
   if (!open) return null;
@@ -49,6 +50,11 @@ export default function OnboardingModal({ open, onComplete, onClose }: Onboardin
       return;
     }
 
+    if (timeMode === "exact" && !isValidBirthTimeExact(exactHour, exactMinute)) {
+      setError("출생 시·분을 0~23시, 0~59분 범위로 입력해 주세요.");
+      return;
+    }
+
     onComplete({
       name: name.trim() || undefined,
       year,
@@ -58,8 +64,8 @@ export default function OnboardingModal({ open, onComplete, onClose }: Onboardin
       calendarType: "solar",
       timeMode,
       slotHour,
-      exactHour,
-      exactMinute,
+      exactHour: Number(exactHour),
+      exactMinute: Number(exactMinute),
     });
     router.push("/today");
   };
@@ -145,29 +151,13 @@ export default function OnboardingModal({ open, onComplete, onClose }: Onboardin
               </select>
             )}
             {timeMode === "exact" && (
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <select
-                  value={exactHour}
-                  onChange={(e) => setExactHour(Number(e.target.value))}
-                  className="rounded-2xl border-2 border-[#E2D7D0] bg-white px-3 py-3 text-sm"
-                >
-                  {Array.from({ length: 24 }, (_, h) => (
-                    <option key={h} value={h}>
-                      {String(h).padStart(2, "0")}시
-                    </option>
-                  ))}
-                </select>
-                <select
-                  value={exactMinute}
-                  onChange={(e) => setExactMinute(Number(e.target.value))}
-                  className="rounded-2xl border-2 border-[#E2D7D0] bg-white px-3 py-3 text-sm"
-                >
-                  {Array.from({ length: 12 }, (_, i) => i * 5).map((m) => (
-                    <option key={m} value={m}>
-                      {String(m).padStart(2, "0")}분
-                    </option>
-                  ))}
-                </select>
+              <div className="mt-3 rounded-2xl border border-[#E2D7D0] bg-[#FAF8F5] p-3">
+                <BirthTimeExactInputs
+                  hour={exactHour}
+                  minute={exactMinute}
+                  onHourChange={setExactHour}
+                  onMinuteChange={setExactMinute}
+                />
               </div>
             )}
           </div>

@@ -1,45 +1,10 @@
 import Link from "next/link";
-import { type ReactNode, useMemo } from "react";
-import AxisScorePanel from "@/components/AxisScorePanel";
+import { type ReactNode } from "react";
+import HomeFocusAreasPanel from "@/components/HomeFocusAreasPanel";
 import ToneDecisionChip from "@/components/ToneDecisionChip";
 import { TODAY_EMPTY_COPY } from "@/lib/history-copy";
 import type { DailyFortuneContent } from "@/lib/today-content-engine";
 import { buildToneChipTooltip, type TodayToneTooltipSource } from "@/lib/today-basis-helpers";
-import { getTodayDateKey } from "@/lib/today-pattern-helpers";
-import {
-  buildOverallComparison,
-  getPreviousDayRecord,
-  getTodayHistory,
-} from "@/lib/today-report-helpers";
-
-function clampScore(value: number) {
-  return Math.max(20, Math.min(99, Math.round(value)));
-}
-
-function getPreviewScores(content: DailyFortuneContent) {
-  const overall = clampScore(
-    content.axisScores.relation * 0.3 +
-      content.axisScores.decision * 0.3 +
-      content.axisScores.emotion * 0.2 +
-      content.axisScores.balance * 0.2,
-  );
-  return {
-    overall,
-    areas: [
-      { label: "관계", score: clampScore(content.axisScores.relation) },
-      { label: "결정", score: clampScore(content.axisScores.decision) },
-      { label: "감정", score: clampScore(content.axisScores.emotion) },
-      { label: "균형", score: clampScore(content.axisScores.balance) },
-    ],
-  };
-}
-
-function getTodayStatus(score: number) {
-  if (score >= 85) return "상승";
-  if (score >= 70) return "안정";
-  if (score >= 55) return "보통";
-  return "주의";
-}
 
 function formatTodayLabel(date = new Date()) {
   const weekdays = ["일", "월", "화", "수", "목", "금", "토"];
@@ -74,10 +39,6 @@ interface HomeResultPreviewProps {
   isLoadingPersonalized?: boolean;
   /** 맞춤 API에서 받은 일간·일진·십성 (칩 툴팁용) */
   toneTooltipBasis?: TodayToneTooltipSource | null;
-  /** 맞춤 API 종합 점수 (없으면 축 점수로 계산) */
-  apiOverall?: number | null;
-  /** 어제 대비 비교용 birthKey */
-  birthKey?: string | null;
   /** 랜딩 임베드 — 앱 링크 없이 미리보기만 */
   embedMode?: boolean;
   /** 하단 TODAY / WEEKLY 미니 카드 */
@@ -90,21 +51,9 @@ export default function HomeResultPreview({
   isPersonalized = false,
   isLoadingPersonalized = false,
   toneTooltipBasis = null,
-  apiOverall = null,
-  birthKey = null,
   embedMode = false,
   showMiniCards = false,
 }: HomeResultPreviewProps) {
-  const scores = getPreviewScores(content);
-  const displayOverall =
-    isPersonalized && apiOverall != null ? clampScore(apiOverall) : scores.overall;
-  const statusLabel = content.toneLabel || getTodayStatus(displayOverall);
-
-  const overallComparison = useMemo(() => {
-    if (!isPersonalized || !birthKey) return null;
-    const previous = getPreviousDayRecord(getTodayHistory(), getTodayDateKey(), birthKey);
-    return buildOverallComparison(previous, displayOverall);
-  }, [isPersonalized, birthKey, displayOverall]);
   const toneChipTooltip = isPersonalized
     ? buildToneChipTooltip(toneTooltipBasis, content.toneLabel)
     : null;
@@ -118,7 +67,12 @@ export default function HomeResultPreview({
   const weeklyTrend =
     content.weekly.trend.length >= 7
       ? content.weekly.trend.slice(0, 7)
-      : [...content.weekly.trend, ...Array(Math.max(0, 7 - content.weekly.trend.length)).fill(displayOverall)];
+      : [
+          ...content.weekly.trend,
+          ...Array(Math.max(0, 7 - content.weekly.trend.length)).fill(
+            content.weekly.trend.at(-1) ?? 50,
+          ),
+        ];
   const todayIndex = (new Date().getDay() + 6) % 7;
 
   return (
@@ -153,7 +107,7 @@ export default function HomeResultPreview({
             {isLoadingPersonalized
               ? "입력하신 사주 기준으로 오늘 흐름을 맞추는 중입니다."
               : isPersonalized
-                ? "아래 점수·한 줄·행동은 모두 입력하신 사주 기준입니다."
+                ? "아래 흐름·한 줄·행동은 모두 입력하신 사주 기준입니다."
                 : `${TODAY_EMPTY_COPY.ctaLead}\n→ ${TODAY_EMPTY_COPY.ctaAction}`}
           </p>
         </div>
@@ -201,31 +155,14 @@ export default function HomeResultPreview({
 
             <div className="relative mt-5">
               {!isPersonalized && (
-                <div className="mb-2">
-                  <p className="text-[11px] font-bold text-[#8B6F47]">{TODAY_EMPTY_COPY.scoreSectionLabel}</p>
-                  <p className="mt-1 text-[11px] leading-relaxed text-[#8A7E78]">{TODAY_EMPTY_COPY.scoreDisclaimer}</p>
-                </div>
-              )}
-              {isPersonalized && (
-                <p className="mb-2 text-[11px] font-bold text-[#8B6F47]">내 사주 기준 · 오늘 점수</p>
+                <div className="pointer-events-none absolute inset-0 z-10 rounded-2xl bg-white/25 backdrop-blur-[1px]" />
               )}
               <div className="relative">
-                {!isPersonalized && (
-                  <div className="pointer-events-none absolute inset-0 z-10 rounded-2xl bg-white/35 backdrop-blur-[1px]" />
-                )}
-                <AxisScorePanel
-                  overall={displayOverall}
-                  areas={scores.areas.map((area) => ({
-                    key: area.label,
-                    label: area.label,
-                    score: area.score,
-                  }))}
-                  overallLabel={isPersonalized ? "종합" : "종합 · 예시"}
-                  overallComparison={overallComparison}
-                  showDelta={isPersonalized}
-                  className="relative bg-white/80"
+                <HomeFocusAreasPanel
+                  content={content}
+                  isPersonalized={isPersonalized}
+                  className="relative z-0"
                 />
-                <p className="relative z-10 mt-2 text-sm font-bold text-[#8B6F47]">{statusLabel}</p>
               </div>
               {!isPersonalized && (
                 <div className="relative z-10 mt-3 rounded-xl border border-[#E8D7C4] bg-[#FFF8EE] px-3 py-2.5">
@@ -236,7 +173,7 @@ export default function HomeResultPreview({
             </div>
 
             <div className="mt-4 rounded-2xl border border-[#E2D7D0] bg-white/70 px-4 py-3">
-              <p className="text-xs font-bold text-[#8B6F47]">오늘의 흐름</p>
+              <p className="text-xs font-bold text-[#8B6F47]">오늘 이렇게 읽히는 이유</p>
               <p className="mt-2 text-sm leading-relaxed text-[#4A403B]">{content.flow}</p>
             </div>
           </div>

@@ -10,6 +10,7 @@ import {
   UNMYEONG_GENERATION_FORBIDDEN as SECRETARY_VOICE_FORBIDDEN,
   UNMYEONG_GENERATION_GOAL as SECRETARY_VOICE_GOAL,
 } from "@/lib/unmyeong-generation-voice";
+import { warnSentencesWithoutPeriod } from "@/lib/unmyeong-sentence-period";
 
 export { buildSecretaryVoicePromptBlock, buildUnmyeongGenerationVoiceBlock, SECRETARY_VOICE_GOAL, SECRETARY_VOICE_FORBIDDEN };
 
@@ -35,25 +36,42 @@ const VOICE_REPLACEMENTS: Array<[RegExp, string]> = [
   [/설명합니다\.?/g, "설명해요."],
 ];
 
+type SecretaryVoiceOptions = {
+  /** 경고 로그 출처 — 미지정 시 로그 생략 */
+  logSource?: string;
+  logField?: string;
+};
+
 /** 규칙·API·톤 엔진 문장을 운명비서 말투로 가볍게 정리 */
-export function applySecretaryVoice(text: string): string {
+export function applySecretaryVoice(text: string, options?: SecretaryVoiceOptions): string {
   if (!text?.trim()) return text;
   let out = text.trim();
   for (const [pattern, replacement] of VOICE_REPLACEMENTS) {
     out = out.replace(pattern, replacement);
   }
-  return out.replace(/\s+/g, " ").trim();
+  out = out.replace(/\s+/g, " ").trim();
+  if (options?.logSource) {
+    warnSentencesWithoutPeriod(out, {
+      source: options.logSource,
+      field: options.logField,
+    });
+  }
+  return out;
 }
 
 export function applySecretaryVoiceToCopy(
   copy: TodaySecretaryGeneratedCopy,
+  logSource = "today/secretaryCopy",
 ): TodaySecretaryGeneratedCopy {
+  const withLog = (field: keyof TodaySecretaryGeneratedCopy, value: string) =>
+    applySecretaryVoice(value, { logSource, logField: field });
+
   return {
-    coreMessage: applySecretaryVoice(copy.coreMessage),
-    flowNarrative: applySecretaryVoice(copy.flowNarrative),
-    warningLine: applySecretaryVoice(copy.warningLine),
-    shake: applySecretaryVoice(copy.shake),
-    myeongri: applySecretaryVoice(copy.myeongri),
-    strategy: applySecretaryVoice(copy.strategy),
+    coreMessage: withLog("coreMessage", copy.coreMessage),
+    flowNarrative: withLog("flowNarrative", copy.flowNarrative),
+    warningLine: withLog("warningLine", copy.warningLine),
+    shake: withLog("shake", copy.shake),
+    myeongri: withLog("myeongri", copy.myeongri),
+    strategy: withLog("strategy", copy.strategy),
   };
 }

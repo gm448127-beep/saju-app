@@ -15,7 +15,7 @@ export type StoredLandingBirth = {
   toneLabel?: string;
 };
 
-const DEFAULT_TIME_MODE: BirthTimeMode = "slot";
+const DEFAULT_TIME_MODE: BirthTimeMode = "exact";
 const DEFAULT_SLOT_HOUR = 9;
 const DEFAULT_CALENDAR: CalendarType = "solar";
 
