@@ -308,6 +308,11 @@
   color: var(--gyeol-terracotta);
 }
 
+.gyeol-carousel-badge__page {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
 .gyeol-carousel-headline {
   font-size: 1.5rem;
   line-height: 1.3;

@@ -27,6 +27,7 @@ type FeatureSlide = {
   headline: string;
   subcopy: string;
   badge: string;
+  pageLabel: string;
   motif: string;
   bg: string;
   accent: string;
@@ -38,6 +39,7 @@ const FEATURE_SLIDES: FeatureSlide[] = [
     headline: "타고난 흐름을 깊이 읽습니다",
     subcopy: "사주에 담긴 기질과 방향을\n차분한 리포트로 정리합니다",
     badge: "01",
+    pageLabel: "사주",
     motif: "命",
     bg: "linear-gradient(135deg, #FFFDF9 0%, #F5EDE3 56%, #E8D7C4 100%)",
     accent: "#8B6F47",
@@ -47,6 +49,7 @@ const FEATURE_SLIDES: FeatureSlide[] = [
     headline: "오늘의 결을 깊이 읽습니다",
     subcopy: "하루의 흐름과 움직임을\n한 장의 리포트로 정리합니다",
     badge: "02",
+    pageLabel: "오늘의 운세",
     motif: "運",
     bg: "linear-gradient(135deg, #FFFDF8 0%, #F3E8D5 56%, #E6CF9F 100%)",
     accent: "#B89968",
@@ -56,6 +59,7 @@ const FEATURE_SLIDES: FeatureSlide[] = [
     headline: "한 해의 흐름을 깊이 읽습니다",
     subcopy: "올해에 담긴 결과 방향을\n차분한 리포트로 정리합니다",
     badge: "03",
+    pageLabel: "토정비결",
     motif: "年",
     bg: "linear-gradient(135deg, #FCFBF7 0%, #EEE7DC 58%, #D9C8B6 100%)",
     accent: "#6B5E58",
@@ -65,6 +69,7 @@ const FEATURE_SLIDES: FeatureSlide[] = [
     headline: "두 사람의 흐름을 읽습니다",
     subcopy: "관계의 온도와 결을\n차분한 리포트로 정리합니다",
     badge: "04",
+    pageLabel: "궁합",
     motif: "緣",
     bg: "linear-gradient(135deg, #FFF9F6 0%, #F1E0DA 58%, #E3C8BE 100%)",
     accent: "#9A685B",
@@ -74,6 +79,7 @@ const FEATURE_SLIDES: FeatureSlide[] = [
     headline: "마음의 결을 깊이 읽습니다",
     subcopy: "카드가 비추는 흐름을\n짧은 리포트로 정리합니다",
     badge: "05",
+    pageLabel: "타로",
     motif: "兆",
     bg: "linear-gradient(135deg, #FBFAFF 0%, #EDE6F4 58%, #D8C8E6 100%)",
     accent: "#7F6A8E",
@@ -380,6 +386,7 @@ export default function HomePage() {
             <div className="flex items-center justify-between">
               <span className="gyeol-carousel-badge">
                 {profile ? "MY REPORT" : "DAILY REPORT"} {selectedSlide.badge}
+                <span className="gyeol-carousel-badge__page">· {selectedSlide.pageLabel}</span>
               </span>
               <span className="gyeol-faint text-xs font-semibold tracking-[0.18em]">
                 {String(activeSlide + 1).padStart(2, "0")} / {String(featureSlides.length).padStart(2, "0")}
@@ -425,7 +432,7 @@ export default function HomePage() {
             <button
               key={slide.href}
               type="button"
-              aria-label={`${slide.badge}번 리포트 선택`}
+              aria-label={`${slide.pageLabel} 리포트 선택`}
               aria-current={activeSlide === index ? "true" : undefined}
               onClick={() => goToSlide(index)}
               className="touch-target flex items-center justify-center rounded-full transition"
