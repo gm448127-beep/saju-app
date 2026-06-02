@@ -12,6 +12,7 @@ import { LANDING_FORTUNE_BAIT } from "@/lib/landing-service-pitch";
 import { getStoredLandingBirth } from "@/lib/landing-preview-storage";
 import { fetchTodayReport, isValidLandingBirthDate } from "@/lib/landing-today-api";
 import { landingBirthKeyFromStored } from "@/lib/landing-birth-payload";
+import { trackMetaEvent } from "@/lib/meta-pixel";
 import {
   buildSheetFromPreview,
   type LandingTodaySheetData,
@@ -68,6 +69,7 @@ export function LandingSignupForm({ illustrationSrc }: { illustrationSrc?: strin
 
     try {
       await submitEmailWithTimeout(normalizedEmail);
+      trackMetaEvent("Lead", { source: "landing-signup-email" });
     } catch {
       /* 이메일 실패해도 결과는 보여줌 */
     }
