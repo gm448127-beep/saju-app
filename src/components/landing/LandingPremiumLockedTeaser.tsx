@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { trackLandingUnlockReport } from "@/lib/landing-analytics";
 import {
   LANDING_PREMIUM_LOCKED,
   LANDING_RESULT_FREE_BADGE,
@@ -25,7 +28,11 @@ export function LandingPremiumLockedTeaser() {
           </li>
         ))}
       </ul>
-      <Link href="/today" className="landing-premium-lock__cta">
+      <Link
+        href="/today"
+        className="landing-premium-lock__cta"
+        onClick={() => trackLandingUnlockReport()}
+      >
         {LANDING_PREMIUM_LOCKED.cta}
       </Link>
       <p className="landing-premium-lock__cta-hint">{LANDING_PREMIUM_LOCKED.ctaHint}</p>

@@ -2,6 +2,7 @@
 import "./globals.css";
 import ClientProviders from "@/components/ClientProviders";
 import AppChrome from "@/components/AppChrome";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import MetaPixel from "@/components/MetaPixel";
 import { rootMetadata } from "@/lib/site-metadata";
 
@@ -34,6 +35,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen md:bg-[var(--paper-desktop)]">
         <MetaPixel />
+        <GoogleAnalytics />
         <ClientProviders>
           <div className="app-viewport mx-auto flex min-h-[100dvh] w-full flex-col shadow-none md:my-3 md:min-h-[calc(100dvh-1.5rem)] md:rounded-[1.75rem] md:border md:border-[color-mix(in_srgb,var(--line)_85%,transparent)] md:shadow-[0_24px_64px_rgba(51,51,51,0.12)]">
             <AppChrome>{children}</AppChrome>
