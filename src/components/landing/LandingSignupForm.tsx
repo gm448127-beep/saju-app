@@ -15,7 +15,7 @@ import { isValidBirthTimeExact } from "@/components/BirthTimeExactInputs";
 import { getStoredLandingBirth } from "@/lib/landing-preview-storage";
 import { fetchTodayReport, isValidLandingBirthDate } from "@/lib/landing-today-api";
 import { landingBirthKeyFromStored } from "@/lib/landing-birth-payload";
-import { trackMetaEvent } from "@/lib/meta-pixel";
+import { trackLandingLeadGenerate, type LandingAnalyticsSource } from "@/lib/landing-analytics";
 import {
   buildSheetFromPreview,
   type LandingTodaySheetData,
@@ -28,7 +28,13 @@ async function submitEmailWithTimeout(email: string) {
   ]);
 }
 
-export function LandingSignupForm({ illustrationSrc }: { illustrationSrc?: string }) {
+export function LandingSignupForm({
+  illustrationSrc,
+  analyticsSource = "landing_decision",
+}: {
+  illustrationSrc?: string;
+  analyticsSource?: LandingAnalyticsSource;
+}) {
   const formId = useId().replace(/:/g, "");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
@@ -77,7 +83,7 @@ export function LandingSignupForm({ illustrationSrc }: { illustrationSrc?: strin
 
     try {
       await submitEmailWithTimeout(normalizedEmail);
-      trackMetaEvent("Lead", { source: "landing-signup-email" });
+      trackLandingLeadGenerate(analyticsSource);
     } catch {
       /* 이메일 실패해도 결과는 보여줌 */
     }
@@ -144,7 +150,9 @@ export function LandingSignupForm({ illustrationSrc }: { illustrationSrc?: strin
       </section>
 
       {sheetLoading ? <p className="landing-sheet__loading">{LANDING_FORTUNE_BAIT.loading}</p> : null}
-      {sheet && !sheetLoading ? <LandingTodaySheet data={sheet} /> : null}
+      {sheet && !sheetLoading ? (
+        <LandingTodaySheet data={sheet} analyticsSource={analyticsSource} />
+      ) : null}
     </>
   );
 }

@@ -22,6 +22,7 @@ export default function LandingRestartPage() {
         infoBlocks={RESTART_INFO_BLOCKS}
         footerClassName="landing-restart-page__footer"
         illustrationSrc="/landing/landing-hero-moon.png"
+        analyticsSource="landing_restart"
       />
     </div>
   );

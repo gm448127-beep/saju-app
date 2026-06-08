@@ -1,14 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { trackLandingUnlockReport } from "@/lib/landing-analytics";
+import { trackLandingUnlockReport, type LandingAnalyticsSource } from "@/lib/landing-analytics";
 import {
   LANDING_PREMIUM_LOCKED,
   LANDING_RESULT_FREE_BADGE,
 } from "@/lib/landing-trust-copy";
 
 /** 결과 하단 — 유료 상세 리포트 잠금 티저 */
-export function LandingPremiumLockedTeaser() {
+export function LandingPremiumLockedTeaser({
+  analyticsSource = "landing_decision",
+}: {
+  analyticsSource?: LandingAnalyticsSource;
+}) {
   return (
     <section className="landing-premium-lock" aria-label={LANDING_PREMIUM_LOCKED.title}>
       <p className="landing-premium-lock__eyebrow">{LANDING_RESULT_FREE_BADGE}</p>
@@ -31,7 +35,7 @@ export function LandingPremiumLockedTeaser() {
       <Link
         href="/today"
         className="landing-premium-lock__cta"
-        onClick={() => trackLandingUnlockReport()}
+        onClick={() => trackLandingUnlockReport(analyticsSource)}
       >
         {LANDING_PREMIUM_LOCKED.cta}
       </Link>

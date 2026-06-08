@@ -1,6 +1,8 @@
 "use client";
 
+import { Suspense } from "react";
 import Script from "next/script";
+import Ga4PageView from "@/components/Ga4PageView";
 import { GA_MEASUREMENT_ID } from "@/lib/ga4";
 
 /** GA4 gtag.js 베이스 코드 */
@@ -21,6 +23,9 @@ export default function GoogleAnalytics() {
           gtag('config', '${GA_MEASUREMENT_ID}');
         `}
       </Script>
+      <Suspense fallback={null}>
+        <Ga4PageView />
+      </Suspense>
     </>
   );
 }

@@ -22,6 +22,7 @@ export default function LandingDecisionPage() {
         infoBlocks={DECISION_INFO_BLOCKS}
         footerClassName="landing-decision-page__footer"
         illustrationSrc="/landing/landing-decision-illustration.png"
+        analyticsSource="landing_decision"
       />
     </div>
   );

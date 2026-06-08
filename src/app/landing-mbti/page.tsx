@@ -22,6 +22,7 @@ export default function LandingMbtiPage() {
         infoBlocks={MBTI_INFO_BLOCKS}
         footerClassName="landing-mbti-page__footer"
         illustrationSrc="/landing/landing-hero.png"
+        analyticsSource="landing_mbti"
       />
     </div>
   );

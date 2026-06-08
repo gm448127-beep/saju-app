@@ -14,3 +14,14 @@ export function trackGa4Event(eventName: string, params?: Record<string, string 
   if (!gtag) return;
   gtag("event", eventName, params ?? {});
 }
+
+/** GA4 page_view — SPA 라우트 전환 */
+export function trackGa4PageView(pagePath: string) {
+  const gtag = getGtag();
+  if (!gtag || typeof window === "undefined") return;
+  gtag("event", "page_view", {
+    page_path: pagePath,
+    page_location: window.location.href,
+    page_title: document.title,
+  });
+}
