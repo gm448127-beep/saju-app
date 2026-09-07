@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import Header from "@/components/Header";
+import SiteFooter from "@/components/SiteFooter";
 import { isLandingPath } from "@/lib/landing-routes";
 
 export default function AppChrome({ children }: { children: ReactNode }) {
@@ -17,6 +18,7 @@ export default function AppChrome({ children }: { children: ReactNode }) {
     <>
       <Header />
       <main className="flex-1 px-4 py-6 md:px-8 lg:px-10">{children}</main>
+      <SiteFooter />
     </>
   );
 }

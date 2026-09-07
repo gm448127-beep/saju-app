@@ -560,19 +560,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <footer className="gyeol-faint py-10 text-center text-sm">
-        <p>운명비서는 재미와 참고용입니다.</p>
-        <p className="mt-1">중요한 결정은 전문가와 상담하세요.</p>
-        <p className="mt-3">
-          <a
-            href="mailto:unmyeong.team@gmail.com?subject=운명비서 피드백"
-            className="gyeol-accent underline-offset-2 transition hover:text-[#1c1a17] hover:underline"
-          >
-            피드백 보내기 · unmyeong.team@gmail.com
-          </a>
-        </p>
-        <p className="mt-3 text-xs">v1.1 · 2026.05 · 운명비서팀</p>
-      </footer>
       </div>
     </div>
   );
